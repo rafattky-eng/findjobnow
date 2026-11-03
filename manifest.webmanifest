@@ -2,7 +2,7 @@
   "id": "./",
   "name": "FindJob Now",
   "short_name": "FindJob",
-  "description": "Find jobs that match your CV. Analyze your resume, set preferences, search public boards, and prepare applications.",
+  "description": "Find English-friendly jobs in Japan \u2014 free, private, no signup. On-device CV analysis for foreigners.",
   "lang": "en",
   "start_url": "./",
   "scope": "./",
