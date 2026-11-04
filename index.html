@@ -1399,35 +1399,46 @@ function renderLanding(){
     </ol>
     <button class="btn secondary" id="gotInstall">${t("got_it")}</button>
   </div>` : ""}
-  <div class="hero">
-    <h1>${t("hero_title")}</h1>
+
+  <div class="hero" style="padding-bottom:8px">
+    <h1 style="font-size:clamp(22px,5.5vw,28px)">${t("hero_title")}</h1>
     <p>${t("hero_sub")}</p>
   </div>
+
   <div class="start-card">
     <div class="start-label">👇 ${t("start_here")}</div>
-    <h2>${t("upload_your_cv")}</h2>
+    <h2 style="margin:0 0 6px">${t("upload_your_cv")}</h2>
+    <p style="margin:0 0 16px;font-size:13px;color:var(--mu);font-weight:400">${LANG==="jp"
+      ? "AIが分析し、おすすめ求人とカバーレターを用意します。"
+      : "AI analyzes it, then shows matched jobs and cover letters."}</p>
     <button class="btn btn-lg" id="btnUpload">📄 ${t("upload")}</button>
     <div class="or">${t("or")}</div>
     <button class="btn secondary btn-lg" id="btnPaste">📋 ${t("paste")}</button>
   </div>
-  <div class="step-guide">
-    <span class="hand">👇</span>
-    <div>
-      <div class="step-text">${t("step1_title")}</div>
-      <div class="step-sub">${t("step1_sub")}</div>
+
+  <div class="card" style="margin-top:4px">
+    <div style="font-size:13px;font-weight:700;color:var(--ac);margin-bottom:10px">${LANG==="jp"?"次にやること":"What happens next"}</div>
+    <div style="font-size:14px;color:var(--tx);line-height:1.7">
+      <div>① ${LANG==="jp"?"履歴書をアップロード（または貼り付け）":"Upload or paste your CV"}</div>
+      <div>② ${LANG==="jp"?"AIスコアとおすすめ職種を確認":"See your scores & best job titles"}</div>
+      <div>③ ${LANG==="jp"?"求人を検索して応募書類を作成":"Search jobs & generate applications"}</div>
     </div>
   </div>
-  <div class="value-grid">
+
+  <div style="text-align:center;margin:14px 0 8px">
+    <button class="btn ghost" id="btnSkip" style="max-width:300px;min-height:48px;font-size:15px">${t("skip")}</button>
+  </div>
+
+  <div class="value-grid" style="margin-top:8px">
     <div class="value-card"><strong>${LANG==="jp"?"履歴書分析":"Resume Analysis"}</strong><span>${LANG==="jp"?"スコア・改善提案":"Score + gaps + recommendations"}</span></div>
     <div class="value-card"><strong>${LANG==="jp"?"キャリアマッチ":"Career Matching"}</strong><span>${LANG==="jp"?"業界・職種ランキング":"Industries & titles ranked for you"}</span></div>
     <div class="value-card"><strong>${LANG==="jp"?"ビザ案内":"Visa Guidance"}</strong><span>${LANG==="jp"?"スポンサーシップの種類":"Sponsorship types & job fit"}</span></div>
     <div class="value-card"><strong>${LANG==="jp"?"応募ツール":"Application Tools"}</strong><span>${LANG==="jp"?"レター・トラッカー・給与":"Cover letters, tracker, salary"}</span></div>
   </div>
-  <div style="text-align:center;margin-top:8px">
-    <button class="btn ghost" id="btnSkip" style="max-width:280px;min-height:48px;font-size:15px">${t("skip")}</button>
-  </div>
-  <p style="margin-top:16px;font-size:12px;color:var(--mu);text-align:center">${t("free_private")}</p>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.2</div>
+
+  <p style="margin-top:14px;font-size:12px;color:var(--mu);text-align:center">${t("free_private")}</p>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.4</div>
+
   <input type="file" id="cvFile" accept=".pdf,.doc,.docx,.txt,application/pdf" class="hidden">
   <div class="hidden" id="pasteModal">
     <div class="card" style="margin-top:12px">
@@ -1488,76 +1499,109 @@ function renderDashboard(){
     <button class="btn secondary" data-go="tracker">${t("tracker")}</button>
     <button class="btn secondary" data-go="directory">🌐 ${t("sites")}</button>
   </div>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.2</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.4</div>
   `;
 }
 
 function renderJobs(){
   const prefs = STATE.preferences || {};
-  let jobs = STATE.jobs || [];
+  let jobs = (STATE.jobs || []).slice();
   if(prefs.visaOnly) jobs = jobs.filter(j => j.visa);
   if(prefs.englishOnly) jobs = jobs.filter(j => j.eng !== false);
   if(prefs.remoteOnly) jobs = jobs.filter(j => j.remote);
   const hasLive = jobs.length > 0;
+  const titles = (STATE.matches?.titles || []).map(x => x.title || x).filter(Boolean);
+
   return `
   <div class="step-guide">
     <span class="hand">👇</span>
     <div>
       <div class="step-text">${t("step3_title")}</div>
-      <div class="step-sub">${t("step3_sub")}</div>
+      <div class="step-sub">${LANG==="jp"?"下のボタンで求人検索、または日本の求人サイトを開く":"Search live jobs below, or open a Japan job board"}</div>
     </div>
   </div>
-  <h2 style="margin:0 0 12px;font-size:20px;font-weight:800">${t("nav_jobs")}</h2>
-  <button class="btn btn-lg" id="btnSearchJobs" style="margin-bottom:12px">🔍 ${LANG==="jp"?"求人を検索":"Search Live Jobs"}</button>
+
+  <h2 style="margin:0 0 10px;font-size:20px;font-weight:800">${t("nav_jobs")}</h2>
+
+  <button class="btn btn-lg" id="btnSearchJobs" style="margin-bottom:10px">
+    🔍 ${LANG==="jp"?"ライブ求人を検索":"Search Live Jobs"}
+  </button>
+  <p style="margin:0 0 12px;font-size:12px;color:var(--mu);text-align:center">
+    ${LANG==="jp"?"Remotive / Jobicy から英語リモート求人を取得します":"Fetches English remote roles from Remotive & Jobicy"}
+  </p>
+
   <div class="filters">
     <label><input type="checkbox" id="fVisa" ${prefs.visaOnly?"checked":""}> 🛂 ${t("visa_support")}</label>
     <label><input type="checkbox" id="fRemote" ${prefs.remoteOnly?"checked":""}> 🏠 ${t("remote")}</label>
     <label><input type="checkbox" id="fEng" ${prefs.englishOnly?"checked":""}> 🌎 ${t("english_friendly")}</label>
   </div>
-  ${!hasLive ? `
+
+  ${hasLive ? `
+  <div class="section-title">${LANG==="jp"?`見つかった求人 (${jobs.length})`:`Results (${jobs.length})`}</div>
+  ${jobs.map(j => {
+    const q = scoreJobQuality(j, STATE.profile);
+    const scam = detectScam((j.description||"")+" "+(j.full||""));
+    const applyUrl = safeHttpsUrl(j.url) || "";
+    return `<div class="job-card">
+      <h4>${esc(j.title)}</h4>
+      <div style="font-size:13px;color:var(--mu);margin-bottom:6px">${esc(j.company||"")} · ${esc(j.location||"Remote")}${j.src?` · ${esc(j.src)}`:""}</div>
+      <div class="job-meta">
+        ${j.visa?`<span class="badge visa">🛂 ${t("visa_support")}</span>`:""}
+        ${j.eng!==false?`<span class="badge eng">🌎 ${t("english_friendly")}</span>`:""}
+        ${j.remote?`<span class="badge remote">🏠 ${t("remote")}</span>`:""}
+        <span class="badge risk-${scam.risk}">${scam.risk} risk</span>
+        <span class="chip">${j.matchScore||q.overall}% match</span>
+      </div>
+      <div style="font-size:13px;color:var(--mu);margin-top:6px">${esc((j.description||"").slice(0,140))}…</div>
+      <div class="apply-row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+        ${applyUrl ? `<a class="btn" href="${applyUrl}" target="_blank" rel="noopener" style="flex:1;min-height:48px;font-size:15px;text-decoration:none;text-align:center">${LANG==="jp"?"求人を開く":"Open job"} ↗</a>` : ""}
+        <button class="btn secondary" data-save-job="${esc(j.id)}" data-job-title="${esc(j.title)}" data-job-company="${esc(j.company||"")}" data-job-url="${esc(applyUrl)}" style="flex:1;min-height:48px;font-size:14px">${t("gen_app")}</button>
+      </div>
+    </div>`;
+  }).join("")}
+  ` : `
   <div class="card">
-    <p style="color:var(--mu);margin:0 0 12px;font-size:14px">${LANG==="jp"
-      ? "上のボタンでライブ求人を検索するか、下の日本の求人サイトを開いてください。"
-      : "Tap Search Live Jobs above, or open a Japan job board below."}</p>
-    <button class="btn secondary" data-go="directory">🌐 ${t("directory")}</button>
+    <p style="margin:0 0 8px;font-size:14px;color:var(--tx);font-weight:600">
+      ${LANG==="jp"?"まだライブ求人はありません":"No live jobs loaded yet"}
+    </p>
+    <p style="margin:0;font-size:13px;color:var(--mu)">
+      ${LANG==="jp"
+        ? "上の「ライブ求人を検索」をタップするか、下の日本の求人サイトを開いてください。"
+        : "Tap “Search Live Jobs” above, or open a Japan board below for visa-friendly roles."}
+    </p>
   </div>
-  <div class="section-title">${LANG==="jp"?"おすすめ求人サイト":"Recommended Japan job boards"}</div>
-  ${JAPAN_SITES.slice(0,4).map(s => `
-    <div class="card">
+  `}
+
+  <div class="section-title">${LANG==="jp"?"日本の求人サイト（推奨）":"Japan job boards (recommended)"}</div>
+  <p style="font-size:12px;color:var(--mu);margin:0 0 10px">
+    ${LANG==="jp"?"ビザ支援・英語求人はこちらが一番確実です。EN/JPで言語が切り替わります。"
+      :"Best source for visa sponsorship in Japan. Links follow your EN/JP language."}
+  </p>
+  ${JAPAN_SITES.map(s => {
+    const q = titles[0] ? encodeURIComponent(titles[0]) : "";
+    let href = siteUrl(s);
+    // append search query when possible for a few boards
+    if(q && /gaijinpot/i.test(s.name)) href = (LANG==="jp"?"https://jobs.gaijinpot.com/jp":"https://jobs.gaijinpot.com") + "/?job_search%5Bkeyword%5D="+q;
+    if(q && /Jobs in Japan/i.test(s.name)) href = "https://jobsinjapan.com/job/?keyword="+q;
+    return `<div class="card">
       <div class="dir-card">
         <div class="dir-logo">${s.name.slice(0,2)}</div>
         <div style="flex:1">
-          <strong style="color:var(--tx)">${esc(s.name)}</strong>
+          <strong style="color:var(--tx);font-size:15px">${esc(s.name)}</strong>
           <div style="font-size:13px;color:var(--mu);margin:4px 0">${esc(siteDesc(s))}</div>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+          <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px">
             ${s.visa?`<span class="badge visa">🛂 ${t("visa_support")}</span>`:""}
-            <a class="btn" href="${siteUrl(s)}" target="_blank" rel="noopener" style="width:auto;min-height:44px;padding:10px 16px;font-size:14px">${LANG==="jp"?"サイトを開く":"Open site"} ↗</a>
+            <span class="badge eng">🌎 ★${s.eng}/5</span>
+            <a class="btn" href="${href}" target="_blank" rel="noopener" style="width:auto;min-height:44px;padding:10px 16px;font-size:14px;text-decoration:none">
+              ${LANG==="jp"?"サイトを開く":"Open site"} ↗
+            </a>
           </div>
         </div>
       </div>
-    </div>`).join("")}
-  ` : jobs.map(j => {
-      const q = scoreJobQuality(j, STATE.profile);
-      const scam = detectScam((j.description||"")+" "+(j.full||""));
-      const applyUrl = safeHttpsUrl(j.url) || siteUrl(JAPAN_SITES[0]);
-      return `<div class="job-card">
-        <h4>${esc(j.title)}</h4>
-        <div style="font-size:13px;color:var(--mu);margin-bottom:6px">${esc(j.company||"")} · ${esc(j.location||"Remote")}${j.src?` · ${esc(j.src)}`:""}</div>
-        <div class="job-meta">
-          ${j.visa?`<span class="badge visa">🛂 ${t("visa_support")}</span>`:""}
-          ${j.eng!==false?`<span class="badge eng">🌎 ${t("english_friendly")}</span>`:""}
-          ${j.remote?`<span class="badge remote">🏠 ${t("remote")}</span>`:""}
-          <span class="badge risk-${scam.risk}">${scam.risk} risk</span>
-          <span class="chip">${j.matchScore||q.overall}% match</span>
-        </div>
-        <div style="font-size:13px;color:var(--mu);margin-top:6px">${esc((j.description||"").slice(0,140))}…</div>
-        <div class="apply-row" style="display:flex;gap:8px;flex-wrap:wrap">
-          <a class="btn" href="${applyUrl}" target="_blank" rel="noopener" style="flex:1;min-height:48px;font-size:15px;text-align:center;text-decoration:none">${LANG==="jp"?"求人を開く":"Open job"} ↗</a>
-          <button class="btn secondary" data-save-job="${esc(j.id)}" data-job-title="${esc(j.title)}" data-job-company="${esc(j.company||"")}" data-job-url="${esc(applyUrl)}" style="flex:1;min-height:48px;font-size:14px">${t("gen_app")}</button>
-        </div>
-      </div>`;
-    }).join("")}
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.2</div>
+    </div>`;
+  }).join("")}
+
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.4</div>
   `;
 }
 
@@ -1637,7 +1681,7 @@ function renderDirectory(){
         </div>
       </div>
     </div>`).join("")}
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.2</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.4</div>
   `;
 }
 
