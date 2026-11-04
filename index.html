@@ -910,6 +910,7 @@ const $$ = sel => Array.from(document.querySelectorAll(sel));
 const L = (k,d) => { try { const v = localStorage.getItem(k); return v!=null ? JSON.parse(v) : d; } catch { return d; } };
 const W = (k,v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 const esc = s => String(s??"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+const safeHttpsUrl = u => { try { const x = new URL(String(u||""), location.href); if(x.protocol==="https:"||x.protocol==="http:") return x.href; } catch{} return ""; };
 const today = () => new Date().toISOString().slice(0,10);
 
 let STATE = L("fj2_state", null) || {
@@ -918,7 +919,7 @@ let STATE = L("fj2_state", null) || {
   matches: null,
   jobs: [],
   applications: { saved:[], applied:[], interview:[], offer:[], rejected:[] },
-  preferences: { visaOnly:false, workType:"any", jlptMin:"", englishOnly:false },
+  preferences: { visaOnly:false, workType:"any", jlptMin:"", englishOnly:false, remoteOnly:false },
   settings: { lang: "en", theme: "dark" },
   view: "landing"
 };
@@ -1100,6 +1101,103 @@ const INDUSTRY_LABELS = {
   travel: "Travel Industry", hospitality: "Hospitality", customer: "Customer Service",
   sales: "Sales", marketing: "Marketing", education: "Education", hr: "HR / Recruiting"
 };
+
+
+const DIRECT = {
+  remotive: p => `https://remotive.com/api/remote-jobs?search=${encodeURIComponent(p.q||"")}&limit=40`,
+  jobicy: p => `https://jobicy.com/api/v2/remote-jobs?count=30&tag=${encodeURIComponent(p.q||"customer")}`
+};
+function MAP(kind, raw){
+  if(kind==="remotive") return ((raw&&raw.jobs)||[]).map(j => ({
+    id: "rm-"+ (j.id || Math.random().toString(36).slice(2,8)),
+    title: j.title,
+    company: j.company_name,
+    location: j.candidate_required_location || "Remote",
+    url: j.url,
+    description: ((j.category||"")+" "+(j.description||"").replace(/<[^>]+>/g," ")).slice(0,280),
+    full: (j.description||"").replace(/<[^>]+>/g," ").slice(0,4000),
+    date: j.publication_date,
+    src: "Remotive",
+    remote: true,
+    visa: /visa sponsor|visa support|sponsorship|relocation/i.test((j.description||"")+(j.title||"")),
+    eng: true
+  }));
+  if(kind==="jobicy") return ((raw&&raw.jobs)||[]).map(j => ({
+    id: "jc-"+ (j.id || Math.random().toString(36).slice(2,8)),
+    title: j.jobTitle,
+    company: j.companyName,
+    location: j.jobGeo || "Remote",
+    url: j.url,
+    description: (j.jobExcerpt||"").slice(0,280),
+    full: (j.jobDescription||"").replace(/<[^>]+>/g," ").slice(0,4000),
+    date: j.pubDate,
+    src: "Jobicy",
+    remote: /remote/i.test(j.jobGeo||""),
+    visa: /visa sponsor|visa support|sponsorship|relocation/i.test((j.jobDescription||"")+(j.jobTitle||"")),
+    eng: true
+  }));
+  return [];
+}
+async function jget(url, ms){
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), ms||9000);
+  try {
+    const r = await fetch(url, {signal: ctl.signal});
+    if(!r.ok) return null;
+    return await r.json();
+  } catch { return null; }
+  finally { clearTimeout(timer); }
+}
+function scoreLiveJob(j, titles, skills){
+  const text = ((j.title||"")+" "+(j.description||"")+" "+(j.company||"")).toLowerCase();
+  let s = 20;
+  (titles||[]).forEach(t => { if(text.includes(String(t).toLowerCase().split(" ")[0])) s += 18; });
+  (skills||[]).forEach(sk => { if(text.includes(String(sk).toLowerCase())) s += 8; });
+  if(j.remote) s += 5;
+  if(j.visa) s += 10;
+  if(/japan|tokyo|osaka|remote/i.test(j.location||"")) s += 8;
+  return Math.min(99, s);
+}
+
+async function searchLiveJobs(){
+  const titles = (STATE.matches?.titles||[]).map(x => x.title || x);
+  const skills = STATE.profile?.skills || [];
+  const q = titles[0] || skills[0] || "customer service";
+  say(LANG==="jp" ? "求人を検索中…" : "Searching jobs…", 1);
+  try {
+    const feeds = await Promise.all([
+      jget(DIRECT.remotive({q}), 9000).then(d => MAP("remotive", d)).catch(() => []),
+      jget(DIRECT.jobicy({q}), 9000).then(d => MAP("jobicy", d)).catch(() => [])
+    ]);
+    let jobs = feeds.flat().filter(Boolean);
+    // also try a second query for japan-friendly roles
+    if(jobs.length < 8){
+      const q2 = "japan OR tokyo hospitality OR travel";
+      const extra = await jget(DIRECT.remotive({q: "hospitality"}), 8000).then(d => MAP("remotive", d)).catch(() => []);
+      jobs = jobs.concat(extra||[]);
+    }
+    // score + dedupe
+    const seen = new Set();
+    jobs = jobs.map(j => ({
+      ...j,
+      matchScore: scoreLiveJob(j, titles, skills)
+    })).sort((a,b) => (b.matchScore||0) - (a.matchScore||0));
+    jobs = jobs.filter(j => {
+      const k = (j.url||j.title+j.company).toLowerCase();
+      if(seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    }).slice(0, 40);
+    STATE.jobs = jobs;
+    persist();
+    say(jobs.length ? (LANG==="jp" ? `${jobs.length}件の求人` : `${jobs.length} jobs found`) : (LANG==="jp" ? "求人が見つかりませんでした" : "No jobs found — try Directory"), jobs.length?1:0);
+    render();
+  } catch(e){
+    console.error(e);
+    say(LANG==="jp" ? "検索に失敗しました" : "Search failed — check connection", 0);
+  }
+}
+
 
 function siteUrl(s){ return (LANG==="jp" ? (s.url_jp||s.url_en||s.url) : (s.url_en||s.url_jp||s.url)) || "#"; }
 function siteDesc(s){ return (LANG==="jp" ? (s.desc_jp||s.desc_en||s.desc) : (s.desc_en||s.desc_jp||s.desc)) || ""; }
@@ -1329,7 +1427,7 @@ function renderLanding(){
     <button class="btn ghost" id="btnSkip" style="max-width:280px;min-height:48px;font-size:15px">${t("skip")}</button>
   </div>
   <p style="margin-top:16px;font-size:12px;color:var(--mu);text-align:center">${t("free_private")}</p>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.1</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.2</div>
   <input type="file" id="cvFile" accept=".pdf,.doc,.docx,.txt,application/pdf" class="hidden">
   <div class="hidden" id="pasteModal">
     <div class="card" style="margin-top:12px">
@@ -1390,29 +1488,17 @@ function renderDashboard(){
     <button class="btn secondary" data-go="tracker">${t("tracker")}</button>
     <button class="btn secondary" data-go="directory">🌐 ${t("sites")}</button>
   </div>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.1</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.2</div>
   `;
 }
 
 function renderJobs(){
   const prefs = STATE.preferences || {};
   let jobs = STATE.jobs || [];
-  if(jobs.length === 0 && STATE.profile){
-    jobs = (STATE.matches?.titles||[]).slice(0,4).map((ti,i)=>({
-      id: "demo"+i,
-      title: ti.title,
-      company: ["Tokyo Travel Co","Osaka Hospitality","Sakura Guest Services","Nippon Connect"][i%4],
-      location: ["Tokyo","Osaka","Tokyo","Fukuoka"][i%4],
-      visa: i%2===0,
-      remote: i===3,
-      eng: true,
-      jlpt: i===1 ? "N3" : null,
-      url: "https://jobs.gaijinpot.com",
-      description: "English-friendly role. Visa sponsorship available for qualified candidates."
-    }));
-  }
-  if(prefs.visaOnly) jobs = jobs.filter(j=>j.visa);
-  if(prefs.englishOnly) jobs = jobs.filter(j=>j.eng !== false);
+  if(prefs.visaOnly) jobs = jobs.filter(j => j.visa);
+  if(prefs.englishOnly) jobs = jobs.filter(j => j.eng !== false);
+  if(prefs.remoteOnly) jobs = jobs.filter(j => j.remote);
+  const hasLive = jobs.length > 0;
   return `
   <div class="step-guide">
     <span class="hand">👇</span>
@@ -1422,33 +1508,56 @@ function renderJobs(){
     </div>
   </div>
   <h2 style="margin:0 0 12px;font-size:20px;font-weight:800">${t("nav_jobs")}</h2>
+  <button class="btn btn-lg" id="btnSearchJobs" style="margin-bottom:12px">🔍 ${LANG==="jp"?"求人を検索":"Search Live Jobs"}</button>
   <div class="filters">
     <label><input type="checkbox" id="fVisa" ${prefs.visaOnly?"checked":""}> 🛂 ${t("visa_support")}</label>
-    <label><input type="checkbox" id="fRemote"> 🏠 ${t("remote")}</label>
+    <label><input type="checkbox" id="fRemote" ${prefs.remoteOnly?"checked":""}> 🏠 ${t("remote")}</label>
     <label><input type="checkbox" id="fEng" ${prefs.englishOnly?"checked":""}> 🌎 ${t("english_friendly")}</label>
   </div>
-  <div class="footer-copy" style="order:99">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.1</div>
-  ${jobs.length===0 ? `<div class="card"><p style="color:var(--mu)">${t("no_jobs")}</p></div>` :
-    jobs.map(j=>{
-      const q = scoreJobQuality(j, STATE.profile);
-      const scam = detectScam(j.description||"");
-      return `<div class="job-card" data-job="${esc(j.id)}">
-        <h4>${esc(j.title)}</h4>
-        <div style="font-size:13px;color:var(--mu);margin-bottom:6px">${esc(j.company)} · ${esc(j.location||"Japan")}</div>
-        <div class="job-meta">
-          ${j.visa?`<span class="badge visa">🛂 Visa Support</span>`:""}
-          ${j.eng!==false?`<span class="badge eng">🌎 English Friendly</span>`:""}
-          ${j.remote?`<span class="badge remote">🏠 Remote</span>`:""}
-          ${j.jlpt?`<span class="badge jlpt">🎌 JLPT ${esc(j.jlpt)}</span>`:""}
-          <span class="badge risk-${scam.risk}">${scam.risk} risk</span>
-          <span class="chip">${q.overall}% quality</span>
+  ${!hasLive ? `
+  <div class="card">
+    <p style="color:var(--mu);margin:0 0 12px;font-size:14px">${LANG==="jp"
+      ? "上のボタンでライブ求人を検索するか、下の日本の求人サイトを開いてください。"
+      : "Tap Search Live Jobs above, or open a Japan job board below."}</p>
+    <button class="btn secondary" data-go="directory">🌐 ${t("directory")}</button>
+  </div>
+  <div class="section-title">${LANG==="jp"?"おすすめ求人サイト":"Recommended Japan job boards"}</div>
+  ${JAPAN_SITES.slice(0,4).map(s => `
+    <div class="card">
+      <div class="dir-card">
+        <div class="dir-logo">${s.name.slice(0,2)}</div>
+        <div style="flex:1">
+          <strong style="color:var(--tx)">${esc(s.name)}</strong>
+          <div style="font-size:13px;color:var(--mu);margin:4px 0">${esc(siteDesc(s))}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+            ${s.visa?`<span class="badge visa">🛂 ${t("visa_support")}</span>`:""}
+            <a class="btn" href="${siteUrl(s)}" target="_blank" rel="noopener" style="width:auto;min-height:44px;padding:10px 16px;font-size:14px">${LANG==="jp"?"サイトを開く":"Open site"} ↗</a>
+          </div>
         </div>
-        <div style="font-size:13px;color:var(--mu);margin-top:6px">${esc((j.description||"").slice(0,100))}…</div>
-        <div class="apply-row">
-          <button class="btn" data-save="${esc(j.id)}" style="min-height:48px;font-size:15px">${t("gen_app")}</button>
+      </div>
+    </div>`).join("")}
+  ` : jobs.map(j => {
+      const q = scoreJobQuality(j, STATE.profile);
+      const scam = detectScam((j.description||"")+" "+(j.full||""));
+      const applyUrl = safeHttpsUrl(j.url) || siteUrl(JAPAN_SITES[0]);
+      return `<div class="job-card">
+        <h4>${esc(j.title)}</h4>
+        <div style="font-size:13px;color:var(--mu);margin-bottom:6px">${esc(j.company||"")} · ${esc(j.location||"Remote")}${j.src?` · ${esc(j.src)}`:""}</div>
+        <div class="job-meta">
+          ${j.visa?`<span class="badge visa">🛂 ${t("visa_support")}</span>`:""}
+          ${j.eng!==false?`<span class="badge eng">🌎 ${t("english_friendly")}</span>`:""}
+          ${j.remote?`<span class="badge remote">🏠 ${t("remote")}</span>`:""}
+          <span class="badge risk-${scam.risk}">${scam.risk} risk</span>
+          <span class="chip">${j.matchScore||q.overall}% match</span>
+        </div>
+        <div style="font-size:13px;color:var(--mu);margin-top:6px">${esc((j.description||"").slice(0,140))}…</div>
+        <div class="apply-row" style="display:flex;gap:8px;flex-wrap:wrap">
+          <a class="btn" href="${applyUrl}" target="_blank" rel="noopener" style="flex:1;min-height:48px;font-size:15px;text-align:center;text-decoration:none">${LANG==="jp"?"求人を開く":"Open job"} ↗</a>
+          <button class="btn secondary" data-save-job="${esc(j.id)}" data-job-title="${esc(j.title)}" data-job-company="${esc(j.company||"")}" data-job-url="${esc(applyUrl)}" style="flex:1;min-height:48px;font-size:14px">${t("gen_app")}</button>
         </div>
       </div>`;
     }).join("")}
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.2</div>
   `;
 }
 
@@ -1528,7 +1637,7 @@ function renderDirectory(){
         </div>
       </div>
     </div>`).join("")}
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.1</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.2</div>
   `;
 }
 
@@ -1537,7 +1646,7 @@ function renderToolPanel(tool){
   if(!panel) return;
   const p = STATE.profile || {};
   if(tool === "letter"){
-    const job = {title: (STATE.matches?.titles?.[0]?.title)||"Travel Consultant", company:"Example Co"};
+    const job = STATE._lastJobForLetter || {title: (STATE.matches?.titles?.[0]?.title)||"Travel Consultant", company:"Example Co"};
     panel.innerHTML = `
       <div class="card" style="margin-top:12px">
         <div class="tabs" id="letterTabs">
@@ -1631,7 +1740,12 @@ function render(){
     $("bottomNav").style.display = "";
     $("progressWrap")?.classList.remove("hidden");
     if(v === "dashboard") main.innerHTML = renderDashboard();
-    else if(v === "jobs") main.innerHTML = renderJobs();
+    else if(v === "jobs"){
+      main.innerHTML = renderJobs();
+      if(!(STATE.jobs||[]).length && STATE.profile){
+        setTimeout(() => searchLiveJobs(), 300);
+      }
+    }
     else if(v === "tools"){ main.innerHTML = renderTools(); wireTools(); }
     else if(v === "tracker"){ main.innerHTML = renderTracker(); wireKanban(); }
     else if(v === "directory") main.innerHTML = renderDirectory();
@@ -1795,42 +1909,28 @@ function wireKanban(){
 
 function wireCommon(){
   $$("[data-go]").forEach(b => b.onclick = () => setView(b.dataset.go));
-  $$("[data-save]").forEach(btn => {
+  $("btnSearchJobs")?.addEventListener("click", () => searchLiveJobs());
+  $$("[data-save-job]").forEach(btn => {
     btn.onclick = (e) => {
+      e.preventDefault();
       e.stopPropagation();
-      const id = btn.dataset.save;
-      const card = btn.closest(".job-card");
-      const title = card?.querySelector("h4")?.textContent || "Job";
-      const company = card?.querySelector("div")?.textContent?.split("·")[0]?.trim() || "";
+      const id = btn.dataset.saveJob;
+      const title = btn.dataset.jobTitle || "Job";
+      const company = btn.dataset.jobCompany || "";
+      const url = btn.dataset.jobUrl || "";
       const exists = Object.values(STATE.applications).flat().some(a => a.id === id);
       if(!exists){
         STATE.applications.saved = STATE.applications.saved || [];
-        STATE.applications.saved.push({id, title, company});
+        STATE.applications.saved.push({id, title, company, url});
         persist();
-        say("Saved — open Apply tools for cover letter", 1);
-      } else {
-        say("Already in Tracker", 1);
       }
+      STATE._lastJobForLetter = {title, company, url};
       setView("tools");
       setTimeout(() => {
         const letterCard = document.querySelector('[data-tool="letter"]');
         if(letterCard) letterCard.click();
-      }, 100);
-    };
-  });
-  $$(".job-card").forEach(card => {
-    card.onclick = (e) => {
-      if(e.target.closest("[data-save]")) return;
-      const id = card.dataset.job;
-      const title = card.querySelector("h4")?.textContent;
-      const company = "Company";
-      const exists = Object.values(STATE.applications).flat().some(a => a.id === id);
-      if(!exists){
-        STATE.applications.saved = STATE.applications.saved || [];
-        STATE.applications.saved.push({id, title, company});
-        persist();
-        say("Saved to Tracker", 1);
-      }
+      }, 120);
+      say(LANG==="jp" ? "トラッカーに保存 → カバーレター" : "Saved — opening cover letter", 1);
     };
   });
   $("fVisa")?.addEventListener("change", e => {
@@ -1841,7 +1941,10 @@ function wireCommon(){
     STATE.preferences.englishOnly = e.target.checked;
     persist(); render();
   });
-  $("fRemote")?.addEventListener("change", () => render());
+  $("fRemote")?.addEventListener("change", e => {
+    STATE.preferences.remoteOnly = e.target.checked;
+    persist(); render();
+  });
 }
 
 // Header actions
