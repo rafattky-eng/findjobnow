@@ -2,1552 +2,848 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#05070c">
-<meta name="description" content="Find English-friendly jobs in Japan — free, private, no signup. All data stays on your device.">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="FindJobNow">
-<link rel="manifest" href="./manifest.json">
-<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FindJob Now">
+<meta name="theme-color" content="#07090D">
+<meta name="description" content="AI Career Copilot for foreigners seeking jobs in Japan. Upload CV, get matched jobs, visa guidance, apply faster — free, private, no signup.">
+<meta name="application-name" content="FindJob Now">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; worker-src 'self' blob: https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://boards-api.greenhouse.io https://api.lever.co https://api.ashbyhq.com https://remotive.com https://jobicy.com; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; upgrade-insecure-requests">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
-<title>FindJobNow — English Jobs in Japan</title>
+<title>FindJob Now — AI Career Copilot for Japan</title>
 <style>
-:root {
-  --bg: #05070c;
-  --panel: #0c1526;
-  --panel2: #12203a;
-  --gold: #d4b062;
-  --text: #f5f1e8;
-  --muted: #8fa3c4;
-  --border: #1e2d45;
-  --ok: #6bcf7f;
-  --warn: #e8a838;
-  --err: #e86a6a;
-  --radius: 16px;
-  --shadow: 0 4px 24px rgba(0,0,0,.4);
-}
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { margin: 0; padding: 0; }
-body {
-  background: var(--bg);
-  color: var(--text);
-  font: 16px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  min-height: 100dvh;
-  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0));
-}
-a { color: var(--gold); }
-button, input, select, textarea { font: inherit; color: inherit; }
-:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-
-.app {
-  max-width: 520px;
-  margin: 0 auto;
-  padding: 0 14px 24px;
-}
-
-/* Header */
-header {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 12px 14px;
-  background: color-mix(in srgb, var(--bg) 92%, transparent);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-}
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 700;
-  font-size: 17px;
-  letter-spacing: -0.02em;
-}
-.brand svg { flex-shrink: 0; }
-.hdr-actions { display: flex; align-items: center; gap: 6px; }
-.lang-toggle {
-  display: flex;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 99px;
-  overflow: hidden;
-}
-.lang-toggle button {
-  border: 0;
-  background: transparent;
-  color: var(--muted);
-  padding: 6px 12px;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
-.lang-toggle button.active {
-  background: var(--gold);
-  color: #0e1218;
-}
-.icon-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--panel);
-  color: var(--text);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-/* Nav */
-.bottom-nav {
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
-  z-index: 50;
-  display: flex;
-  justify-content: center;
-  gap: 4px;
-  padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0));
-  background: color-mix(in srgb, var(--bg) 94%, transparent);
-  backdrop-filter: blur(14px);
-  border-top: 1px solid var(--border);
-}
-.bottom-nav button {
-  flex: 1;
-  max-width: 100px;
-  border: 0;
-  background: transparent;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 600;
-  padding: 8px 4px;
-  border-radius: 12px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
-.bottom-nav button.active { color: var(--gold); }
-.bottom-nav button span { font-size: 18px; line-height: 1; }
-
-/* Cards & UI */
-.card {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px;
-  margin-bottom: 14px;
-  box-shadow: var(--shadow);
-}
-.card h2 {
-  margin: 0 0 8px;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-.card h3 {
-  margin: 0 0 6px;
-  font-size: 15px;
-  font-weight: 650;
-}
-.muted { color: var(--muted); font-size: 13px; }
-.hero {
-  text-align: center;
-  padding: 28px 8px 12px;
-}
-.hero h1 {
-  margin: 0 0 10px;
-  font-size: 24px;
-  font-weight: 800;
-  line-height: 1.25;
-  letter-spacing: -0.03em;
-}
-.hero p { margin: 0 0 20px; color: var(--muted); font-size: 15px; }
-.btn-row { display: flex; flex-direction: column; gap: 10px; }
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 48px;
-  padding: 12px 18px;
-  border-radius: 14px;
-  border: 1px solid transparent;
-  font-weight: 700;
-  font-size: 15px;
-  cursor: pointer;
-  transition: transform .12s, opacity .12s;
-}
-.btn:active { transform: scale(0.98); }
-.btn-primary {
-  background: var(--gold);
-  color: #0e1218;
-}
-.btn-secondary {
-  background: var(--panel2);
-  color: var(--text);
-  border-color: var(--border);
-}
-.btn-ghost {
-  background: transparent;
-  color: var(--muted);
-  border-color: var(--border);
-}
-.btn-sm {
-  min-height: 36px;
-  padding: 8px 12px;
-  font-size: 13px;
-  border-radius: 10px;
-}
-.pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 10px;
-  border-radius: 99px;
-  font-size: 11px;
-  font-weight: 700;
-  background: var(--panel2);
-  border: 1px solid var(--border);
-  color: var(--muted);
-}
-.pill.gold { background: color-mix(in srgb, var(--gold) 18%, transparent); border-color: var(--gold); color: var(--gold); }
-.pill.ok { background: color-mix(in srgb, var(--ok) 18%, transparent); border-color: var(--ok); color: var(--ok); }
-.pill.warn { background: color-mix(in srgb, var(--warn) 18%, transparent); border-color: var(--warn); color: var(--warn); }
-.pill.err { background: color-mix(in srgb, var(--err) 18%, transparent); border-color: var(--err); color: var(--err); }
-
-.field { margin-bottom: 14px; }
-.field label {
-  display: block;
-  font-size: 12px;
-  font-weight: 650;
-  color: var(--muted);
-  margin-bottom: 5px;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-}
-.field input, .field select, .field textarea {
-  width: 100%;
-  background: #080e1a;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 11px 13px;
-  color: var(--text);
-}
-.field textarea { min-height: 100px; resize: vertical; }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 12px;
-  border-radius: 99px;
-  background: var(--panel2);
-  border: 1px solid var(--border);
-  font-size: 13px;
-  cursor: pointer;
-}
-.chip input { margin: 0; }
-.chip:has(input:checked) {
-  border-color: var(--gold);
-  background: color-mix(in srgb, var(--gold) 15%, var(--panel2));
-  color: var(--gold);
-}
-
-.section-title {
-  font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  color: var(--muted);
-  margin: 20px 0 10px;
-}
-.job-card {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 14px;
-  margin-bottom: 10px;
-}
-.job-card .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
-.job-card .title { font-weight: 700; font-size: 15px; }
-.job-card .company { color: var(--muted); font-size: 13px; }
-.match-bar {
-  height: 6px;
-  background: var(--panel2);
-  border-radius: 99px;
-  overflow: hidden;
-  margin: 8px 0 4px;
-}
-.match-bar i {
-  display: block;
-  height: 100%;
-  background: linear-gradient(90deg, var(--gold), #e8c87a);
-  border-radius: 99px;
-}
-.reasons { font-size: 12px; color: var(--muted); margin-top: 6px; }
-.reasons li { margin-bottom: 2px; }
-
-.board-card {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 14px;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  margin-bottom: 10px;
-}
-.board-card a {
-  font-weight: 700;
-  text-decoration: none;
-  color: var(--text);
-}
-.board-card a:hover { color: var(--gold); }
-.filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
-.filter-btn {
-  padding: 6px 12px;
-  border-radius: 99px;
-  border: 1px solid var(--border);
-  background: var(--panel);
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 650;
-  cursor: pointer;
-}
-.filter-btn.active {
-  background: var(--gold);
-  color: #0e1218;
-  border-color: var(--gold);
-}
-
-.kanban {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 8px;
-  -webkit-overflow-scrolling: touch;
-}
-.kanban-col {
-  min-width: 160px;
-  flex: 1;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 10px;
-}
-.kanban-col h4 {
-  margin: 0 0 8px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--muted);
-  text-transform: uppercase;
-}
-.app-item {
-  background: var(--panel2);
-  border-radius: 10px;
-  padding: 10px;
-  margin-bottom: 6px;
-  font-size: 13px;
-}
-.app-item .t { font-weight: 650; }
-.app-item .c { color: var(--muted); font-size: 12px; }
-
-.checklist { list-style: none; padding: 0; margin: 0; }
-.checklist li {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 14px;
-}
-.checklist li:last-child { border-bottom: 0; }
-.checklist input[type=checkbox] { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--gold); }
-.checklist .warn-text { color: var(--err); font-weight: 650; margin-top: 4px; font-size: 13px; }
-
-.empty {
-  text-align: center;
-  padding: 28px 16px;
-  color: var(--muted);
-}
-.empty p { margin: 0 0 12px; }
-
-.skeleton {
-  background: linear-gradient(90deg, var(--panel2) 25%, var(--panel) 50%, var(--panel2) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s infinite;
-  border-radius: 10px;
-  height: 72px;
-  margin-bottom: 10px;
-}
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-.toast {
-  position: fixed;
-  left: 50%;
-  bottom: calc(80px + env(safe-area-inset-bottom, 0));
-  transform: translateX(-50%) translateY(16px);
-  max-width: min(90vw, 380px);
-  padding: 12px 16px;
-  background: var(--panel2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 650;
-  box-shadow: var(--shadow);
-  opacity: 0;
-  pointer-events: none;
-  transition: .25s;
-  z-index: 100;
-  text-align: center;
-}
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.toast.ok { border-color: var(--ok); }
-.toast.err { border-color: var(--err); }
-
-.view { display: none; }
-.view.active { display: block; }
-
-.profile-grid {
-  display: grid;
-  gap: 8px;
-}
-.profile-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 6px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 14px;
-}
-.profile-row:last-child { border-bottom: 0; }
-.profile-row span:first-child { color: var(--muted); }
-
-.file-drop {
-  border: 2px dashed var(--border);
-  border-radius: 14px;
-  padding: 24px 16px;
-  text-align: center;
-  cursor: pointer;
-  background: var(--panel2);
-  position: relative;
-}
-.file-drop input {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  cursor: pointer;
-}
-.file-drop strong { color: var(--gold); }
-
-.cover-out {
-  background: #080e1a;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px;
-  font-size: 14px;
-  white-space: pre-wrap;
-  min-height: 160px;
-  max-height: 320px;
-  overflow-y: auto;
+:root,[data-theme="dark"]{--bg:#07090D;--cd:#0B1A2E;--cd2:#12243a;--tx:#F3EFE6;--mu:#8B97A8;--ac:#D4B36A;--bd:#2A3D55;--ok:#7BC47F;--er:#FF8A8A;--btn:#D4B36A;--btnText:#0E1218;--input:#0a1422;--gold:#D4B36A;--radius:16px;--shadow:0 4px 24px rgba(0,0,0,.35);--safe-b:env(safe-area-inset-bottom,0px)}
+[data-theme="light"]{--bg:#F3EFE6;--cd:#fff;--cd2:#f7f3ea;--tx:#0E1218;--mu:#4a5568;--ac:#8a6d2f;--bd:#d4c4a0;--ok:#2e7d32;--er:#c62828;--btn:#0B1A2E;--btnText:#F3EFE6;--input:#fff;--gold:#D4B36A;--shadow:0 4px 20px rgba(11,26,46,.08)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;padding:0;height:100%}
+body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:var(--ac);text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+.hidden{display:none!important}
+.app{min-height:100%;display:flex;flex-direction:column;padding-bottom:calc(64px + var(--safe-b))}
+header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd);padding:10px 16px;display:flex;align-items:center;gap:10px}
+.logo{font-weight:800;font-size:18px;letter-spacing:-.02em;color:var(--gold);display:flex;align-items:center;gap:8px}
+.logo span{background:var(--ac);color:var(--btnText);width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:14px}
+.header-actions{margin-left:auto;display:flex;gap:6px}
+.icon-btn{background:var(--cd);border:1px solid var(--bd);color:var(--tx);width:36px;height:36px;border-radius:10px;display:grid;place-items:center;cursor:pointer;font-size:16px}
+main{flex:1;padding:16px;max-width:720px;margin:0 auto;width:100%}
+.nav-bottom{position:fixed;bottom:0;left:0;right:0;z-index:60;background:var(--cd);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:6px 0 calc(6px + var(--safe-b));}
+.nav-bottom button{background:none;border:none;color:var(--mu);font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 8px;cursor:pointer;min-width:56px}
+.nav-bottom button.active{color:var(--ac)}
+.nav-bottom button span{font-size:20px;line-height:1}
+.hero{text-align:center;padding:32px 8px 24px}
+.hero h1{font-size:clamp(26px,6vw,34px);font-weight:800;letter-spacing:-.03em;margin:0 0 12px;line-height:1.2}
+.hero p{color:var(--mu);margin:0 0 24px;font-size:16px}
+.value-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0}
+.value-card{background:var(--cd);border:1px solid var(--bd);border-radius:var(--radius);padding:14px;text-align:left}
+.value-card strong{display:block;font-size:13px;margin-bottom:4px;color:var(--ac)}
+.value-card span{font-size:12px;color:var(--mu)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--btn);color:var(--btnText);border:none;border-radius:12px;padding:14px 20px;font-weight:700;font-size:15px;cursor:pointer;width:100%;max-width:320px}
+.btn.secondary{background:var(--cd);color:var(--tx);border:1px solid var(--bd)}
+.btn.ghost{background:transparent;color:var(--ac);border:1px solid var(--bd)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.card{background:var(--cd);border:1px solid var(--bd);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.card h3{margin:0 0 8px;font-size:16px}
+.score-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.score-card{background:var(--cd2);border-radius:14px;padding:14px;text-align:center}
+.score-card .num{font-size:28px;font-weight:800;color:var(--ac);line-height:1.1}
+.score-card .lbl{font-size:11px;color:var(--mu);margin-top:4px;text-transform:uppercase;letter-spacing:.04em}
+.progress-bar{height:8px;background:var(--bd);border-radius:99px;overflow:hidden;margin:8px 0}
+.progress-bar > i{display:block;height:100%;background:var(--ac);border-radius:99px;transition:width .4s}
+.match-row{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:14px}
+.match-row .bar{flex:1;height:8px;background:var(--bd);border-radius:99px;overflow:hidden}
+.match-row .bar i{display:block;height:100%;background:var(--ac)}
+.match-row .pct{font-weight:700;color:var(--ac);min-width:36px;text-align:right;font-size:13px}
+.chip{display:inline-flex;align-items:center;gap:4px;background:color-mix(in srgb,var(--ac) 15%,var(--cd));color:var(--ac);border-radius:99px;padding:4px 10px;font-size:12px;font-weight:600;margin:2px}
+.chip.bad{background:color-mix(in srgb,var(--er) 15%,var(--cd));color:var(--er)}
+.chip.ok{background:color-mix(in srgb,var(--ok) 15%,var(--cd));color:var(--ok)}
+.job-card{background:var(--cd);border:1px solid var(--bd);border-radius:var(--radius);padding:14px;margin-bottom:10px;cursor:pointer;transition:border-color .15s}
+.job-card:active,.job-card:hover{border-color:var(--ac)}
+.job-card h4{margin:0 0 4px;font-size:15px}
+.job-meta{font-size:12px;color:var(--mu);display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;border:1px solid}
+.badge.visa{background:color-mix(in srgb,#4fc3f7 15%,var(--cd));border-color:#4fc3f7;color:#4fc3f7}
+.badge.risk-low{background:color-mix(in srgb,var(--ok) 15%,var(--cd));border-color:var(--ok);color:var(--ok)}
+.badge.risk-med{background:color-mix(in srgb,#ffb74d 15%,var(--cd));border-color:#ffb74d;color:#ffb74d}
+.badge.risk-high{background:color-mix(in srgb,var(--er) 15%,var(--cd));border-color:var(--er);color:var(--er)}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.filters label{font-size:12px;background:var(--cd2);border:1px solid var(--bd);border-radius:99px;padding:6px 10px;cursor:pointer;display:flex;align-items:center;gap:4px}
+.filters input{accent-color:var(--ac)}
+.kanban{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x mandatory}
+.kanban-col{min-width:220px;background:var(--cd2);border-radius:14px;padding:10px;scroll-snap-align:start}
+.kanban-col h4{margin:0 0 8px;font-size:13px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em}
+.kanban-item{background:var(--cd);border:1px solid var(--bd);border-radius:10px;padding:10px;margin-bottom:8px;font-size:13px;cursor:grab}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;color:var(--mu);margin-bottom:4px}
+.field input,.field select,.field textarea{width:100%;background:var(--input);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;color:var(--tx)}
+.field textarea{min-height:100px;resize:vertical}
+.toast{position:fixed;bottom:calc(80px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(20px);background:var(--cd);border:1px solid var(--bd);color:var(--tx);padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:100;max-width:90%;text-align:center;box-shadow:var(--shadow)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{border-color:var(--ok)}
+.toast.err{border-color:var(--er)}
+.section-title{font-size:13px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin:20px 0 10px}
+.roadmap{position:relative;padding-left:24px}
+.roadmap::before{content:"";position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:var(--bd)}
+.roadmap-step{position:relative;margin-bottom:16px;padding-left:8px}
+.roadmap-step::before{content:"";position:absolute;left:-21px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--ac);border:2px solid var(--bg)}
+.roadmap-step strong{display:block;font-size:14px}
+.roadmap-step span{font-size:12px;color:var(--mu)}
+.tabs{display:flex;gap:4px;overflow-x:auto;margin-bottom:12px}
+.tabs button{background:var(--cd2);border:1px solid var(--bd);border-radius:99px;padding:8px 14px;font-size:13px;color:var(--mu);white-space:nowrap;cursor:pointer}
+.tabs button.active{background:var(--ac);color:var(--btnText);border-color:var(--ac)}
+.letter-box{background:var(--cd2);border:1px solid var(--bd);border-radius:12px;padding:14px;font-size:14px;white-space:pre-wrap;max-height:320px;overflow-y:auto;line-height:1.55}
+.action-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.action-row .btn{width:auto;padding:10px 14px;font-size:13px}
+.upload-zone{border:2px dashed var(--bd);border-radius:var(--radius);padding:28px 16px;text-align:center;background:var(--cd2);cursor:pointer}
+.upload-zone.drag{border-color:var(--ac);background:color-mix(in srgb,var(--ac) 8%,var(--cd))}
+.dir-card{display:flex;gap:12px;align-items:flex-start}
+.dir-logo{width:44px;height:44px;border-radius:10px;background:var(--cd2);display:grid;place-items:center;font-weight:800;color:var(--ac);flex-shrink:0}
+.list-check{margin:0;padding:0;list-style:none}
+.list-check li{padding:4px 0;font-size:14px;display:flex;gap:8px}
+.list-check .ok{color:var(--ok)}
+.list-check .miss{color:var(--er)}
+@media(min-width:640px){
+  .score-grid{grid-template-columns:repeat(4,1fr)}
+  .value-grid{grid-template-columns:repeat(4,1fr)}
+  .nav-bottom{display:none}
+  .app{padding-bottom:0}
+  header{padding:12px 24px}
+  main{padding:24px}
 }
 </style>
 </head>
 <body>
+<div class="app" id="app">
 <header>
-  <div class="brand">
-    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <rect width="32" height="32" rx="8" fill="#0c1526"/>
-      <path d="M9.5 12h13a1.5 1.5 0 0 1 1.5 1.5v7.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 8 21v-7.5A1.5 1.5 0 0 1 9.5 12z" fill="#d4b062"/>
-      <path d="M13 12V10.5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2V12" stroke="#d4b062" stroke-width="1.5" fill="none"/>
-      <circle cx="20" cy="18" r="5" stroke="#f5f1e8" stroke-width="1.6" fill="none"/>
-      <line x1="23.5" y1="21.5" x2="26.5" y2="24.5" stroke="#f5f1e8" stroke-width="1.8" stroke-linecap="round"/>
-    </svg>
-    <span>FindJobNow</span>
-  </div>
-  <div class="hdr-actions">
-    <div class="lang-toggle" role="group" aria-label="Language">
-      <button type="button" id="langEN" class="active">EN</button>
-      <button type="button" id="langJP">JP</button>
-    </div>
-    <button type="button" class="icon-btn" id="backupBtn" title="Backup / Restore" aria-label="Backup">💾</button>
+  <div class="logo"><span>🔍</span> FindJob Now</div>
+  <div class="header-actions">
+    <button class="icon-btn" id="btnLang" title="Language">EN</button>
+    <button class="icon-btn" id="btnTheme" title="Theme">🌓</button>
+    <button class="icon-btn" id="btnBackup" title="Backup">💾</button>
   </div>
 </header>
-
-<div class="app">
-  <!-- LANDING -->
-  <div id="view-home" class="view active">
-    <div class="hero">
-      <h1 data-i18n="hero_title">Find English-Friendly Jobs in Japan — Free, Private, No Signup.</h1>
-      <p data-i18n="hero_sub">Everything stays on your device. No account. No tracking.</p>
-      <div class="btn-row">
-        <button class="btn btn-primary" id="ctaUpload" data-i18n="cta_upload">Upload CV</button>
-        <button class="btn btn-secondary" id="ctaBrowse" data-i18n="cta_browse">Browse Job Boards Without CV</button>
-      </div>
-    </div>
-
-    <div class="section-title" data-i18n="sec_features">What you get</div>
-    <div class="card">
-      <ul style="margin:0;padding-left:18px;color:var(--muted);font-size:14px;line-height:1.7">
-        <li data-i18n="f1">On-device CV parsing (PDF or text)</li>
-        <li data-i18n="f2">Skill-based job matching with scores</li>
-        <li data-i18n="f3">Curated Japan job board directory</li>
-        <li data-i18n="f4">Application tracker (kanban)</li>
-        <li data-i18n="f5">Cover letter draft + Rirekisho checklist</li>
-        <li data-i18n="f6">Scam safety checklist</li>
-        <li data-i18n="f7">Full backup / restore as JSON</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- CV / PROFILE -->
-  <div id="view-cv" class="view">
-    <div class="card">
-      <h2 data-i18n="cv_title">Your Profile</h2>
-      <p class="muted" data-i18n="cv_intro">Upload a PDF or paste text. Parsing runs only on this device.</p>
-
-      <div class="file-drop" id="dropZone">
-        <input type="file" id="cvFile" accept=".pdf,application/pdf,text/plain,.txt">
-        <div>
-          <strong data-i18n="drop_label">Tap to choose PDF or TXT</strong>
-          <div class="muted" style="margin-top:6px" data-i18n="drop_hint">or paste text below</div>
-        </div>
-      </div>
-
-      <div class="field" style="margin-top:14px">
-        <label data-i18n="paste_label">Paste CV text</label>
-        <textarea id="cvPaste" rows="5" placeholder="Paste your resume text here…"></textarea>
-      </div>
-      <button class="btn btn-primary" id="parseBtn" data-i18n="parse_btn">Parse CV</button>
-      <div id="parseStatus" class="muted" style="margin-top:8px"></div>
-    </div>
-
-    <div id="profileCard" class="card" style="display:none">
-      <h2 data-i18n="profile_title">Profile Summary</h2>
-      <p class="muted" data-i18n="profile_edit">All fields are editable.</p>
-      <div class="field"><label data-i18n="lbl_name">Name</label><input id="pName" type="text"></div>
-      <div class="field"><label data-i18n="lbl_titles">Job titles</label><input id="pTitles" type="text" placeholder="e.g. Software Engineer, Product Manager"></div>
-      <div class="field"><label data-i18n="lbl_skills">Skills (comma-separated)</label><input id="pSkills" type="text"></div>
-      <div class="field"><label data-i18n="lbl_years">Years of experience</label><input id="pYears" type="number" min="0" max="40"></div>
-      <div class="field"><label data-i18n="lbl_en">English level</label>
-        <select id="pEn"><option value="Native">Native</option><option value="Fluent">Fluent</option><option value="Business">Business</option><option value="Conversational">Conversational</option><option value="Basic">Basic</option></select>
-      </div>
-      <div class="field"><label data-i18n="lbl_jp">Japanese level</label>
-        <select id="pJp"><option value="Native">Native</option><option value="Fluent">Fluent</option><option value="Business">Business</option><option value="Conversational">Conversational</option><option value="Basic">Basic</option><option value="None">None</option></select>
-      </div>
-      <div class="field"><label data-i18n="lbl_visa">Visa status</label>
-        <select id="pVisa"><option value="Yes">Has work visa / PR</option><option value="Need">Needs sponsorship</option><option value="Unknown">Unknown</option></select>
-      </div>
-      <button class="btn btn-primary" id="saveProfile" data-i18n="save_profile">Save Profile</button>
-    </div>
-  </div>
-
-  <!-- MATCHING -->
-  <div id="view-match" class="view">
-    <div class="card">
-      <h2 data-i18n="match_title">Job Matching</h2>
-      <p class="muted" data-i18n="match_intro">Based on your profile skills and language/visa preferences.</p>
-      <div class="field">
-        <label data-i18n="pref_loc">Preferred location</label>
-        <select id="prefLoc">
-          <option value="Any">Any / Remote</option>
-          <option value="Tokyo">Tokyo</option>
-          <option value="Osaka">Osaka</option>
-          <option value="Remote">Remote only</option>
-        </select>
-      </div>
-      <div class="field">
-        <label data-i18n="pref_visa">Visa sponsorship needed?</label>
-        <select id="prefVisa">
-          <option value="Any">Any</option>
-          <option value="Yes">Only jobs with visa support</option>
-        </select>
-      </div>
-      <button class="btn btn-primary" id="runMatch" data-i18n="run_match">Find Matching Jobs</button>
-    </div>
-
-    <div class="section-title" data-i18n="rec_boards">Recommended Job Boards</div>
-    <div id="recBoards"></div>
-
-    <div class="section-title" data-i18n="sample_jobs">Sample Matching Jobs</div>
-    <div id="matchResults">
-      <div class="empty"><p data-i18n="match_empty">Save a profile and run matching to see sample jobs.</p></div>
-    </div>
-  </div>
-
-  <!-- JOB BOARDS -->
-  <div id="view-boards" class="view">
-    <div class="section-title" data-i18n="boards_title">Japan Job Board Directory</div>
-    <div class="filters" id="boardFilters">
-      <button class="filter-btn active" data-cat="All">All</button>
-      <button class="filter-btn" data-cat="Tech">Tech</button>
-      <button class="filter-btn" data-cat="Teaching">Teaching</button>
-      <button class="filter-btn" data-cat="General">General</button>
-      <button class="filter-btn" data-cat="Startup">Startup</button>
-      <button class="filter-btn" data-cat="Multilingual">Multilingual</button>
-    </div>
-    <div id="boardList"></div>
-  </div>
-
-  <!-- TRACKER -->
-  <div id="view-tracker" class="view">
-    <div class="card">
-      <h2 data-i18n="tracker_title">Application Tracker</h2>
-      <p class="muted" data-i18n="tracker_intro">Mark jobs from matching or boards. Data stays in this browser.</p>
-      <div class="field">
-        <label data-i18n="add_job">Add a job manually</label>
-        <input id="newJobTitle" type="text" placeholder="Job title">
-        <input id="newJobCompany" type="text" placeholder="Company" style="margin-top:6px">
-        <button class="btn btn-secondary btn-sm" id="addJobBtn" style="margin-top:8px" data-i18n="add_btn">Add as Interested</button>
-      </div>
-    </div>
-    <div id="kanban" class="kanban"></div>
-    <div id="trackerEmpty" class="empty" style="display:none">
-      <p data-i18n="tracker_empty">No applications yet. Try marking a job as “Interested”.</p>
-    </div>
-  </div>
-
-  <!-- TOOLS -->
-  <div id="view-tools" class="view">
-    <div class="card">
-      <h2 data-i18n="cover_title">Cover Letter Draft</h2>
-      <p class="muted" data-i18n="cover_intro">Uses your saved profile + a job title/company.</p>
-      <div class="field"><label data-i18n="cover_job">Job title</label><input id="coverJob" type="text" placeholder="e.g. Frontend Engineer"></div>
-      <div class="field"><label data-i18n="cover_co">Company</label><input id="coverCo" type="text" placeholder="e.g. Example Inc."></div>
-      <button class="btn btn-primary" id="genCover" data-i18n="gen_cover">Generate Draft</button>
-      <div class="cover-out" id="coverOut" style="margin-top:12px;display:none"></div>
-      <button class="btn btn-secondary btn-sm" id="copyCover" style="margin-top:8px;display:none" data-i18n="copy_btn">Copy to clipboard</button>
-    </div>
-
-    <div class="card">
-      <h2 data-i18n="rireki_title">Japan Resume (Rirekisho) Checklist</h2>
-      <ul class="checklist" id="rirekiList">
-        <li><input type="checkbox" data-key="photo"><div><span data-i18n="rk1">Photo (3×4 cm, formal)</span></div></li>
-        <li><input type="checkbox" data-key="name"><div><span data-i18n="rk2">Full name in kanji / romaji</span></div></li>
-        <li><input type="checkbox" data-key="dob"><div><span data-i18n="rk3">Date of birth & age</span></div></li>
-        <li><input type="checkbox" data-key="address"><div><span data-i18n="rk4">Current address & phone</span></div></li>
-        <li><input type="checkbox" data-key="edu"><div><span data-i18n="rk5">Education history (newest first)</span></div></li>
-        <li><input type="checkbox" data-key="work"><div><span data-i18n="rk6">Work history with company names</span></div></li>
-        <li><input type="checkbox" data-key="licenses"><div><span data-i18n="rk7">Licenses / certifications</span></div></li>
-        <li><input type="checkbox" data-key="motivation"><div><span data-i18n="rk8">Motivation / self-PR section</span></div></li>
-        <li><input type="checkbox" data-key="commute"><div><span data-i18n="rk9">Commute time if required</span></div></li>
-        <li><input type="checkbox" data-key="handwrite"><div><span data-i18n="rk10">Handwritten or clean digital format</span></div></li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h2 data-i18n="scam_title">Scam Safety Checklist</h2>
-      <ul class="checklist" id="scamList">
-        <li>
-          <input type="checkbox" data-key="money">
-          <div>
-            <span data-i18n="sc1">Does the employer ask for money (registration, training, equipment)?</span>
-            <div class="warn-text" data-i18n="sc1w" style="display:none">⚠ Warning: Legitimate employers never ask candidates to pay.</div>
-          </div>
-        </li>
-        <li>
-          <input type="checkbox" data-key="personal">
-          <div>
-            <span data-i18n="sc2">Are they asking for bank details, My Number, or passport before an offer?</span>
-            <div class="warn-text" data-i18n="sc2w" style="display:none">⚠ High risk. Share sensitive data only after a formal offer.</div>
-          </div>
-        </li>
-        <li>
-          <input type="checkbox" data-key="urgency">
-          <div>
-            <span data-i18n="sc3">Is there extreme pressure to accept immediately or wire money?</span>
-            <div class="warn-text" data-i18n="sc3w" style="display:none">⚠ Common scam tactic. Take time to verify.</div>
-          </div>
-        </li>
-        <li>
-          <input type="checkbox" data-key="email">
-          <div>
-            <span data-i18n="sc4">Is the email domain free (gmail etc.) instead of a company domain?</span>
-            <div class="warn-text" data-i18n="sc4w" style="display:none">⚠ Suspicious. Prefer official company email addresses.</div>
-          </div>
-        </li>
-        <li>
-          <input type="checkbox" data-key="interview">
-          <div>
-            <span data-i18n="sc5">Have they refused a proper interview or video call?</span>
-            <div class="warn-text" data-i18n="sc5w" style="display:none">⚠ Red flag. Real companies interview candidates.</div>
-          </div>
-        </li>
-      </ul>
-      <p class="muted" style="margin-top:12px" data-i18n="scam_report">
-        Report scams to the National Consumer Affairs Center of Japan or police if money was lost.
-      </p>
-      <a href="https://www.cao.go.jp/consumer/" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" data-i18n="scam_link">Official resources →</a>
-    </div>
-  </div>
-</div>
-
-<!-- Bottom nav -->
-<nav class="bottom-nav">
-  <button type="button" data-view="home" class="active"><span>🏠</span><span data-i18n="nav_home">Home</span></button>
-  <button type="button" data-view="cv"><span>📄</span><span data-i18n="nav_cv">CV</span></button>
-  <button type="button" data-view="match"><span>🎯</span><span data-i18n="nav_match">Match</span></button>
-  <button type="button" data-view="boards"><span>🗂</span><span data-i18n="nav_boards">Boards</span></button>
-  <button type="button" data-view="tracker"><span>📋</span><span data-i18n="nav_tracker">Tracker</span></button>
-  <button type="button" data-view="tools"><span>🛠</span><span data-i18n="nav_tools">Tools</span></button>
+<main id="main"></main>
+<nav class="nav-bottom" id="bottomNav">
+  <button data-view="dashboard" class="active"><span>🏠</span>Home</button>
+  <button data-view="jobs"><span>💼</span>Jobs</button>
+  <button data-view="tools"><span>🛠️</span>Tools</button>
+  <button data-view="tracker"><span>📋</span>Tracker</button>
+  <button data-view="directory"><span>🌐</span>Directory</button>
 </nav>
-
+</div>
 <div class="toast" id="toast"></div>
+<script>
 
-<!-- Backup modal (simple) -->
-<dialog id="backupDialog" style="border:1px solid var(--border);border-radius:16px;background:var(--panel);color:var(--text);padding:20px;max-width:360px;width:90%">
-  <h3 style="margin:0 0 12px" data-i18n="backup_title">Backup / Restore</h3>
-  <p class="muted" data-i18n="backup_intro">Export all local data as JSON or import a previous backup.</p>
-  <div class="btn-row">
-    <button class="btn btn-primary" id="exportBtn" data-i18n="export_btn">Export JSON</button>
-    <button class="btn btn-secondary" id="importBtn" data-i18n="import_btn">Import JSON</button>
-    <input type="file" id="importFile" accept="application/json,.json" style="display:none">
-    <button class="btn btn-ghost" id="closeBackup" data-i18n="close_btn">Close</button>
-  </div>
-</dialog>
+// ===== FindJob Now v2 — AI Career Copilot for Japan =====
+const $ = id => document.getElementById(id);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+const L = (k,d) => { try { const v = localStorage.getItem(k); return v!=null ? JSON.parse(v) : d; } catch { return d; } };
+const W = (k,v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+const esc = s => String(s??"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+const today = () => new Date().toISOString().slice(0,10);
 
-<script type="module">
-// ─── i18n ───────────────────────────────────────────────
+let STATE = L("fj2_state", null) || {
+  profile: null,
+  scores: null,
+  matches: null,
+  jobs: [],
+  applications: { saved:[], applied:[], interview:[], offer:[], rejected:[] },
+  preferences: { visaOnly:false, workType:"any", jlptMin:"", englishOnly:false },
+  settings: { lang: "en", theme: "dark" },
+  view: "landing"
+};
+
+let LANG = STATE.settings.lang || "en";
+let THEME = STATE.settings.theme || "dark";
+document.documentElement.setAttribute("data-theme", THEME);
+document.documentElement.lang = LANG;
+
+function persist(){ W("fj2_state", STATE); }
+function say(msg, ok){
+  const el = $("toast"); if(!el) return;
+  el.textContent = msg;
+  el.className = "toast show" + (ok ? " ok" : /error|fail|could|please/i.test(msg||"") ? " err" : "");
+  clearTimeout(window._toastT);
+  window._toastT = setTimeout(() => el.classList.remove("show"), 3500);
+}
+
+// ---------- i18n (minimal core) ----------
 const I18N = {
   en: {
-    hero_title: "Find English-Friendly Jobs in Japan — Free, Private, No Signup.",
-    hero_sub: "Everything stays on your device. No account. No tracking.",
-    cta_upload: "Upload CV",
-    cta_browse: "Browse Job Boards Without CV",
-    sec_features: "What you get",
-    f1: "On-device CV parsing (PDF or text)",
-    f2: "Skill-based job matching with scores",
-    f3: "Curated Japan job board directory",
-    f4: "Application tracker (kanban)",
-    f5: "Cover letter draft + Rirekisho checklist",
-    f6: "Scam safety checklist",
-    f7: "Full backup / restore as JSON",
-    cv_title: "Your Profile",
-    cv_intro: "Upload a PDF or paste text. Parsing runs only on this device.",
-    drop_label: "Tap to choose PDF or TXT",
-    drop_hint: "or paste text below",
-    paste_label: "Paste CV text",
-    parse_btn: "Parse CV",
-    profile_title: "Profile Summary",
-    profile_edit: "All fields are editable.",
-    lbl_name: "Name",
-    lbl_titles: "Job titles",
-    lbl_skills: "Skills (comma-separated)",
-    lbl_years: "Years of experience",
-    lbl_en: "English level",
-    lbl_jp: "Japanese level",
-    lbl_visa: "Visa status",
-    save_profile: "Save Profile",
-    match_title: "Job Matching",
-    match_intro: "Based on your profile skills and language/visa preferences.",
-    pref_loc: "Preferred location",
-    pref_visa: "Visa sponsorship needed?",
-    run_match: "Find Matching Jobs",
-    rec_boards: "Recommended Job Boards",
-    sample_jobs: "Sample Matching Jobs",
-    match_empty: "Save a profile and run matching to see sample jobs.",
-    boards_title: "Japan Job Board Directory",
-    tracker_title: "Application Tracker",
-    tracker_intro: "Mark jobs from matching or boards. Data stays in this browser.",
-    add_job: "Add a job manually",
-    add_btn: "Add as Interested",
-    tracker_empty: "No applications yet. Try marking a job as “Interested”.",
-    cover_title: "Cover Letter Draft",
-    cover_intro: "Uses your saved profile + a job title/company.",
-    cover_job: "Job title",
-    cover_co: "Company",
-    gen_cover: "Generate Draft",
-    copy_btn: "Copy to clipboard",
-    rireki_title: "Japan Resume (Rirekisho) Checklist",
-    rk1: "Photo (3×4 cm, formal)",
-    rk2: "Full name in kanji / romaji",
-    rk3: "Date of birth & age",
-    rk4: "Current address & phone",
-    rk5: "Education history (newest first)",
-    rk6: "Work history with company names",
-    rk7: "Licenses / certifications",
-    rk8: "Motivation / self-PR section",
-    rk9: "Commute time if required",
-    rk10: "Handwritten or clean digital format",
-    scam_title: "Scam Safety Checklist",
-    sc1: "Does the employer ask for money (registration, training, equipment)?",
-    sc1w: "⚠ Warning: Legitimate employers never ask candidates to pay.",
-    sc2: "Are they asking for bank details, My Number, or passport before an offer?",
-    sc2w: "⚠ High risk. Share sensitive data only after a formal offer.",
-    sc3: "Is there extreme pressure to accept immediately or wire money?",
-    sc3w: "⚠ Common scam tactic. Take time to verify.",
-    sc4: "Is the email domain free (gmail etc.) instead of a company domain?",
-    sc4w: "⚠ Suspicious. Prefer official company email addresses.",
-    sc5: "Have they refused a proper interview or video call?",
-    sc5w: "⚠ Red flag. Real companies interview candidates.",
-    scam_report: "Report scams to the National Consumer Affairs Center of Japan or police if money was lost.",
-    scam_link: "Official resources →",
-    nav_home: "Home",
-    nav_cv: "CV",
-    nav_match: "Match",
-    nav_boards: "Boards",
-    nav_tracker: "Tracker",
-    nav_tools: "Tools",
-    backup_title: "Backup / Restore",
-    backup_intro: "Export all local data as JSON or import a previous backup.",
-    export_btn: "Export JSON",
-    import_btn: "Import JSON",
-    close_btn: "Close",
-    toast_saved: "Profile saved",
-    toast_parsed: "CV parsed — review and edit fields",
-    toast_exported: "Backup downloaded",
-    toast_imported: "Data restored",
-    toast_copied: "Copied to clipboard",
-    toast_added: "Added to tracker",
-    interested: "Interested",
-    applied: "Applied",
-    interview: "Interview",
-    offer: "Offer",
-    rejected: "Rejected",
-    match_pct: "match",
-    best_for: "Best for",
-    mark_interested: "Mark Interested",
-    open_job: "Open",
+    hero_title: "Find Your Next Job In Japan With AI",
+    hero_sub: "Upload your CV. Get matched jobs. Discover visa-sponsored opportunities. Apply faster.",
+    upload: "Upload CV",
+    skip: "Continue without CV",
+    dash: "Your AI Dashboard",
+    resume_score: "Resume Strength",
+    japan_score: "Japan Readiness",
+    best_matches: "Best Jobs For You",
+    generate_letter: "Generate Cover Letter",
+    save_tracker: "Save to Tracker",
+    visa_help: "Visa Assistant",
+    improve_cv: "Improve CV",
+    salary: "Salary Estimator",
+    roadmap: "Career Roadmap",
+    directory: "Japan Job Directory",
+    tracker: "Application Tracker",
+    filters: "Smart Filters",
+    no_jobs: "No jobs yet. Upload a CV or adjust filters.",
+    backup_ok: "Backup downloaded",
+    restored: "Progress restored"
   },
-  ja: {
-    hero_title: "日本の英語対応求人を探そう — 無料・プライバシー重視・登録不要",
-    hero_sub: "データはすべて端末内に保存。アカウント不要・追跡なし。",
-    cta_upload: "CVをアップロード",
-    cta_browse: "CVなしで求人サイトを見る",
-    sec_features: "できること",
-    f1: "端末内CV解析（PDF / テキスト）",
-    f2: "スキルに基づく求人マッチング",
-    f3: "日本の求人サイト一覧",
-    f4: "応募トラッカー（カンバン）",
-    f5: "カバーレター下書き + 履歴書チェックリスト",
-    f6: "詐欺対策チェックリスト",
-    f7: "JSONでのバックアップ / 復元",
-    cv_title: "プロフィール",
-    cv_intro: "PDFをアップロードするかテキストを貼り付け。解析はこの端末のみで行われます。",
-    drop_label: "PDFまたはTXTを選択",
-    drop_hint: "または下にテキストを貼り付け",
-    paste_label: "CVテキストを貼り付け",
-    parse_btn: "CVを解析",
-    profile_title: "プロフィール概要",
-    profile_edit: "すべての項目を編集できます。",
-    lbl_name: "氏名",
-    lbl_titles: "職種",
-    lbl_skills: "スキル（カンマ区切り）",
-    lbl_years: "経験年数",
-    lbl_en: "英語レベル",
-    lbl_jp: "日本語レベル",
-    lbl_visa: "ビザ状況",
-    save_profile: "プロフィールを保存",
-    match_title: "求人マッチング",
-    match_intro: "プロフィールのスキルと言語・ビザ設定に基づきます。",
-    pref_loc: "希望勤務地",
-    pref_visa: "ビザサポートが必要？",
-    run_match: "マッチする求人を探す",
-    rec_boards: "おすすめ求人サイト",
-    sample_jobs: "サンプルマッチ求人",
-    match_empty: "プロフィールを保存してマッチングを実行してください。",
-    boards_title: "日本の求人サイト一覧",
-    tracker_title: "応募トラッカー",
-    tracker_intro: "マッチングやサイトから求人をマーク。データはこのブラウザに保存されます。",
-    add_job: "手動で求人を追加",
-    add_btn: "興味ありとして追加",
-    tracker_empty: "まだ応募がありません。「興味あり」で求人をマークしてみてください。",
-    cover_title: "カバーレター下書き",
-    cover_intro: "保存したプロフィールと職種・会社名を使います。",
-    cover_job: "職種",
-    cover_co: "会社名",
-    gen_cover: "下書きを生成",
-    copy_btn: "クリップボードにコピー",
-    rireki_title: "日本式履歴書チェックリスト",
-    rk1: "写真（3×4cm・フォーマル）",
-    rk2: "氏名（漢字 / ローマ字）",
-    rk3: "生年月日・年齢",
-    rk4: "現住所・電話番号",
-    rk5: "学歴（新しい順）",
-    rk6: "職歴（会社名含む）",
-    rk7: "免許・資格",
-    rk8: "志望動機 / 自己PR",
-    rk9: "通勤時間（必要な場合）",
-    rk10: "手書きまたはきれいなデジタル形式",
-    scam_title: "詐欺対策チェックリスト",
-    sc1: "登録料・研修費・機材代などを求められたか？",
-    sc1w: "⚠ 警告：正当な雇用主は候補者に金銭を求めません。",
-    sc2: "内定前に銀行口座・マイナンバー・パスポートを求められたか？",
-    sc2w: "⚠ 高リスク。正式な内定後にのみ共有してください。",
-    sc3: "即決や送金を強く急かされたか？",
-    sc3w: "⚠ よくある詐欺手法。時間をかけて確認を。",
-    sc4: "会社ドメインではなく無料メール（gmailなど）か？",
-    sc4w: "⚠ 疑わしい。公式の会社メールを優先。",
-    sc5: "面接やビデオ通話を拒否されたか？",
-    sc5w: "⚠ 危険信号。本物の会社は面接します。",
-    scam_report: "金銭被害があった場合は国民生活センターや警察に相談してください。",
-    scam_link: "公式情報 →",
-    nav_home: "ホーム",
-    nav_cv: "CV",
-    nav_match: "マッチ",
-    nav_boards: "サイト",
-    nav_tracker: "管理",
-    nav_tools: "ツール",
-    backup_title: "バックアップ / 復元",
-    backup_intro: "ローカルデータをJSONで書き出すか、以前のバックアップを読み込みます。",
-    export_btn: "JSONを書き出し",
-    import_btn: "JSONを読み込み",
-    close_btn: "閉じる",
-    toast_saved: "プロフィールを保存しました",
-    toast_parsed: "CVを解析しました — 内容を確認・編集してください",
-    toast_exported: "バックアップをダウンロードしました",
-    toast_imported: "データを復元しました",
-    toast_copied: "クリップボードにコピーしました",
-    toast_added: "トラッカーに追加しました",
-    interested: "興味あり",
-    applied: "応募済",
-    interview: "面接",
-    offer: "内定",
-    rejected: "不採用",
-    match_pct: "マッチ",
-    best_for: "向いている人",
-    mark_interested: "興味あり",
-    open_job: "開く",
+  jp: {
+    hero_title: "AIで日本の仕事を見つけよう",
+    hero_sub: "履歴書をアップロード。マッチした求人、ビザ支援求人、応募を加速。",
+    upload: "履歴書をアップロード",
+    skip: "履歴書なしで続ける",
+    dash: "AIダッシュボード",
+    resume_score: "履歴書スコア",
+    japan_score: "日本準備度",
+    best_matches: "あなたに最適な仕事",
+    generate_letter: "カバーレター作成",
+    save_tracker: "トラッカーに保存",
+    visa_help: "ビザアシスタント",
+    improve_cv: "履歴書を改善",
+    salary: "給与推定",
+    roadmap: "キャリアロードマップ",
+    directory: "日本求人ディレクトリ",
+    tracker: "応募トラッカー",
+    filters: "スマートフィルター",
+    no_jobs: "求人がありません。履歴書をアップロードするかフィルターを調整してください。",
+    backup_ok: "バックアップをダウンロードしました",
+    restored: "進捗を復元しました"
   }
 };
+const t = k => (I18N[LANG] && I18N[LANG][k]) || I18N.en[k] || k;
 
-let lang = localStorage.getItem("fjn_lang") || "en";
+// ---------- Skill & industry packs ----------
+const SKILL_PACKS = {
+  travel: ["travel","tour","tourism","hospitality","hotel","guest","reservation","airline","guide","itinerary","booking"],
+  hospitality: ["hospitality","hotel","restaurant","front desk","concierge","guest relations","fnb","service"],
+  customer: ["customer service","customer success","support","client","call center","crm"],
+  sales: ["sales","account","business development","b2b","negotiation"],
+  marketing: ["marketing","content","social media","seo","campaign","brand"],
+  eng: ["english","native english","bilingual"],
+  jp: ["japanese","jlpt","nihongo"]
+};
 
-function t(key) {
-  return (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key;
-}
-
-function applyI18n() {
-  document.querySelectorAll("[data-i18n]").forEach((el) => {
-    const key = el.getAttribute("data-i18n");
-    if (I18N[lang][key] !== undefined) el.textContent = I18N[lang][key];
-  });
-  document.getElementById("langEN").classList.toggle("active", lang === "en");
-  document.getElementById("langJP").classList.toggle("active", lang === "ja");
-  document.documentElement.lang = lang === "ja" ? "ja" : "en";
-}
-
-document.getElementById("langEN").onclick = () => { lang = "en"; localStorage.setItem("fjn_lang", "en"); applyI18n(); renderTracker(); renderBoards(); };
-document.getElementById("langJP").onclick = () => { lang = "ja"; localStorage.setItem("fjn_lang", "ja"); applyI18n(); renderTracker(); renderBoards(); };
-
-// ─── Toast ──────────────────────────────────────────────
-function toast(msg, type = "ok") {
-  const el = document.getElementById("toast");
-  el.textContent = msg;
-  el.className = "toast show " + type;
-  clearTimeout(el._t);
-  el._t = setTimeout(() => el.classList.remove("show"), 2600);
-}
-
-// ─── Navigation ─────────────────────────────────────────
-function showView(name) {
-  document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
-  const target = document.getElementById("view-" + name);
-  if (target) target.classList.add("active");
-  document.querySelectorAll(".bottom-nav button").forEach((b) => {
-    b.classList.toggle("active", b.dataset.view === name);
-  });
-  window.scrollTo(0, 0);
-}
-
-document.querySelectorAll(".bottom-nav button").forEach((btn) => {
-  btn.addEventListener("click", () => showView(btn.dataset.view));
-});
-document.getElementById("ctaUpload").onclick = () => showView("cv");
-document.getElementById("ctaBrowse").onclick = () => showView("boards");
-
-// ─── IndexedDB ──────────────────────────────────────────
-const DB_NAME = "FindJobNow";
-const DB_VER = 1;
-let db;
-
-function openDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VER);
-    req.onupgradeneeded = (e) => {
-      const d = e.target.result;
-      if (!d.objectStoreNames.contains("profile")) d.createObjectStore("profile");
-      if (!d.objectStoreNames.contains("applications")) d.createObjectStore("applications", { keyPath: "id" });
-      if (!d.objectStoreNames.contains("settings")) d.createObjectStore("settings");
-    };
-    req.onsuccess = () => { db = req.result; resolve(db); };
-    req.onerror = () => reject(req.error);
-  });
-}
-
-function idbGet(store, key) {
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(store, "readonly");
-    const req = tx.objectStore(store).get(key);
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
-}
-
-function idbSet(store, key, value) {
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(store, "readwrite");
-    const req = key !== undefined
-      ? tx.objectStore(store).put(value, key)
-      : tx.objectStore(store).put(value);
-    req.onsuccess = () => resolve();
-    req.onerror = () => reject(req.error);
-  });
-}
-
-function idbGetAll(store) {
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(store, "readonly");
-    const req = tx.objectStore(store).getAll();
-    req.onsuccess = () => resolve(req.result || []);
-    req.onerror = () => reject(req.error);
-  });
-}
-
-function idbClear(store) {
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(store, "readwrite");
-    const req = tx.objectStore(store).clear();
-    req.onsuccess = () => resolve();
-    req.onerror = () => reject(req.error);
-  });
-}
-
-// ─── Skills dictionary (100+) ───────────────────────────
-const SKILL_LIST = [
-  "javascript","typescript","python","java","c#","c++","go","rust","ruby","php","swift","kotlin",
-  "react","vue","angular","next.js","node.js","express","django","flask","spring","laravel",
-  "sql","mysql","postgresql","mongodb","redis","elasticsearch","aws","azure","gcp","docker",
-  "kubernetes","terraform","linux","git","ci/cd","jenkins","github actions","graphql","rest",
-  "html","css","sass","tailwind","figma","ui/ux","product management","agile","scrum","jira",
-  "sales","marketing","seo","content writing","copywriting","social media","hr","recruiting",
-  "accounting","finance","excel","powerpoint","project management","customer support","cs",
-  "english teaching","esl","tefl","tesol","japanese","translation","interpretation",
-  "data analysis","machine learning","ai","deep learning","pandas","numpy","tableau","power bi",
-  "devops","sre","security","cybersecurity","networking","system admin","it support",
-  "hospitality","tourism","hotel","inbound","customer service","retail","logistics",
-  "supply chain","operations","business development","b2b","b2c","crm","salesforce",
-  "communication","leadership","team management","presentation","negotiation","research"
+const TITLE_HINTS = [
+  {t:"Travel Consultant", k:/travel|tour|tourism/i, ind:"travel"},
+  {t:"Tour Coordinator", k:/tour|coordinator|itinerary/i, ind:"travel"},
+  {t:"Hotel Guest Relations", k:/hotel|guest|front desk|concierge/i, ind:"hospitality"},
+  {t:"Reservation Specialist", k:/reservation|booking|airline/i, ind:"travel"},
+  {t:"Customer Success", k:/customer success|client success/i, ind:"customer"},
+  {t:"Customer Support", k:/customer service|support|help desk/i, ind:"customer"},
+  {t:"Sales Associate", k:/sales|retail/i, ind:"sales"},
+  {t:"Marketing Coordinator", k:/marketing|content|social/i, ind:"marketing"},
+  {t:"English Teacher", k:/teacher|instructor|efl|esl|tefl/i, ind:"education"},
+  {t:"Recruiter", k:/recruit|hr|talent/i, ind:"hr"}
 ];
 
-// ─── Sample jobs ────────────────────────────────────────
-const SAMPLE_JOBS = [
-  { id: "j1", title: "Frontend Engineer", company: "Tokyo Tech Startup", skills: ["javascript","react","typescript","css","html"], english_level: "Business", japanese_level: "Basic", visa_support: true, location: "Tokyo", url: "https://www.wantedly.com/", description: "Build modern web apps with React." },
-  { id: "j2", title: "Backend Engineer (Python)", company: "Fintech JP", skills: ["python","django","sql","aws","docker"], english_level: "Fluent", japanese_level: "None", visa_support: true, location: "Tokyo", url: "https://japan-dev.com/", description: "API development for financial services." },
-  { id: "j3", title: "English Teacher (Eikaiwa)", company: "Global English School", skills: ["english teaching","esl","tefl","communication"], english_level: "Native", japanese_level: "Basic", visa_support: true, location: "Osaka", url: "https://www.gaijinpot.com/jobs/", description: "Full-time conversation classes." },
-  { id: "j4", title: "Product Manager", company: "SaaS Scale-up", skills: ["product management","agile","scrum","jira","communication"], english_level: "Fluent", japanese_level: "Conversational", visa_support: false, location: "Tokyo", url: "https://www.linkedin.com/jobs/", description: "Own roadmap for B2B product." },
-  { id: "j5", title: "DevOps Engineer", company: "Cloud Infra Co", skills: ["aws","docker","kubernetes","terraform","linux","ci/cd"], english_level: "Business", japanese_level: "None", visa_support: true, location: "Remote", url: "https://remoteok.com/", description: "Infrastructure as code, multi-cloud." },
-  { id: "j6", title: "Full-stack Developer", company: "Agency Tokyo", skills: ["javascript","node.js","react","sql","git"], english_level: "Business", japanese_level: "Basic", visa_support: true, location: "Tokyo", url: "https://www.wantedly.com/", description: "Client projects, modern stack." },
-  { id: "j7", title: "Data Analyst", company: "E-commerce Giant", skills: ["sql","python","tableau","excel","data analysis"], english_level: "Fluent", japanese_level: "Business", visa_support: false, location: "Tokyo", url: "https://www.daijob.com/", description: "Business intelligence dashboards." },
-  { id: "j8", title: "Customer Success Manager", company: "B2B Software", skills: ["customer support","crm","salesforce","communication","english"], english_level: "Fluent", japanese_level: "Conversational", visa_support: true, location: "Tokyo", url: "https://www.gaijinpot.com/jobs/", description: "Support enterprise accounts." },
-  { id: "j9", title: "iOS Developer", company: "Mobile Studio", skills: ["swift","ios","git","ui/ux"], english_level: "Business", japanese_level: "None", visa_support: true, location: "Tokyo", url: "https://japan-dev.com/", description: "Native iOS apps for startups." },
-  { id: "j10", title: "Marketing Specialist", company: "Inbound Agency", skills: ["marketing","seo","content writing","social media"], english_level: "Fluent", japanese_level: "Basic", visa_support: true, location: "Osaka", url: "https://www.careerengine.jp/", description: "Content & growth for global brands." },
-  { id: "j11", title: "Java Backend Engineer", company: "Enterprise Systems", skills: ["java","spring","sql","aws"], english_level: "Business", japanese_level: "Conversational", visa_support: false, location: "Tokyo", url: "https://www.green-japan.com/", description: "Microservices for large-scale systems." },
-  { id: "j12", title: "UX Designer", company: "Design Studio", skills: ["figma","ui/ux","html","css","research"], english_level: "Fluent", japanese_level: "Basic", visa_support: true, location: "Remote", url: "https://www.wantedly.com/", description: "End-to-end product design." },
-  { id: "j13", title: "Sales Account Executive", company: "SaaS Japan", skills: ["sales","b2b","negotiation","crm","communication"], english_level: "Fluent", japanese_level: "Business", visa_support: false, location: "Tokyo", url: "https://www.linkedin.com/jobs/", description: "Enterprise software sales." },
-  { id: "j14", title: "Machine Learning Engineer", company: "AI Lab", skills: ["python","machine learning","deep learning","pandas","numpy"], english_level: "Fluent", japanese_level: "None", visa_support: true, location: "Tokyo", url: "https://japan-dev.com/", description: "NLP and recommendation systems." },
-  { id: "j15", title: "Hotel Front Desk (English)", company: "Luxury Hotel Group", skills: ["hospitality","customer service","english","tourism"], english_level: "Fluent", japanese_level: "Conversational", visa_support: true, location: "Tokyo", url: "https://www.gaijinpot.com/jobs/", description: "Guest services for international travelers." },
-  { id: "j16", title: "Technical Writer", company: "Developer Tools Co", skills: ["content writing","technical writing","markdown","git"], english_level: "Native", japanese_level: "None", visa_support: true, location: "Remote", url: "https://remoteok.com/", description: "Docs for developer products." },
-  { id: "j17", title: "QA Engineer", company: "Quality First", skills: ["testing","javascript","selenium","agile"], english_level: "Business", japanese_level: "Basic", visa_support: true, location: "Osaka", url: "https://www.wantedly.com/", description: "Automated and manual testing." },
-  { id: "j18", title: "HR Generalist", company: "Global Corp Japan", skills: ["hr","recruiting","communication","excel"], english_level: "Fluent", japanese_level: "Business", visa_support: false, location: "Tokyo", url: "https://www.daijob.com/", description: "Talent acquisition and employee relations." },
-  { id: "j19", title: "React Native Developer", company: "Cross-platform App", skills: ["react","javascript","typescript","mobile"], english_level: "Business", japanese_level: "None", visa_support: true, location: "Tokyo", url: "https://japan-dev.com/", description: "Mobile apps for iOS and Android." },
-  { id: "j20", title: "Business Analyst", company: "Consulting Firm", skills: ["data analysis","excel","powerpoint","communication","research"], english_level: "Fluent", japanese_level: "Business", visa_support: false, location: "Tokyo", url: "https://www.linkedin.com/jobs/", description: "Client-facing analysis and reporting." }
+const INDUSTRY_LABELS = {
+  travel: "Travel Industry", hospitality: "Hospitality", customer: "Customer Service",
+  sales: "Sales", marketing: "Marketing", education: "Education", hr: "HR / Recruiting"
+};
+
+const JAPAN_SITES = [
+  {name:"GaijinPot", url:"https://jobs.gaijinpot.com", desc:"Popular English job board for foreigners in Japan.", visa:true, eng:5, industries:["All"]},
+  {name:"Jobs in Japan", url:"https://jobsinjapan.com", desc:"Long-running English-friendly job site.", visa:true, eng:5, industries:["All"]},
+  {name:"CareerCross", url:"https://www.careercross.com", desc:"Bilingual and professional roles.", visa:true, eng:4, industries:["IT","Finance","Marketing"]},
+  {name:"Daijob", url:"https://www.daijob.com", desc:"Bilingual professional jobs.", visa:true, eng:4, industries:["IT","Engineering","Sales"]},
+  {name:"YOLO Japan", url:"https://www.yolo-japan.com", desc:"Part-time and full-time for foreigners.", visa:true, eng:4, industries:["Service","Hospitality"]},
+  {name:"WeXpats Jobs", url:"https://jobs.wexpats.com", desc:"Jobs and lifestyle support for foreigners.", visa:true, eng:4, industries:["All"]},
+  {name:"Indeed Japan", url:"https://jp.indeed.com", desc:"Large aggregate search (filter for English).", visa:false, eng:3, industries:["All"]},
+  {name:"Hello Work", url:"https://www.hellowork.mhlw.go.jp", desc:"Official public employment service (Japanese).", visa:false, eng:1, industries:["All"]}
 ];
 
-// ─── Job boards ─────────────────────────────────────────
-const JOB_BOARDS = [
-  { name: "GaijinPot Jobs", desc: "Jobs for foreigners in Japan — teaching, IT, hospitality.", best: "Foreigners", cat: "General", url: "https://jobs.gaijinpot.com/" },
-  { name: "Daijob", desc: "Bilingual and high-level positions across industries.", best: "Bilingual professionals", cat: "Multilingual", url: "https://www.daijob.com/" },
-  { name: "Japan Dev", desc: "Tech jobs at Japanese and foreign companies. Engineer-focused.", best: "Software engineers", cat: "Tech", url: "https://japan-dev.com/" },
-  { name: "Wantedly", desc: "Startup and company culture–focused matching. Popular with younger talent.", best: "Startups & culture fit", cat: "Startup", url: "https://www.wantedly.com/" },
-  { name: "Green", desc: "IT and web industry jobs in Japan. Strong for engineers and designers.", best: "IT professionals", cat: "Tech", url: "https://www.green-japan.com/" },
-  { name: "CareerEngine", desc: "Jobs for bilingual and global talent in Japan.", best: "Global talent", cat: "Multilingual", url: "https://www.careerengine.jp/" },
-  { name: "LinkedIn Jobs", desc: "Global platform with many English-friendly roles in Japan.", best: "Professionals", cat: "General", url: "https://www.linkedin.com/jobs/" },
-  { name: "TokyoDev", desc: "Software developer jobs in Tokyo and remote from Japan.", best: "Developers", cat: "Tech", url: "https://www.tokyodev.com/" },
-  { name: "Ohayo Sensei", desc: "Teaching jobs newsletter and listings for English teachers.", best: "English teachers", cat: "Teaching", url: "https://www.ohayosensei.com/" },
-  { name: "Jobs in Japan", desc: "English-friendly jobs across sectors.", best: "Expats", cat: "General", url: "https://jobsinjapan.com/" },
-  { name: "Remote OK", desc: "Remote jobs worldwide; filter for Japan-friendly.", best: "Remote workers", cat: "Tech", url: "https://remoteok.com/" },
-  { name: "Indeed Japan", desc: "Large aggregate job board (Japanese + some English).", best: "All levels", cat: "General", url: "https://jp.indeed.com/" },
-  { name: "CareerCross", desc: "Bilingual job board for professionals in Japan.", best: "Bilingual", cat: "Multilingual", url: "https://www.careercross.com/" },
-  { name: "Findy", desc: "Engineer-focused platform with skill matching.", best: "Engineers", cat: "Tech", url: "https://findy-code.io/" }
-];
+const SALARY_BANDS = {
+  travel: { Tokyo:[350,550], Osaka:[300,480], Fukuoka:[280,420] },
+  hospitality: { Tokyo:[320,500], Osaka:[280,450], Fukuoka:[260,400] },
+  customer: { Tokyo:[380,600], Osaka:[330,520], Fukuoka:[300,450] },
+  sales: { Tokyo:[400,700], Osaka:[350,600], Fukuoka:[320,520] },
+  marketing: { Tokyo:[420,700], Osaka:[360,600], Fukuoka:[330,520] },
+  education: { Tokyo:[280,450], Osaka:[250,400], Fukuoka:[240,380] },
+  default: { Tokyo:[350,600], Osaka:[300,500], Fukuoka:[280,450] }
+};
 
-// ─── CV parsing ─────────────────────────────────────────
-function extractSkills(text) {
-  const lower = text.toLowerCase();
-  const found = new Set();
-  for (const s of SKILL_LIST) {
-    const re = new RegExp("\\b" + s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+") + "\\b", "i");
-    if (re.test(lower)) found.add(s);
-  }
-  return [...found];
-}
+const ROADMAPS = {
+  travel: ["Travel Agent","Travel Consultant","Senior Consultant","Operations Manager","Country Manager"],
+  hospitality: ["Front Desk","Guest Relations","Assistant Manager","Hotel Manager","Regional Manager"],
+  customer: ["Support Agent","Customer Success","Senior CS","CS Manager","Head of CS"],
+  sales: ["Sales Associate","Account Executive","Senior AE","Sales Manager","Sales Director"],
+  marketing: ["Marketing Coordinator","Specialist","Senior Specialist","Marketing Manager","Head of Marketing"],
+  education: ["Instructor","Senior Instructor","Academic Coordinator","School Manager","Director of Studies"],
+  default: ["Entry Role","Specialist","Senior Specialist","Manager","Director"]
+};
 
-function extractName(text) {
-  const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-  for (const line of lines.slice(0, 8)) {
-    if (line.length > 2 && line.length < 50 && !/resume|curriculum|cv|email|@|phone|tel|address/i.test(line)) {
-      if (/^[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3}$/.test(line) || /^[A-Za-z\s.'-]{3,40}$/.test(line)) {
-        return line;
-      }
-    }
-  }
-  return "";
-}
+// ---------- CV Analysis (enhanced heuristics) ----------
+function analyse(text){
+  const t = String(text||"");
+  const low = t.toLowerCase();
+  let name = "";
+  const nameM = t.match(/(?:name|氏名|名前)[:：\s]*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+|[ぁ-んァ-ヶー一-龥]{2,20})/i) || t.match(/^([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,3})\s*$/m);
+  if(nameM) name = nameM[1].trim();
+  let phone = "";
+  const ph = t.match(/(?:\+?\d{1,3}[\s-]?)?(?:\(?\d{2,4}\)?[\s-]?)?\d{2,4}[\s-]?\d{3,4}[\s-]?\d{3,4}/);
+  if(ph) phone = ph[0].trim();
+  let em = "";
+  const emM = t.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+  if(emM) em = emM[0];
+  let yrs = 0;
+  const yrM = t.match(/(\d{1,2})\+?\s*(?:years?|yrs?|年)/i);
+  if(yrM) yrs = Math.min(40, parseInt(yrM[1],10)||0);
+  let jlpt = "";
+  const jl = t.match(/JLPT\s*N([1-5])/i) || t.match(/日本語能力試験\s*N([1-5])/i);
+  if(jl) jlpt = "N"+jl[1];
+  let visaStatus = "";
+  if(/永住者|permanent resident/i.test(t)) visaStatus = "Permanent resident";
+  else if(/日本人の配偶者|spouse visa/i.test(t)) visaStatus = "Spouse visa";
+  else if(/技術・人文知識・国際業務|engineer.?humanities/i.test(t)) visaStatus = "Engineer/Humanities";
+  else if(/特定技能|specified skills/i.test(t)) visaStatus = "Specified Skills";
+  else if(/留学|student visa/i.test(t)) visaStatus = "Student";
 
-function extractYears(text) {
-  const m = text.match(/(\d{1,2})\+?\s*(?:years?|yrs?)\s*(?:of\s*)?(?:experience|exp)/i);
-  if (m) return parseInt(m[1], 10);
-  const m2 = text.match(/(?:experience|exp)[:\s]+(\d{1,2})\+?\s*(?:years?|yrs?)/i);
-  if (m2) return parseInt(m2[1], 10);
-  return null;
-}
+  const langs = [];
+  if(/english|英語/i.test(t)) langs.push("English");
+  if(/japanese|日本語|jlpt|nihongo/i.test(t)) langs.push(jlpt ? "Japanese ("+jlpt+")" : "Japanese");
 
-function extractTitles(text) {
-  const titles = [];
-  const patterns = [
-    /(?:title|position|role)[:\s]+([^\n,]{5,50})/gi,
-    /\b(Software Engineer|Frontend Developer|Backend Engineer|Full[- ]?stack Developer|Product Manager|Data Analyst|DevOps Engineer|QA Engineer|UX Designer|iOS Developer|Android Developer|English Teacher|Account Executive|Customer Success|Marketing Specialist|Business Analyst|Machine Learning Engineer)\b/gi
-  ];
-  for (const p of patterns) {
-    let m;
-    while ((m = p.exec(text)) !== null) {
-      const t = (m[1] || m[0]).trim();
-      if (t && !titles.includes(t)) titles.push(t);
-    }
-  }
-  return titles.slice(0, 5);
-}
+  const skills = new Set();
+  Object.values(SKILL_PACKS).flat().forEach(kw => {
+    const re = new RegExp("\\b" + kw.replace(/[.*+?^${}()|[\]\\]/g,"\\$&") + "\\b","i");
+    if(re.test(low)) skills.add(kw.replace(/\b\w/g, c => c.toUpperCase()));
+  });
 
-function guessLanguageLevels(text) {
-  const lower = text.toLowerCase();
-  let en = "Business";
-  let jp = "None";
-  if (/native\s*english|english\s*native|mother tongue.*english/i.test(text)) en = "Native";
-  else if (/fluent\s*english|english\s*fluent|c2|ielts\s*7|toefl/i.test(text)) en = "Fluent";
-  else if (/business\s*english|english\s*business|b2/i.test(text)) en = "Business";
-  if (/native\s*japanese|japanese\s*native|母語/i.test(text)) jp = "Native";
-  else if (/fluent\s*japanese|japanese\s*fluent|n1|jlpt\s*n1/i.test(text)) jp = "Fluent";
-  else if (/business\s*japanese|japanese\s*business|n2|jlpt\s*n2/i.test(text)) jp = "Business";
-  else if (/conversational\s*japanese|japanese\s*conversation|n3|jlpt\s*n3/i.test(text)) jp = "Conversational";
-  else if (/basic\s*japanese|japanese\s*basic|n4|n5/i.test(text)) jp = "Basic";
-  return { en, jp };
-}
+  const recs = [];
+  TITLE_HINTS.forEach(h => { if(h.k.test(t)) recs.push({t:h.t, ind:h.ind}); });
+  if(recs.length === 0) recs.push({t:"Customer Support", ind:"customer"}, {t:"Travel Consultant", ind:"travel"});
 
-async function parsePDF(file) {
-  const pdfjs = await import("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs");
-  pdfjs.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
-  const buf = await file.arrayBuffer();
-  const doc = await pdfjs.getDocument({ data: buf }).promise;
-  let text = "";
-  for (let i = 1; i <= Math.min(doc.numPages, 8); i++) {
-    const page = await doc.getPage(i);
-    const content = await page.getTextContent();
-    text += content.items.map((it) => it.str).join(" ") + "\n";
-  }
-  return text;
-}
+  // Industry scores
+  const indScores = {};
+  Object.keys(SKILL_PACKS).forEach(ind => {
+    let hits = 0;
+    SKILL_PACKS[ind].forEach(kw => { if(low.includes(kw)) hits++; });
+    indScores[ind] = Math.min(98, Math.round(40 + hits * 12 + (yrs>2?10:0)));
+  });
 
-async function parseCVText(text) {
-  const skills = extractSkills(text);
-  const name = extractName(text);
-  const years = extractYears(text);
-  const titles = extractTitles(text);
-  const { en, jp } = guessLanguageLevels(text);
+  // Resume score
+  let resume = 40;
+  if(name) resume += 8;
+  if(em) resume += 8;
+  if(phone) resume += 5;
+  if(skills.size >= 3) resume += 12;
+  if(yrs >= 1) resume += 10;
+  if(langs.length) resume += 8;
+  if(/summary|objective|profile/i.test(t)) resume += 6;
+  if(/\d+%|\d+\+|increased|improved|led |managed /i.test(t)) resume += 10;
+  if(jlpt) resume += 5;
+  resume = Math.min(98, resume);
+
+  const strengths = [];
+  const missing = [];
+  if(yrs >= 2) strengths.push("Solid experience");
+  if(langs.length >= 1) strengths.push("Language skills");
+  if(indScores.travel > 70 || indScores.hospitality > 70) strengths.push("Tourism / Hospitality background");
+  if(skills.size >= 4) strengths.push("Diverse skill set");
+  if(!/summary|objective|profile/i.test(t)) missing.push("Professional summary");
+  if(!/\d+%|\d+\+|increased|improved|achieved/i.test(t)) missing.push("Measurable achievements");
+  if(skills.size < 3) missing.push("Clear skills section");
+  if(!jlpt && !/japanese|日本語/i.test(t)) missing.push("Japanese level stated");
+
+  // Japan readiness
+  const langScore = jlpt === "N1" ? 95 : jlpt === "N2" ? 85 : jlpt === "N3" ? 70 : jlpt === "N4" ? 55 : jlpt === "N5" ? 40 : (/japanese/i.test(t) ? 45 : 25);
+  const expScore = Math.min(95, 40 + yrs * 12);
+  const resumeReady = resume;
+  const visaScore = /permanent|spouse|engineer|humanities|specified/i.test(visaStatus) ? 90 : /student/i.test(visaStatus) ? 50 : 65;
+  const japan = Math.round((langScore * 0.3 + expScore * 0.25 + resumeReady * 0.25 + visaScore * 0.2));
+
   return {
-    name: name || "",
-    titles: titles.join(", "),
-    skills: skills.join(", "),
-    years: years ?? "",
-    english: en,
-    japanese: jp,
-    visa: "Unknown",
-    raw: text.slice(0, 5000)
+    name, phone, em, yrs, jlpt, visaStatus, langs, skills: [...skills],
+    recs, indScores, resume, strengths, missing,
+    scores: { resume, japan, language: langScore, experience: expScore, resumeReady, visa: visaScore }
   };
 }
 
-function fillProfileForm(profile) {
-  document.getElementById("pName").value = profile.name || "";
-  document.getElementById("pTitles").value = profile.titles || "";
-  document.getElementById("pSkills").value = profile.skills || "";
-  document.getElementById("pYears").value = profile.years ?? "";
-  document.getElementById("pEn").value = profile.english || "Business";
-  document.getElementById("pJp").value = profile.japanese || "None";
-  document.getElementById("pVisa").value = profile.visa || "Unknown";
-  document.getElementById("profileCard").style.display = "block";
+function computeMatches(ana){
+  const industries = Object.entries(ana.indScores || {})
+    .map(([k,v]) => ({id:k, label: INDUSTRY_LABELS[k]||k, pct:v}))
+    .sort((a,b)=>b.pct-a.pct)
+    .slice(0,6);
+  const titles = (ana.recs||[]).map(r => ({
+    title: r.t,
+    why: `Matches your ${r.ind} experience and keywords found in your CV.`
+  }));
+  const avoid = ["Senior Software Engineer","Japanese Lawyer","Financial Analyst","Quantitative Researcher"]
+    .filter(t => !(ana.skills||[]).some(s => t.toLowerCase().includes(s.toLowerCase())));
+  return { industries, titles, avoid };
 }
 
-function readProfileForm() {
-  return {
-    name: document.getElementById("pName").value.trim(),
-    titles: document.getElementById("pTitles").value.trim(),
-    skills: document.getElementById("pSkills").value.trim(),
-    years: document.getElementById("pYears").value,
-    english: document.getElementById("pEn").value,
-    japanese: document.getElementById("pJp").value,
-    visa: document.getElementById("pVisa").value
-  };
+// ---------- Cover letter templates ----------
+function genCoverLetter(job, profile, type){
+  const name = profile?.name || "Candidate";
+  const skills = (profile?.skills||[]).slice(0,4).join(", ") || "customer service and communication";
+  const title = job?.title || "the position";
+  const company = job?.company || "your company";
+  if(type === "email"){
+    return `Subject: Application for ${title}\n\nDear Hiring Manager,\n\nI am writing to apply for the ${title} role at ${company}. With my background in ${skills}, I am confident I can contribute quickly to your team in Japan.\n\nI would welcome the opportunity to discuss how my experience aligns with your needs.\n\nBest regards,\n${name}`;
+  }
+  if(type === "linkedin"){
+    return `Hi, I'm excited to apply for the ${title} position at ${company}. My experience with ${skills} and interest in working in Japan make me a strong fit. I'd love to connect and share more about how I can contribute.`;
+  }
+  if(type === "jp"){
+    return `はじめまして。${name}と申します。\n\nこの度、${company}の${title}職に応募させていただきたく、ご連絡いたしました。\n\nこれまで${skills}の分野で経験を積んでまいりました。日本で働くことに強い意欲があり、貴社の一員として貢献できるよう努めてまいります。\n\n何卒ご検討のほど、よろしくお願いいたします。\n\n${name}`;
+  }
+  if(type === "interview"){
+    return `Thank you for the opportunity. I'm ${name}. I have experience in ${skills} and I'm particularly motivated to build my career in Japan. I'm excited about the ${title} role because it aligns with my strengths and long-term goals.`;
+  }
+  // full
+  return `Dear Hiring Manager,\n\nI am applying for the ${title} position at ${company}. After reviewing the requirements, I believe my background is a strong match.\n\nKey strengths I bring:\n• Experience relevant to ${skills}\n• Clear communication and customer-focused mindset\n• Motivation to build a long-term career in Japan\n\nI am eager to contribute to your team and would welcome the chance to discuss how I can add value.\n\nThank you for your consideration.\n\nSincerely,\n${name}`;
 }
 
-document.getElementById("parseBtn").onclick = async () => {
-  const status = document.getElementById("parseStatus");
-  status.textContent = "Parsing…";
-  try {
-    let text = document.getElementById("cvPaste").value.trim();
-    const file = document.getElementById("cvFile").files[0];
-    if (file) {
-      if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
-        text = await parsePDF(file);
-      } else {
-        text = await file.text();
-      }
-    }
-    if (!text || text.length < 20) {
-      status.textContent = "Please upload a PDF/TXT or paste more text.";
-      return;
-    }
-    const profile = await parseCVText(text);
-    fillProfileForm(profile);
-    status.textContent = "";
-    toast(t("toast_parsed"));
-  } catch (err) {
-    console.error(err);
-    status.textContent = "Parse failed: " + (err.message || err);
-  }
-};
-
-document.getElementById("saveProfile").onclick = async () => {
-  const profile = readProfileForm();
-  await idbSet("profile", "main", profile);
-  toast(t("toast_saved"));
-};
-
-// ─── Matching ───────────────────────────────────────────
-function scoreJob(job, profile, prefLoc, prefVisa) {
-  const userSkills = (profile.skills || "").toLowerCase().split(/[,;|/]+/).map((s) => s.trim()).filter(Boolean);
-  let skillHits = 0;
-  const reasons = [];
-  for (const js of job.skills) {
-    if (userSkills.some((us) => us.includes(js) || js.includes(us))) {
-      skillHits++;
-      reasons.push(`Your ${js} skill matches`);
-    }
-  }
-  const skillScore = job.skills.length ? (skillHits / job.skills.length) * 70 : 0;
-
-  let langScore = 20;
-  const enMap = { Native: 5, Fluent: 4, Business: 3, Conversational: 2, Basic: 1 };
-  const userEn = enMap[profile.english] || 3;
-  const jobEn = enMap[job.english_level] || 3;
-  if (userEn >= jobEn) {
-    langScore = 20;
-    if (job.english_level === "Native" || job.english_level === "Fluent") reasons.push("English-only / high English role");
-  } else {
-    langScore = 5;
-  }
-
-  let visaScore = 10;
-  if (prefVisa === "Yes" && !job.visa_support) visaScore = 0;
-  else if (job.visa_support) {
-    visaScore = 10;
-    reasons.push("Visa sponsorship available");
-  }
-
-  let locScore = 0;
-  if (prefLoc === "Any" || job.location === prefLoc || (prefLoc === "Remote" && job.location === "Remote")) {
-    locScore = 10;
-  } else if (job.location === "Remote") {
-    locScore = 5;
-  }
-
-  const total = Math.min(100, Math.round(skillScore + langScore + visaScore + locScore));
-  return { score: total, reasons: reasons.slice(0, 4) };
+// ---------- Scam / Quality heuristics ----------
+function scoreJobQuality(job, profile){
+  let visa = job.visa ? 85 : 40;
+  let salary = job.salary ? 75 : 50;
+  let employer = /official|career|jobs\./i.test(job.url||"") ? 70 : 55;
+  let langMatch = 60;
+  if(profile?.jlpt && /n[1-3]/i.test(profile.jlpt)) langMatch += 15;
+  if((profile?.langs||[]).some(l=>/english/i.test(l))) langMatch += 10;
+  const overall = Math.round(visa*0.3 + salary*0.25 + employer*0.2 + langMatch*0.25);
+  return { visa, salary, employer, langMatch, overall: Math.min(98, overall) };
 }
 
-async function runMatching() {
-  const profile = (await idbGet("profile", "main")) || readProfileForm();
-  const prefLoc = document.getElementById("prefLoc").value;
-  const prefVisa = document.getElementById("prefVisa").value;
-  const results = SAMPLE_JOBS.map((job) => {
-    const { score, reasons } = scoreJob(job, profile, prefLoc, prefVisa);
-    return { ...job, score, reasons };
-  }).sort((a, b) => b.score - a.score);
+function detectScam(text){
+  const low = (text||"").toLowerCase();
+  let risk = "low", reasons = [];
+  if(/visa processing fee|training fee|pay.*to.*start|registration fee/i.test(low)){ risk="high"; reasons.push("Mentions fees to the candidate"); }
+  if(/telegram only|contact on telegram|whatsapp only/i.test(low)){ risk="high"; reasons.push("Only contact via messaging apps"); }
+  if(/crypto|bitcoin|usdt|payment in crypto/i.test(low)){ risk="high"; reasons.push("Crypto payment requested"); }
+  if(/guaranteed visa|100% visa|visa guaranteed/i.test(low)){ risk="med"; reasons.push("Overly strong visa guarantee claims"); }
+  if(risk==="low" && /fee|payment required/i.test(low)){ risk="med"; reasons.push("Possible fee language"); }
+  return { risk, reasons: reasons.length ? reasons : ["No obvious red flags detected"] };
+}
 
-  const container = document.getElementById("matchResults");
-  if (!results.length) {
-    container.innerHTML = `<div class="empty"><p>${t("match_empty")}</p></div>`;
-    return;
-  }
-  container.innerHTML = results.map((job) => `
-    <div class="job-card">
-      <div class="top">
-        <div>
-          <div class="title">${escapeHtml(job.title)}</div>
-          <div class="company">${escapeHtml(job.company)} · ${escapeHtml(job.location)}</div>
-        </div>
-        <span class="pill gold">${job.score}% ${t("match_pct")}</span>
-      </div>
-      <div class="match-bar"><i style="width:${job.score}%"></i></div>
-      <ul class="reasons">${job.reasons.map((r) => `<li>${escapeHtml(r)}</li>`).join("")}</ul>
-      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-        <a class="btn btn-secondary btn-sm" href="${job.url}" target="_blank" rel="noopener">${t("open_job")}</a>
-        <button class="btn btn-ghost btn-sm" data-add='${JSON.stringify({ title: job.title, company: job.company, url: job.url })}'>${t("mark_interested")}</button>
-      </div>
+// ---------- Views ----------
+function setView(v){
+  STATE.view = v;
+  persist();
+  render();
+  $$("#bottomNav button").forEach(b => b.classList.toggle("active", b.dataset.view === v));
+}
+
+function renderLanding(){
+  return `
+  <div class="hero">
+    <h1>${t("hero_title")}</h1>
+    <p>${t("hero_sub")}</p>
+    <div class="value-grid">
+      <div class="value-card"><strong>Resume Analysis</strong><span>Score + gaps + recommendations</span></div>
+      <div class="value-card"><strong>Career Matching</strong><span>Industries & titles ranked for you</span></div>
+      <div class="value-card"><strong>Visa Guidance</strong><span>Sponsorship types & job fit</span></div>
+      <div class="value-card"><strong>Application Tools</strong><span>Cover letters, tracker, salary</span></div>
     </div>
-  `).join("");
-
-  container.querySelectorAll("[data-add]").forEach((btn) => {
-    btn.onclick = async () => {
-      const data = JSON.parse(btn.getAttribute("data-add"));
-      await addApplication({ ...data, status: "Interested" });
-      toast(t("toast_added"));
-    };
-  });
-
-  // Recommended boards based on skills
-  const userSkills = (profile.skills || "").toLowerCase();
-  const rec = [];
-  if (/react|javascript|python|java|devops|aws|docker|engineer|developer/.test(userSkills)) {
-    rec.push(...JOB_BOARDS.filter((b) => b.cat === "Tech").slice(0, 3));
-  }
-  if (/teach|esl|tefl|english teaching/.test(userSkills)) {
-    rec.push(...JOB_BOARDS.filter((b) => b.cat === "Teaching").slice(0, 2));
-  }
-  if (rec.length < 3) rec.push(...JOB_BOARDS.filter((b) => b.cat === "General" || b.cat === "Multilingual").slice(0, 3));
-  const unique = [...new Map(rec.map((b) => [b.name, b])).values()].slice(0, 4);
-  document.getElementById("recBoards").innerHTML = unique.map((b) => `
-    <div class="board-card">
-      <a href="${b.url}" target="_blank" rel="noopener">${escapeHtml(b.name)}</a>
-      <div class="muted" style="font-size:13px">${escapeHtml(b.desc)}</div>
-      <span class="pill">${t("best_for")}: ${escapeHtml(b.best)}</span>
+    <div style="margin-top:20px">
+      <button class="btn" id="btnUpload">${t("upload")}</button>
+      <div style="margin-top:10px"><button class="btn ghost" id="btnSkip" style="max-width:320px">${t("skip")}</button></div>
     </div>
-  `).join("") || `<div class="muted">${t("match_empty")}</div>`;
+    <p style="margin-top:18px;font-size:12px;color:var(--mu)">Free · Private · No signup · Everything stays on this device</p>
+  </div>
+  <input type="file" id="cvFile" accept=".pdf,.doc,.docx,.txt,application/pdf" class="hidden">
+  `;
 }
 
-document.getElementById("runMatch").onclick = () => runMatching();
-
-// ─── Boards ─────────────────────────────────────────────
-let boardFilter = "All";
-
-function renderBoards() {
-  const list = boardFilter === "All" ? JOB_BOARDS : JOB_BOARDS.filter((b) => b.cat === boardFilter);
-  document.getElementById("boardList").innerHTML = list.map((b) => `
-    <div class="board-card">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
-        <a href="${b.url}" target="_blank" rel="noopener">${escapeHtml(b.name)}</a>
-        <span class="pill">${escapeHtml(b.cat)}</span>
-      </div>
-      <div class="muted" style="font-size:13px">${escapeHtml(b.desc)}</div>
-      <span class="pill gold">${t("best_for")}: ${escapeHtml(b.best)}</span>
-    </div>
-  `).join("");
+function renderDashboard(){
+  const p = STATE.profile || {};
+  const s = STATE.scores || {resume:0,japan:0,language:0,experience:0,visa:0};
+  const m = STATE.matches || {industries:[],titles:[],avoid:[]};
+  return `
+  <h2 style="margin:0 0 4px;font-size:20px">${t("dash")}</h2>
+  <p style="color:var(--mu);margin:0 0 16px;font-size:14px">${esc(p.name||"Your profile")} · Local only</p>
+  <div class="score-grid">
+    <div class="score-card"><div class="num">${s.resume||0}</div><div class="lbl">${t("resume_score")}</div></div>
+    <div class="score-card"><div class="num">${s.japan||0}</div><div class="lbl">${t("japan_score")}</div></div>
+    <div class="score-card"><div class="num">${s.language||0}</div><div class="lbl">Language</div></div>
+    <div class="score-card"><div class="num">${s.visa||0}</div><div class="lbl">Visa</div></div>
+  </div>
+  ${p.strengths?.length ? `<div class="card"><h3>Strengths</h3><ul class="list-check">${p.strengths.map(x=>`<li class="ok">✓ ${esc(x)}</li>`).join("")}</ul>
+  ${p.missing?.length?`<h3 style="margin-top:12px">Missing</h3><ul class="list-check">${p.missing.map(x=>`<li class="miss">✗ ${esc(x)}</li>`).join("")}</ul>`:""}</div>`:""}
+  <div class="section-title">Best Industries</div>
+  <div class="card">
+    ${(m.industries||[]).slice(0,5).map(i=>`
+      <div class="match-row"><span style="min-width:110px;font-size:13px">${esc(i.label)}</span>
+      <div class="bar"><i style="width:${i.pct}%"></i></div><span class="pct">${i.pct}%</span></div>`).join("")||"<p style='color:var(--mu);font-size:13px'>Upload a CV to see matches</p>"}
+  </div>
+  <div class="section-title">${t("best_matches")}</div>
+  <div class="card">
+    ${(m.titles||[]).slice(0,5).map(ti=>`
+      <div style="margin-bottom:10px"><strong>${esc(ti.title)}</strong>
+      <div style="font-size:12px;color:var(--mu)">${esc(ti.why)}</div></div>`).join("")||"<p style='color:var(--mu);font-size:13px'>No titles yet</p>"}
+    ${(m.avoid||[]).length?`<div style="margin-top:12px;font-size:12px;color:var(--mu)">Avoid for now: ${m.avoid.map(a=>`<span class="chip bad">${esc(a)}</span>`).join(" ")}</div>`:""}
+  </div>
+  <div class="section-title">Quick Actions</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    <button class="btn secondary" data-go="tools">${t("improve_cv")}</button>
+    <button class="btn secondary" data-go="tools">${t("visa_help")}</button>
+    <button class="btn secondary" data-go="jobs">Browse Jobs</button>
+    <button class="btn secondary" data-go="tracker">${t("tracker")}</button>
+  </div>
+  `;
 }
 
-document.getElementById("boardFilters").addEventListener("click", (e) => {
-  const btn = e.target.closest(".filter-btn");
-  if (!btn) return;
-  boardFilter = btn.dataset.cat;
-  document.querySelectorAll(".filter-btn").forEach((b) => b.classList.toggle("active", b === btn));
-  renderBoards();
-});
-
-// ─── Application tracker ────────────────────────────────
-const STATUSES = ["Interested", "Applied", "Interview", "Offer", "Rejected"];
-
-async function addApplication({ title, company, url, status = "Interested" }) {
-  const id = "app_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
-  const item = { id, title, company: company || "", url: url || "", status, created: Date.now() };
-  await idbSet("applications", undefined, item);
-  renderTracker();
-}
-
-async function updateStatus(id, status) {
-  const all = await idbGetAll("applications");
-  const item = all.find((a) => a.id === id);
-  if (item) {
-    item.status = status;
-    await idbSet("applications", undefined, item);
-    renderTracker();
+function renderJobs(){
+  const prefs = STATE.preferences || {};
+  let jobs = STATE.jobs || [];
+  // demo jobs if empty
+  if(jobs.length === 0 && STATE.profile){
+    jobs = (STATE.matches?.titles||[]).slice(0,4).map((ti,i)=>({
+      id: "demo"+i,
+      title: ti.title,
+      company: ["Tokyo Travel Co","Osaka Hospitality","Sakura Guest Services","Nippon Connect"][i%4],
+      location: ["Tokyo","Osaka","Tokyo","Fukuoka"][i%4],
+      visa: i%2===0,
+      remote: i===3,
+      url: "https://jobs.gaijinpot.com",
+      description: "English-friendly role. Visa sponsorship available for qualified candidates."
+    }));
   }
+  // filters
+  if(prefs.visaOnly) jobs = jobs.filter(j=>j.visa);
+  if(prefs.englishOnly) jobs = jobs.filter(j=>true);
+  return `
+  <h2 style="margin:0 0 12px;font-size:20px">Jobs</h2>
+  <div class="filters">
+    <label><input type="checkbox" id="fVisa" ${prefs.visaOnly?"checked":""}> Visa sponsorship</label>
+    <label><input type="checkbox" id="fRemote"> Remote / Hybrid</label>
+    <label><input type="checkbox" id="fEng" ${prefs.englishOnly?"checked":""}> English only</label>
+  </div>
+  ${jobs.length===0 ? `<div class="card"><p style="color:var(--mu)">${t("no_jobs")}</p></div>` :
+    jobs.map(j=>{
+      const q = scoreJobQuality(j, STATE.profile);
+      const scam = detectScam(j.description||"");
+      return `<div class="job-card" data-job="${esc(j.id)}">
+        <h4>${esc(j.title)}</h4>
+        <div class="job-meta"><span>${esc(j.company)}</span>·<span>${esc(j.location||"Japan")}</span>
+        ${j.visa?`<span class="badge visa">Visa</span>`:""}
+        <span class="badge risk-${scam.risk}">${scam.risk} risk</span>
+        <span class="chip">${q.overall}% quality</span></div>
+        <div style="font-size:12px;color:var(--mu);margin-top:4px">${esc((j.description||"").slice(0,90))}…</div>
+      </div>`;
+    }).join("")}
+  `;
 }
 
-async function deleteApp(id) {
-  const tx = db.transaction("applications", "readwrite");
-  tx.objectStore("applications").delete(id);
-  await new Promise((r) => (tx.oncomplete = r));
-  renderTracker();
+function renderTools(){
+  return `
+  <h2 style="margin:0 0 12px;font-size:20px">Tools</h2>
+  <div class="card" data-tool="letter"><h3>${t("generate_letter")}</h3><p style="font-size:13px;color:var(--mu);margin:0">Professional, email, LinkedIn, Japanese self-intro, interview intro — one click.</p></div>
+  <div class="card" data-tool="improve"><h3>${t("improve_cv")}</h3><p style="font-size:13px;color:var(--mu);margin:0">See gaps and get rewritten sections to raise your score.</p></div>
+  <div class="card" data-tool="salary"><h3>${t("salary")}</h3><p style="font-size:13px;color:var(--mu);margin:0">Tokyo / Osaka / Fukuoka bands by industry & level.</p></div>
+  <div class="card" data-tool="visa"><h3>${t("visa_help")}</h3><p style="font-size:13px;color:var(--mu);margin:0">Which visa fits you and which jobs commonly sponsor.</p></div>
+  <div class="card" data-tool="roadmap"><h3>${t("roadmap")}</h3><p style="font-size:13px;color:var(--mu);margin:0">Visual career path and next skills to learn.</p></div>
+  <div id="toolPanel"></div>
+  `;
 }
 
-async function renderTracker() {
-  const apps = await idbGetAll("applications");
-  const kanban = document.getElementById("kanban");
-  const empty = document.getElementById("trackerEmpty");
-  if (!apps.length) {
-    kanban.innerHTML = "";
-    empty.style.display = "block";
-    return;
-  }
-  empty.style.display = "none";
-  const statusLabel = {
-    Interested: t("interested"),
-    Applied: t("applied"),
-    Interview: t("interview"),
-    Offer: t("offer"),
-    Rejected: t("rejected")
-  };
-  kanban.innerHTML = STATUSES.map((st) => {
-    const items = apps.filter((a) => a.status === st);
-    return `
-      <div class="kanban-col">
-        <h4>${statusLabel[st]} (${items.length})</h4>
-        ${items.map((a) => `
-          <div class="app-item">
-            <div class="t">${escapeHtml(a.title)}</div>
-            <div class="c">${escapeHtml(a.company || "")}</div>
-            <select data-id="${a.id}" style="margin-top:6px;width:100%;background:#080e1a;border:1px solid var(--border);border-radius:8px;padding:4px;font-size:12px">
-              ${STATUSES.map((s) => `<option value="${s}" ${s === a.status ? "selected" : ""}>${statusLabel[s]}</option>`).join("")}
-            </select>
+function renderTracker(){
+  const cols = ["saved","applied","interview","offer","rejected"];
+  const labels = {saved:"Saved",applied:"Applied",interview:"Interview",offer:"Offer",rejected:"Rejected"};
+  return `
+  <h2 style="margin:0 0 12px;font-size:20px">${t("tracker")}</h2>
+  <p style="font-size:13px;color:var(--mu);margin:0 0 12px">Drag items between columns. Stored only on this device.</p>
+  <div class="kanban" id="kanban">
+    ${cols.map(c=>`
+      <div class="kanban-col" data-col="${c}">
+        <h4>${labels[c]} (${(STATE.applications[c]||[]).length})</h4>
+        ${(STATE.applications[c]||[]).map(item=>`
+          <div class="kanban-item" draggable="true" data-id="${esc(item.id)}">
+            <strong>${esc(item.title)}</strong>
+            <div style="font-size:11px;color:var(--mu)">${esc(item.company||"")}</div>
+          </div>`).join("")}
+      </div>`).join("")}
+  </div>
+  `;
+}
+
+function renderDirectory(){
+  return `
+  <h2 style="margin:0 0 12px;font-size:20px">${t("directory")}</h2>
+  ${JAPAN_SITES.map(s=>`
+    <div class="card">
+      <div class="dir-card">
+        <div class="dir-logo">${s.name.slice(0,2)}</div>
+        <div style="flex:1">
+          <strong>${esc(s.name)}</strong>
+          <div style="font-size:13px;color:var(--mu);margin:4px 0">${esc(s.desc)}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">
+            ${s.visa?`<span class="badge visa">Visa support</span>`:""}
+            <span class="chip">English ★${s.eng}/5</span>
+            <a href="${s.url}" target="_blank" rel="noopener" class="chip">Open ↗</a>
           </div>
-        `).join("") || `<div class="muted" style="font-size:12px">—</div>`}
+        </div>
       </div>
-    `;
-  }).join("");
+    </div>`).join("")}
+  `;
+}
 
-  kanban.querySelectorAll("select[data-id]").forEach((sel) => {
-    sel.onchange = () => updateStatus(sel.dataset.id, sel.value);
+function renderToolPanel(tool){
+  const panel = $("toolPanel");
+  if(!panel) return;
+  const p = STATE.profile || {};
+  if(tool === "letter"){
+    const job = {title: (STATE.matches?.titles?.[0]?.title)||"Travel Consultant", company:"Example Co"};
+    panel.innerHTML = `
+      <div class="card" style="margin-top:12px">
+        <div class="tabs" id="letterTabs">
+          <button class="active" data-type="full">Full Letter</button>
+          <button data-type="email">Email</button>
+          <button data-type="linkedin">LinkedIn</button>
+          <button data-type="jp">Japanese</button>
+          <button data-type="interview">Interview</button>
+        </div>
+        <div class="letter-box" id="letterOut">${esc(genCoverLetter(job,p,"full"))}</div>
+        <div class="action-row">
+          <button class="btn" id="copyLetter">Copy</button>
+        </div>
+      </div>`;
+    $$("#letterTabs button").forEach(b=>b.onclick=()=>{
+      $$("#letterTabs button").forEach(x=>x.classList.remove("active"));
+      b.classList.add("active");
+      $("letterOut").textContent = genCoverLetter(job,p,b.dataset.type);
+    });
+    $("copyLetter").onclick = () => {
+      navigator.clipboard.writeText($("letterOut").textContent).then(()=>say("Copied",1));
+    };
+  } else if(tool === "improve"){
+    const score = STATE.scores?.resume || 60;
+    panel.innerHTML = `
+      <div class="card" style="margin-top:12px">
+        <h3>Current Score: ${score}</h3>
+        <p style="font-size:13px;color:var(--mu)">To reach 90+</p>
+        <ul class="list-check">
+          <li class="miss">✗ Add a professional summary (2–3 lines)</li>
+          <li class="miss">✗ Add measurable achievements (numbers, %)</li>
+          <li class="miss">✗ Add industry keywords from your target roles</li>
+          <li class="miss">✗ State JLPT level clearly</li>
+        </ul>
+        <div class="section-title">Suggested Summary</div>
+        <div class="letter-box">${esc(`Results-driven professional with ${p.yrs||"several"} years of experience in ${(p.skills||[]).slice(0,3).join(", ")||"customer-facing roles"}. Seeking opportunities in Japan to contribute strong communication and problem-solving skills.`)}</div>
+      </div>`;
+  } else if(tool === "salary"){
+    const ind = STATE.matches?.industries?.[0]?.id || "default";
+    const bands = SALARY_BANDS[ind] || SALARY_BANDS.default;
+    panel.innerHTML = `
+      <div class="card" style="margin-top:12px">
+        <h3>Estimated annual salary (¥10,000 units)</h3>
+        <div class="match-row"><span style="min-width:80px">Tokyo</span><strong>¥${bands.Tokyo[0]/10}M – ¥${bands.Tokyo[1]/10}M</strong></div>
+        <div class="match-row"><span style="min-width:80px">Osaka</span><strong>¥${bands.Osaka[0]/10}M – ¥${bands.Osaka[1]/10}M</strong></div>
+        <div class="match-row"><span style="min-width:80px">Fukuoka</span><strong>¥${bands.Fukuoka[0]/10}M – ¥${bands.Fukuoka[1]/10}M</strong></div>
+        <p style="font-size:12px;color:var(--mu);margin-top:12px">Factors: experience years, Japanese level, English ability, company size, and whether the role is customer-facing or specialist. These are typical ranges for English-friendly roles; actual offers vary.</p>
+      </div>`;
+  } else if(tool === "visa"){
+    panel.innerHTML = `
+      <div class="card" style="margin-top:12px">
+        <h3>Do you need visa sponsorship?</h3>
+        <div class="field"><select id="visaNeed">
+          <option value="need">Yes — I need sponsorship</option>
+          <option value="have">No — I already have status to work</option>
+        </select></div>
+        <div class="section-title">Common work visas</div>
+        <ul class="list-check">
+          <li>• Engineer / Specialist in Humanities / International Services — most office & tourism roles</li>
+          <li>• Specified Skilled Worker — certain service & care sectors</li>
+          <li>• Instructor — teaching roles</li>
+          <li>• Working Holiday — limited nationalities, temporary</li>
+        </ul>
+        <p style="font-size:13px;color:var(--mu)">Jobs that commonly offer sponsorship appear with a Visa badge. Prefer GaijinPot, Jobs in Japan, CareerCross and Daijob when you need sponsorship.</p>
+      </div>`;
+  } else if(tool === "roadmap"){
+    const ind = STATE.matches?.industries?.[0]?.id || "default";
+    const steps = ROADMAPS[ind] || ROADMAPS.default;
+    panel.innerHTML = `
+      <div class="card" style="margin-top:12px">
+        <h3>Suggested path</h3>
+        <div class="roadmap">
+          ${steps.map((s,i)=>`<div class="roadmap-step"><strong>${esc(s)}</strong><span>${i===0?"You are here or nearby":"Next skills: leadership, Japanese business manners, domain depth"}</span></div>`).join("")}
+        </div>
+      </div>`;
+  }
+}
+
+function render(){
+  const main = $("main");
+  if(!main) return;
+  const v = STATE.view || "landing";
+  if(v === "landing" || !STATE.profile){
+    main.innerHTML = renderLanding();
+    $("bottomNav").style.display = "none";
+    wireLanding();
+  } else {
+    $("bottomNav").style.display = "";
+    if(v === "dashboard") main.innerHTML = renderDashboard();
+    else if(v === "jobs") main.innerHTML = renderJobs();
+    else if(v === "tools"){ main.innerHTML = renderTools(); wireTools(); }
+    else if(v === "tracker"){ main.innerHTML = renderTracker(); wireKanban(); }
+    else if(v === "directory") main.innerHTML = renderDirectory();
+    wireCommon();
+  }
+}
+
+function wireLanding(){
+  $("btnUpload")?.addEventListener("click", () => $("cvFile").click());
+  $("btnSkip")?.addEventListener("click", () => {
+    STATE.profile = { name:"", skills:[], langs:[], yrs:0, strengths:[], missing:["Upload a CV for full analysis"] };
+    STATE.scores = { resume:40, japan:40, language:30, experience:30, visa:50 };
+    STATE.matches = computeMatches({ indScores:{travel:60,hospitality:55,customer:70}, recs:[{t:"Customer Support",ind:"customer"}] });
+    STATE.view = "dashboard";
+    persist();
+    render();
+  });
+  $("cvFile")?.addEventListener("change", async e => {
+    const f = e.target.files?.[0];
+    if(!f) return;
+    say("Reading CV…",1);
+    try {
+      let text = "";
+      if(f.type === "application/pdf" || f.name.endsWith(".pdf")){
+        // lightweight: try text extraction via pdf.js if available, else fallback message
+        text = await extractPdfText(f);
+      } else {
+        text = await f.text();
+      }
+      if(text.trim().length < 40){
+        say("Could not extract enough text. Try a text-based PDF or enter manually.",0);
+        return;
+      }
+      const ana = analyse(text);
+      STATE.profile = {
+        name: ana.name, email: ana.em, phone: ana.phone, skills: ana.skills,
+        langs: ana.langs, jlpt: ana.jlpt, yrs: ana.yrs, visaStatus: ana.visaStatus,
+        strengths: ana.strengths, missing: ana.missing
+      };
+      STATE.scores = ana.scores;
+      STATE.matches = computeMatches(ana);
+      STATE.view = "dashboard";
+      persist();
+      say("Analysis complete",1);
+      render();
+    } catch(err){
+      say("Analysis failed — try another file or continue without CV",0);
+      console.error(err);
+    }
   });
 }
 
-document.getElementById("addJobBtn").onclick = async () => {
-  const title = document.getElementById("newJobTitle").value.trim();
-  const company = document.getElementById("newJobCompany").value.trim();
-  if (!title) return;
-  await addApplication({ title, company, status: "Interested" });
-  document.getElementById("newJobTitle").value = "";
-  document.getElementById("newJobCompany").value = "";
-  toast(t("toast_added"));
-};
-
-// ─── Cover letter ───────────────────────────────────────
-document.getElementById("genCover").onclick = async () => {
-  const profile = (await idbGet("profile", "main")) || readProfileForm();
-  const job = document.getElementById("coverJob").value.trim() || "the open position";
-  const co = document.getElementById("coverCo").value.trim() || "your company";
-  const name = profile.name || "[Your Name]";
-  const skills = profile.skills || "relevant skills";
-  const years = profile.years ? `${profile.years} years of experience` : "professional experience";
-  const letter = `Dear Hiring Manager,
-
-I am writing to express my interest in the ${job} position at ${co}. With ${years} and a background that includes ${skills}, I am confident I can contribute to your team.
-
-My experience has prepared me to deliver results in a fast-moving environment, and I am particularly drawn to ${co}'s work. I am proficient in English${profile.japanese && profile.japanese !== "None" ? ` and have ${profile.japanese.toLowerCase()} Japanese ability` : ""}, and I am ready to relocate / work in Japan as required.
-
-I would welcome the opportunity to discuss how my background aligns with your needs. Thank you for your consideration.
-
-Sincerely,
-${name}`;
-  const out = document.getElementById("coverOut");
-  out.style.display = "block";
-  out.textContent = letter;
-  document.getElementById("copyCover").style.display = "inline-flex";
-};
-
-document.getElementById("copyCover").onclick = async () => {
-  const text = document.getElementById("coverOut").textContent;
-  try {
-    await navigator.clipboard.writeText(text);
-    toast(t("toast_copied"));
-  } catch {
-    toast("Copy failed", "err");
+async function extractPdfText(file){
+  // Minimal fallback — if pdf.js is loaded use it, else read as text (works for some)
+  if(window.pdfjsLib){
+    const buf = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({data:buf}).promise;
+    let text = "";
+    for(let i=1;i<=Math.min(pdf.numPages,8);i++){
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      text += content.items.map(it=>it.str).join(" ") + "\n";
+    }
+    return text;
   }
+  return file.text();
+}
+
+function wireTools(){
+  $$("[data-tool]").forEach(el => {
+    el.style.cursor = "pointer";
+    el.onclick = () => renderToolPanel(el.dataset.tool);
+  });
+}
+
+function wireKanban(){
+  let dragId = null, fromCol = null;
+  $$(".kanban-item").forEach(item => {
+    item.ondragstart = e => { dragId = item.dataset.id; fromCol = item.closest(".kanban-col").dataset.col; e.dataTransfer.effectAllowed="move"; };
+  });
+  $$(".kanban-col").forEach(col => {
+    col.ondragover = e => { e.preventDefault(); };
+    col.ondrop = e => {
+      e.preventDefault();
+      if(!dragId || !fromCol) return;
+      const toCol = col.dataset.col;
+      if(fromCol === toCol) return;
+      const arr = STATE.applications[fromCol] || [];
+      const idx = arr.findIndex(x => x.id === dragId);
+      if(idx < 0) return;
+      const [item] = arr.splice(idx,1);
+      STATE.applications[toCol] = STATE.applications[toCol] || [];
+      STATE.applications[toCol].push(item);
+      persist();
+      render();
+    };
+  });
+}
+
+function wireCommon(){
+  $$("[data-go]").forEach(b => b.onclick = () => setView(b.dataset.go));
+  $$(".job-card").forEach(card => {
+    card.onclick = () => {
+      const id = card.dataset.job;
+      // simple: add to saved
+      const job = (STATE.jobs||[]).find(j=>j.id===id) || {
+        id, title: card.querySelector("h4")?.textContent, company: "Company", location:"Japan"
+      };
+      const exists = Object.values(STATE.applications).flat().some(a=>a.id===id);
+      if(!exists){
+        STATE.applications.saved = STATE.applications.saved || [];
+        STATE.applications.saved.push({id: job.id||id, title: job.title, company: job.company});
+        persist();
+        say("Saved to Tracker",1);
+      }
+    };
+  });
+  $("fVisa")?.addEventListener("change", e => {
+    STATE.preferences.visaOnly = e.target.checked;
+    persist(); render();
+  });
+}
+
+// Header actions
+$("btnLang").onclick = () => {
+  LANG = LANG === "en" ? "jp" : "en";
+  STATE.settings.lang = LANG;
+  $("btnLang").textContent = LANG.toUpperCase();
+  persist(); render();
 };
-
-// ─── Scam checklist warnings ────────────────────────────
-document.getElementById("scamList").addEventListener("change", (e) => {
-  const cb = e.target;
-  if (cb.type !== "checkbox") return;
-  const warn = cb.parentElement.querySelector(".warn-text");
-  if (warn) warn.style.display = cb.checked ? "block" : "none";
-});
-
-// ─── Backup / Restore ───────────────────────────────────
-document.getElementById("backupBtn").onclick = () => document.getElementById("backupDialog").showModal();
-document.getElementById("closeBackup").onclick = () => document.getElementById("backupDialog").close();
-
-document.getElementById("exportBtn").onclick = async () => {
-  const profile = await idbGet("profile", "main");
-  const applications = await idbGetAll("applications");
-  const data = {
-    version: 1,
-    exportedAt: new Date().toISOString(),
-    profile: profile || null,
-    applications
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+$("btnTheme").onclick = () => {
+  THEME = THEME === "dark" ? "light" : "dark";
+  STATE.settings.theme = THEME;
+  document.documentElement.setAttribute("data-theme", THEME);
+  persist();
+};
+$("btnBackup").onclick = () => {
+  const blob = new Blob([JSON.stringify(STATE,null,2)], {type:"application/json"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `FindJobNow-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  a.download = `FindJobNow-backup-${today()}.json`;
   a.click();
-  URL.revokeObjectURL(a.href);
-  toast(t("toast_exported"));
+  say(t("backup_ok"),1);
 };
 
-document.getElementById("importBtn").onclick = () => document.getElementById("importFile").click();
-document.getElementById("importFile").onchange = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  try {
-    const text = await file.text();
-    const data = JSON.parse(text);
-    if (data.profile) await idbSet("profile", "main", data.profile);
-    if (Array.isArray(data.applications)) {
-      await idbClear("applications");
-      for (const app of data.applications) await idbSet("applications", undefined, app);
-    }
-    if (data.profile) fillProfileForm(data.profile);
-    renderTracker();
-    toast(t("toast_imported"));
-    document.getElementById("backupDialog").close();
-  } catch (err) {
-    toast("Import failed: invalid file", "err");
-  }
-  e.target.value = "";
-};
+// Bottom nav
+$$("#bottomNav button").forEach(b => {
+  b.onclick = () => setView(b.dataset.view);
+});
 
-// ─── Helpers ────────────────────────────────────────────
-function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+// Load pdf.js for better extraction
+const s = document.createElement("script");
+s.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+s.onload = () => { if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"; };
+document.head.appendChild(s);
+
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("./sw.js").catch(()=>{});
 }
 
-// ─── Init ───────────────────────────────────────────────
-async function init() {
-  await openDB();
-  applyI18n();
-  renderBoards();
-  const profile = await idbGet("profile", "main");
-  if (profile) fillProfileForm(profile);
-  renderTracker();
+render();
 
-  if ("serviceWorker" in navigator) {
-    try {
-      await navigator.serviceWorker.register("./sw.js");
-    } catch (_) {}
-  }
-}
-
-init();
 </script>
 </body>
 </html>
