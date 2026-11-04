@@ -3,361 +3,1551 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#05070c">
+<meta name="description" content="Find English-friendly jobs in Japan — free, private, no signup. All data stays on your device.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="FindJob Now">
-<meta name="theme-color" content="#07090D">
-<meta name="description" content="Find English-friendly jobs in Japan — free, private, no signup. On-device CV analysis for foreigners.">
-<meta name="application-name" content="FindJob Now">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; worker-src 'self' blob: https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://boards-api.greenhouse.io https://api.lever.co https://api.ashbyhq.com https://remotive.com https://jobicy.com; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; upgrade-insecure-requests">
-<link rel="manifest" href="./manifest.webmanifest">
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="FindJobNow">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
-<title>FindJob Now</title>
+<title>FindJobNow — English Jobs in Japan</title>
 <style>
-:root,[data-theme="dark"]{--bg:#07090D;--cd:#0B1A2E;--cd2:#12243a;--tx:#F3EFE6;--mu:#8B97A8;--ac:#D4B36A;--bd:#2A3D55;--ok:#7BC47F;--er:#FF8A8A;--btn:#D4B36A;--btnText:#0E1218;--input:#0a1422;--gold:#D4B36A;--radius:16px;--shadow:0 4px 24px rgba(0,0,0,.35)}
-[data-theme="light"]{--bg:#F3EFE6;--cd:#fff;--cd2:#f7f3ea;--tx:#0E1218;--mu:#4a5568;--ac:#8a6d2f;--bd:#d4c4a0;--ok:#2e7d32;--er:#c62828;--btn:#0B1A2E;--btnText:#F3EFE6;--input:#fff;--gold:#D4B36A;--shadow:0 4px 20px rgba(11,26,46,.08)}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;padding:0}
-body{background:var(--bg);color:var(--tx);font:17px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;padding:env(safe-area-inset-top,0) 0 calc(110px + env(safe-area-inset-bottom,0));min-height:100dvh}
-button,input,select,textarea{font:inherit;color:inherit}a{color:var(--ac)}:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-header{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd)}
-.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:-.02em}
-.hdr-actions{display:flex;align-items:center;gap:6px}
-.hdr-actions button{width:44px;height:44px;border:1px solid var(--bd);border-radius:12px;background:var(--cd);color:var(--tx);cursor:pointer;display:grid;place-items:center;font-size:16px}
-.lang-toggle{display:flex;border:1px solid var(--bd);border-radius:12px;overflow:hidden}
-.lang-toggle button{width:auto;padding:0 12px;height:44px;border:0;border-radius:0;background:transparent;font-weight:700;font-size:13px}
-.lang-toggle button.active{background:var(--ac);color:var(--btnText)}
-.progress-wrap{max-width:640px;margin:0 auto;padding:12px 16px 0}
-.progress-meta{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--mu);margin-bottom:6px}
-.progress-bar{height:4px;background:var(--bd);border-radius:99px;overflow:hidden}
-.progress-bar>i{display:block;height:100%;background:var(--ac);border-radius:99px;transition:width .35s ease}
-main{max-width:640px;margin:0 auto;padding:16px 16px 32px}
-.card{background:var(--cd);border:1px solid var(--bd);border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:var(--shadow)}
-.card h2{margin:0 0 8px;font-size:20px;font-weight:800;letter-spacing:-.02em}
-.card h3{margin:0 0 8px;font-size:16px;font-weight:700}
-.card p{margin:0 0 12px;color:var(--mu)}
-.hero-value{font-size:15px;color:var(--mu);margin:4px 0 20px;line-height:1.45}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border:0;border-radius:14px;font-weight:700;font-size:16px;cursor:pointer;transition:transform .12s,opacity .12s}
-.btn:active{transform:scale(.98)}.btn:disabled{opacity:.45;cursor:not-allowed}
-.btn-primary{background:var(--btn);color:var(--btnText);width:100%}
-.btn-secondary{background:transparent;color:var(--tx);border:1px solid var(--bd);width:100%}
-.btn-ghost{background:transparent;color:var(--ac);border:0;min-height:40px;font-size:14px;padding:0 8px}
-.btn-sm{min-height:40px;font-size:14px;padding:0 14px;width:auto}
-.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.btn-row .btn{flex:1;min-width:120px}
-label{display:block;font-size:13px;font-weight:600;color:var(--mu);margin-bottom:6px}
-input[type=text],input[type=email],input[type=tel],input[type=search],select,textarea{width:100%;min-height:48px;padding:12px 14px;background:var(--input);border:1px solid var(--bd);border-radius:12px;color:var(--tx)}
-textarea{min-height:100px;resize:vertical;line-height:1.45}
-.field{margin-bottom:14px}.field:last-child{margin-bottom:0}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 12px;border-radius:99px;background:var(--cd2);border:1px solid var(--bd);font-size:13px;font-weight:600;cursor:pointer;user-select:none}
-.chip.on,.chip:has(input:checked){background:color-mix(in srgb,var(--ac) 22%,var(--cd));border-color:var(--ac)}
-.chip input{position:absolute;opacity:0;pointer-events:none}
-.chip .x{opacity:.6;font-size:14px;margin-left:2px}
-.check-row{display:flex;align-items:flex-start;gap:12px;min-height:48px;padding:10px 0}
-.check-row input[type=checkbox]{width:22px;height:22px;margin-top:2px;accent-color:var(--ac);flex-shrink:0}
-.check-row label{margin:0;font-size:15px;font-weight:500;color:var(--tx);cursor:pointer}
-.visa-box{background:color-mix(in srgb,var(--ac) 12%,var(--cd));border:1px solid color-mix(in srgb,var(--ac) 40%,var(--bd));border-radius:12px;padding:14px 16px;margin:12px 0}
-.visa-box .check-row{padding:0;min-height:auto}
-.job{background:var(--cd);border:1px solid var(--bd);border-radius:var(--radius);padding:16px;margin-bottom:12px}
-.job-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px}
-.job-title{font-size:18px;font-weight:800;margin:0;line-height:1.3;letter-spacing:-.02em}
-.match-pill{flex-shrink:0;font-size:12px;font-weight:800;padding:4px 10px;border-radius:99px;background:color-mix(in srgb,var(--ac) 20%,var(--cd));color:var(--ac)}
-.job-meta{font-size:13px;color:var(--mu);margin-bottom:8px}
-.badges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
-.badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;background:var(--cd2);border:1px solid var(--bd);color:var(--tx)}
-.badge.visa{background:color-mix(in srgb,#4fc3f7 15%,var(--cd));border-color:#4fc3f7}
-.badge.en{background:color-mix(in srgb,#81c784 15%,var(--cd));border-color:#81c784}
-.badge.jp{background:color-mix(in srgb,#ffb74d 15%,var(--cd));border-color:#ffb74d}
-.badge.entry{background:color-mix(in srgb,#ba68c8 15%,var(--cd));border-color:#ba68c8}
-.badge.yrs{background:color-mix(in srgb,#90a4ae 15%,var(--cd));border-color:#90a4ae}
-.badge.remote{background:color-mix(in srgb,#4db6ac 15%,var(--cd));border-color:#4db6ac}
-.why{font-size:13px;color:var(--mu);margin-bottom:12px;font-style:italic}
-.job-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.job-actions .btn-primary{width:auto;flex:1;min-width:140px}
-.job-actions .btn-secondary{width:auto;flex:1;min-width:110px}
-.job details{margin-top:10px;font-size:13px;color:var(--mu)}
-.job details summary{cursor:pointer;color:var(--ac);font-weight:600}
-.footer-nav{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;gap:10px;justify-content:center;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0));background:color-mix(in srgb,var(--bg) 94%,transparent);backdrop-filter:blur(14px);border-top:1px solid var(--bd)}
-.footer-nav .btn{flex:1;max-width:280px}
-.toast{position:fixed;left:50%;bottom:calc(80px + env(safe-area-inset-bottom,0));transform:translateX(-50%) translateY(20px);max-width:min(92vw,420px);padding:12px 18px;background:var(--cd2);border:1px solid var(--bd);border-radius:12px;font-size:14px;font-weight:600;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:60;text-align:center}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.toast.ok{border-color:var(--ok)}.toast.err{border-color:var(--er)}
-.skip-link{display:inline-block;margin-top:12px;font-size:14px;color:var(--mu);text-decoration:underline}
-.muted{color:var(--mu);font-size:13px}.hidden{display:none!important}
-details.entry-path{margin-top:16px}
-details.entry-path>summary{cursor:pointer;font-weight:600;color:var(--ac);list-style:none;min-height:44px;display:flex;align-items:center}
-details.entry-path>summary::-webkit-details-marker{display:none}
-.japan-sites{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 16px}
-.japan-sites a{display:flex;align-items:center;justify-content:center;min-height:48px;padding:8px;border-radius:12px;background:var(--cd2);border:1px solid var(--bd);color:var(--tx);font-weight:700;font-size:13px;text-decoration:none}
-.empty-state{text-align:center;padding:24px 12px}
-.section-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin:18px 0 8px}
-.profile-row{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd)}
-.profile-row:last-child{border-bottom:0}.profile-row span:first-child{color:var(--mu);font-size:13px}
-.scam-card{border-left:3px solid var(--er)}
-.app-item{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid var(--bd);font-size:14px}
-.app-item:last-child{border-bottom:0}
-.status-pill{font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;background:var(--cd2);border:1px solid var(--bd)}
-.status-pill.applied{background:color-mix(in srgb,var(--ok) 20%,var(--cd));border-color:var(--ok)}
-.file-btn{position:relative;overflow:hidden;cursor:pointer}
-.file-btn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
-#printArea,#rirekishoArea{display:none}
-@media print{body *{visibility:hidden}#printArea,#printArea *,#rirekishoArea,#rirekishoArea *{visibility:visible}#printArea,#rirekishoArea{display:block!important;position:absolute;left:0;top:0;width:100%;background:#fff;color:#000;padding:20mm}}
+:root {
+  --bg: #05070c;
+  --panel: #0c1526;
+  --panel2: #12203a;
+  --gold: #d4b062;
+  --text: #f5f1e8;
+  --muted: #8fa3c4;
+  --border: #1e2d45;
+  --ok: #6bcf7f;
+  --warn: #e8a838;
+  --err: #e86a6a;
+  --radius: 16px;
+  --shadow: 0 4px 24px rgba(0,0,0,.4);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  min-height: 100dvh;
+  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0));
+}
+a { color: var(--gold); }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 
-.site-copy{text-align:center;padding:24px 16px 12px;font-size:12px;color:var(--mu);line-height:1.55}
-.site-copy strong{color:var(--tx);font-weight:600}
+.app {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 0 14px 24px;
+}
+
+/* Header */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 14px;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+.brand svg { flex-shrink: 0; }
+.hdr-actions { display: flex; align-items: center; gap: 6px; }
+.lang-toggle {
+  display: flex;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.lang-toggle button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.lang-toggle button.active {
+  background: var(--gold);
+  color: #0e1218;
+}
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* Nav */
+.bottom-nav {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0));
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid var(--border);
+}
+.bottom-nav button {
+  flex: 1;
+  max-width: 100px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 8px 4px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.bottom-nav button.active { color: var(--gold); }
+.bottom-nav button span { font-size: 18px; line-height: 1; }
+
+/* Cards & UI */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+}
+.card h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.card h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 650;
+}
+.muted { color: var(--muted); font-size: 13px; }
+.hero {
+  text-align: center;
+  padding: 28px 8px 12px;
+}
+.hero h1 {
+  margin: 0 0 10px;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.03em;
+}
+.hero p { margin: 0 0 20px; color: var(--muted); font-size: 15px; }
+.btn-row { display: flex; flex-direction: column; gap: 10px; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 12px 18px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: transform .12s, opacity .12s;
+}
+.btn:active { transform: scale(0.98); }
+.btn-primary {
+  background: var(--gold);
+  color: #0e1218;
+}
+.btn-secondary {
+  background: var(--panel2);
+  color: var(--text);
+  border-color: var(--border);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border-color: var(--border);
+}
+.btn-sm {
+  min-height: 36px;
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 10px;
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+.pill.gold { background: color-mix(in srgb, var(--gold) 18%, transparent); border-color: var(--gold); color: var(--gold); }
+.pill.ok { background: color-mix(in srgb, var(--ok) 18%, transparent); border-color: var(--ok); color: var(--ok); }
+.pill.warn { background: color-mix(in srgb, var(--warn) 18%, transparent); border-color: var(--warn); color: var(--warn); }
+.pill.err { background: color-mix(in srgb, var(--err) 18%, transparent); border-color: var(--err); color: var(--err); }
+
+.field { margin-bottom: 14px; }
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--muted);
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.field input, .field select, .field textarea {
+  width: 100%;
+  background: #080e1a;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 11px 13px;
+  color: var(--text);
+}
+.field textarea { min-height: 100px; resize: vertical; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 99px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  font-size: 13px;
+  cursor: pointer;
+}
+.chip input { margin: 0; }
+.chip:has(input:checked) {
+  border-color: var(--gold);
+  background: color-mix(in srgb, var(--gold) 15%, var(--panel2));
+  color: var(--gold);
+}
+
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted);
+  margin: 20px 0 10px;
+}
+.job-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 10px;
+}
+.job-card .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+.job-card .title { font-weight: 700; font-size: 15px; }
+.job-card .company { color: var(--muted); font-size: 13px; }
+.match-bar {
+  height: 6px;
+  background: var(--panel2);
+  border-radius: 99px;
+  overflow: hidden;
+  margin: 8px 0 4px;
+}
+.match-bar i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), #e8c87a);
+  border-radius: 99px;
+}
+.reasons { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.reasons li { margin-bottom: 2px; }
+
+.board-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 10px;
+}
+.board-card a {
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--text);
+}
+.board-card a:hover { color: var(--gold); }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.filter-btn {
+  padding: 6px 12px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.filter-btn.active {
+  background: var(--gold);
+  color: #0e1218;
+  border-color: var(--gold);
+}
+
+.kanban {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+}
+.kanban-col {
+  min-width: 160px;
+  flex: 1;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+}
+.kanban-col h4 {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.app-item {
+  background: var(--panel2);
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+.app-item .t { font-weight: 650; }
+.app-item .c { color: var(--muted); font-size: 12px; }
+
+.checklist { list-style: none; padding: 0; margin: 0; }
+.checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.checklist li:last-child { border-bottom: 0; }
+.checklist input[type=checkbox] { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--gold); }
+.checklist .warn-text { color: var(--err); font-weight: 650; margin-top: 4px; font-size: 13px; }
+
+.empty {
+  text-align: center;
+  padding: 28px 16px;
+  color: var(--muted);
+}
+.empty p { margin: 0 0 12px; }
+
+.skeleton {
+  background: linear-gradient(90deg, var(--panel2) 25%, var(--panel) 50%, var(--panel2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 10px;
+  height: 72px;
+  margin-bottom: 10px;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(80px + env(safe-area-inset-bottom, 0));
+  transform: translateX(-50%) translateY(16px);
+  max-width: min(90vw, 380px);
+  padding: 12px 16px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 650;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  pointer-events: none;
+  transition: .25s;
+  z-index: 100;
+  text-align: center;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.ok { border-color: var(--ok); }
+.toast.err { border-color: var(--err); }
+
+.view { display: none; }
+.view.active { display: block; }
+
+.profile-grid {
+  display: grid;
+  gap: 8px;
+}
+.profile-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.profile-row:last-child { border-bottom: 0; }
+.profile-row span:first-child { color: var(--muted); }
+
+.file-drop {
+  border: 2px dashed var(--border);
+  border-radius: 14px;
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--panel2);
+  position: relative;
+}
+.file-drop input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.file-drop strong { color: var(--gold); }
+
+.cover-out {
+  background: #080e1a;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 14px;
+  white-space: pre-wrap;
+  min-height: 160px;
+  max-height: 320px;
+  overflow-y: auto;
+}
 </style>
 </head>
 <body>
 <header>
   <div class="brand">
     <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-  <rect width="32" height="32" rx="8" fill="#080E1C"/>
-  <path d="M9.5 12h13a1.5 1.5 0 0 1 1.5 1.5v7.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 8 21v-7.5A1.5 1.5 0 0 1 9.5 12z" fill="#E8B84A" stroke="#FFD666" stroke-width="0.7"/>
-  <path d="M13 12V10.5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2V12" stroke="#E8B84A" stroke-width="1.5" fill="none"/>
-  <rect x="14.2" y="16.2" width="3.6" height="2.4" rx="0.4" fill="#E8B84A"/>
-  <circle cx="18.5" cy="18" r="5.4" stroke="#00E8F5" stroke-width="1.9" fill="rgba(0,200,230,0.1)"/>
-  <line x1="22.4" y1="22" x2="26.2" y2="25.7" stroke="#00E8F5" stroke-width="2.1" stroke-linecap="round"/>
-  <path d="M15.8 19.6l1.9-2.1 1.3 1.3 2.3-2.9" stroke="#00E8F5" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M20.6 15.2h1.9v1.9" stroke="#00E8F5" stroke-width="1.15" stroke-linecap="round"/>
-</svg>
-    <span>FindJob Now</span>
+      <rect width="32" height="32" rx="8" fill="#0c1526"/>
+      <path d="M9.5 12h13a1.5 1.5 0 0 1 1.5 1.5v7.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 8 21v-7.5A1.5 1.5 0 0 1 9.5 12z" fill="#d4b062"/>
+      <path d="M13 12V10.5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2V12" stroke="#d4b062" stroke-width="1.5" fill="none"/>
+      <circle cx="20" cy="18" r="5" stroke="#f5f1e8" stroke-width="1.6" fill="none"/>
+      <line x1="23.5" y1="21.5" x2="26.5" y2="24.5" stroke="#f5f1e8" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    <span>FindJobNow</span>
   </div>
   <div class="hdr-actions">
     <div class="lang-toggle" role="group" aria-label="Language">
       <button type="button" id="langEN" class="active">EN</button>
       <button type="button" id="langJP">JP</button>
     </div>
-    <button type="button" id="themeBtn" aria-label="Toggle theme" title="Theme">🌓</button>
-    <button type="button" id="saveBtn" aria-label="Backup" title="Backup">💾</button>
+    <button type="button" class="icon-btn" id="backupBtn" title="Backup / Restore" aria-label="Backup">💾</button>
   </div>
 </header>
-<div class="progress-wrap">
-  <div class="progress-meta"><span id="stepLabel">Step 1 of 5</span><span id="stepName">Welcome</span></div>
-  <div class="progress-bar" aria-hidden="true"><i id="progressFill" style="width:20%"></i></div>
-</div>
-<main id="main">
-<section id="step1" data-step="1">
-  <div class="card">
-    <h2 data-i18n="welcome_title">Find English-friendly jobs in Japan</h2>
-    <p class="hero-value" data-i18n="welcome_sub">Free, private, no signup. Your CV never leaves this device.</p>
-    <label class="btn btn-primary file-btn" for="cvFile"><span data-i18n="upload_cv">Upload CV</span>
-      <input type="file" id="cvFile" accept=".pdf,.doc,.docx,.txt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain">
-    </label>
-    <a href="#" class="skip-link" id="skipCv" data-i18n="skip_cv">Skip — search without a CV</a>
+
+<div class="app">
+  <!-- LANDING -->
+  <div id="view-home" class="view active">
+    <div class="hero">
+      <h1 data-i18n="hero_title">Find English-Friendly Jobs in Japan — Free, Private, No Signup.</h1>
+      <p data-i18n="hero_sub">Everything stays on your device. No account. No tracking.</p>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="ctaUpload" data-i18n="cta_upload">Upload CV</button>
+        <button class="btn btn-secondary" id="ctaBrowse" data-i18n="cta_browse">Browse Job Boards Without CV</button>
+      </div>
+    </div>
+
+    <div class="section-title" data-i18n="sec_features">What you get</div>
+    <div class="card">
+      <ul style="margin:0;padding-left:18px;color:var(--muted);font-size:14px;line-height:1.7">
+        <li data-i18n="f1">On-device CV parsing (PDF or text)</li>
+        <li data-i18n="f2">Skill-based job matching with scores</li>
+        <li data-i18n="f3">Curated Japan job board directory</li>
+        <li data-i18n="f4">Application tracker (kanban)</li>
+        <li data-i18n="f5">Cover letter draft + Rirekisho checklist</li>
+        <li data-i18n="f6">Scam safety checklist</li>
+        <li data-i18n="f7">Full backup / restore as JSON</li>
+      </ul>
+    </div>
   </div>
-  <details class="entry-path card">
-    <summary data-i18n="no_exp_toggle">I have no work experience</summary>
-    <div style="margin-top:14px">
-      <div class="field"><label for="entryEng" data-i18n="entry_eng">English level</label>
-        <select id="entryEng"><option value="native" data-i18n="eng_native">Native / bilingual</option><option value="fluent" selected data-i18n="eng_fluent">Fluent</option><option value="conversational" data-i18n="eng_conv">Conversational</option></select>
-      </div>
-      <div class="field"><label for="entryJp" data-i18n="entry_jp">Japanese level</label>
-        <select id="entryJp"><option value="none" data-i18n="jp_none">None</option><option value="conversational" selected data-i18n="jp_conv">Conversational</option><option value="n5">JLPT N5</option><option value="n4">JLPT N4</option><option value="n3">JLPT N3</option><option value="n2">JLPT N2</option><option value="n1">JLPT N1</option></select>
-      </div>
-      <div class="field"><label for="entryVisa" data-i18n="entry_visa_lbl">Working visa</label>
-        <select id="entryVisa"><option value="either" selected data-i18n="entry_visa_either">Either — have visa or need sponsorship</option><option value="need" data-i18n="entry_visa_need">Need working visa / sponsorship</option><option value="have" data-i18n="entry_visa_have">Already have status to work in Japan</option></select>
-      </div>
-      <div class="field"><label for="entryCity" data-i18n="entry_city">Preferred city</label><input type="text" id="entryCity" list="cityList" placeholder="Tokyo" autocomplete="off"></div>
-      <div class="field"><label data-i18n="entry_type">Work type</label>
-        <div class="chips" id="entryTypeChips">
-          <label class="chip"><input type="checkbox" value="full" checked> <span data-i18n="type_full">Full-time</span></label>
-          <label class="chip"><input type="checkbox" value="part"> <span data-i18n="type_part">Part-time</span></label>
+
+  <!-- CV / PROFILE -->
+  <div id="view-cv" class="view">
+    <div class="card">
+      <h2 data-i18n="cv_title">Your Profile</h2>
+      <p class="muted" data-i18n="cv_intro">Upload a PDF or paste text. Parsing runs only on this device.</p>
+
+      <div class="file-drop" id="dropZone">
+        <input type="file" id="cvFile" accept=".pdf,application/pdf,text/plain,.txt">
+        <div>
+          <strong data-i18n="drop_label">Tap to choose PDF or TXT</strong>
+          <div class="muted" style="margin-top:6px" data-i18n="drop_hint">or paste text below</div>
         </div>
       </div>
-    </div>
-  </details>
-</section>
-<section id="step2" data-step="2" class="hidden">
-  <div class="card" id="profileCard">
-    <h2 data-i18n="profile_title">Profile summary</h2>
-    <div class="field"><label for="meName" data-i18n="lbl_name">Name</label><input type="text" id="meName" autocomplete="name"></div>
-    <div class="profile-row"><span data-i18n="lbl_exp">Experience</span><span id="yrsDisplay">—</span></div>
-    <div class="section-label" data-i18n="lbl_skills">Key skills</div>
-    <div class="chips" id="skillChips"></div>
-    <div class="field" style="margin-top:10px"><input type="text" id="addSkill" data-i18n-placeholder="add_skill_ph" placeholder="Add a skill…"></div>
-    <div class="section-label" data-i18n="lbl_langs">Languages</div>
-    <div id="langDisplay" class="muted" style="margin-bottom:8px">—</div>
-    <div class="field"><label for="jlptSelect" data-i18n="lbl_jlpt">Japanese level (manual)</label>
-      <select id="jlptSelect"><option value="">—</option><option value="N1">N1</option><option value="N2">N2</option><option value="N3">N3</option><option value="N4">N4</option><option value="N5">N5</option><option value="Conversational">Conversational</option><option value="None">None</option></select>
-    </div>
-    <div class="section-label" data-i18n="lbl_titles">Recommended job titles</div>
-    <div class="chips" id="titleChips"></div>
-    <div class="section-label" data-i18n="lbl_contact">Contact</div>
-    <div class="field"><label for="mePhone" data-i18n="lbl_phone">Phone</label>
-      <div style="display:flex;gap:8px"><input type="tel" id="mePhone" autocomplete="tel" style="flex:1"><button type="button" class="btn btn-secondary btn-sm" id="copyPhone" data-i18n="copy">Copy</button></div>
-    </div>
-    <div class="field"><label for="meEmail" data-i18n="lbl_email">Email</label>
-      <div style="display:flex;gap:8px"><input type="email" id="meEmail" autocomplete="email" style="flex:1"><button type="button" class="btn btn-secondary btn-sm" id="copyEmail" data-i18n="copy">Copy</button></div>
-    </div>
-    <div class="field"><label for="meEssay" data-i18n="lbl_note">Application note</label><textarea id="meEssay" rows="4"></textarea></div>
-    <button type="button" class="btn btn-primary" id="confirmProfile" data-i18n="confirm_continue">Confirm & continue</button>
-  </div>
-  <div class="card hidden" id="parseFailCard">
-    <h2 data-i18n="parse_fail_title">Couldn’t read that CV</h2>
-    <p data-i18n="parse_fail_msg">Scanned PDFs and image-only files aren’t supported. Try a text-based PDF or Word file, or enter your details manually.</p>
-    <button type="button" class="btn btn-primary" id="manualEntry" data-i18n="enter_manual">Enter details myself</button>
-  </div>
-</section>
-<section id="step3" data-step="3" class="hidden">
-  <div class="card">
-    <h2 data-i18n="prefs_title">Search preferences</h2>
-    <div class="field"><label data-i18n="pref_loc">Location</label>
-      <div class="chips" id="locChips">
-        <label class="chip"><input type="radio" name="locScope" value="japan" checked> <span data-i18n="loc_japan">Japan</span></label>
-        <label class="chip"><input type="radio" name="locScope" value="overseas"> <span data-i18n="loc_overseas">Overseas</span></label>
-        <label class="chip"><input type="radio" name="locScope" value="both"> <span data-i18n="loc_both">Both</span></label>
-        <label class="chip"><input type="radio" name="locScope" value="any"> <span data-i18n="loc_any">Any</span></label>
-      </div>
-    </div>
-    <div class="field"><label for="prefCity" data-i18n="pref_city">City</label>
-      <input type="text" id="prefCity" list="cityList" placeholder="Tokyo" autocomplete="off">
-      <datalist id="cityList"><option value="Tokyo"><option value="Osaka"><option value="Kyoto"><option value="Yokohama"><option value="Nagoya"><option value="Fukuoka"><option value="Sapporo"><option value="Kobe"><option value="Sendai"><option value="Hiroshima"><option value="Okinawa"><option value="Remote"><option value="Anywhere"></datalist>
-    </div>
-    <div class="field"><label data-i18n="pref_lang">Language</label>
-      <div class="chips">
-        <label class="chip"><input type="checkbox" id="langEn" checked> <span data-i18n="lang_en">English</span></label>
-        <label class="chip"><input type="checkbox" id="langJpConv"> <span data-i18n="lang_jp_conv">Japanese conversation</span></label>
-        <label class="chip"><input type="checkbox" id="langJpBiz"> <span data-i18n="lang_jp_biz">Japanese business</span></label>
-      </div>
-    </div>
-    <div class="field"><label data-i18n="pref_style">Work style</label>
-      <div class="chips">
-        <label class="chip"><input type="checkbox" id="wsFull" checked> <span data-i18n="type_full">Full-time</span></label>
-        <label class="chip"><input type="checkbox" id="wsPart"> <span data-i18n="type_part">Part-time</span></label>
-        <label class="chip"><input type="checkbox" id="wsRemote"> <span data-i18n="type_remote">Remote</span></label>
-        <label class="chip"><input type="checkbox" id="wsAny"> <span data-i18n="type_any">Any</span></label>
-      </div>
-    </div>
-    <div class="field"><label data-i18n="pref_employer">Employer type</label>
-      <div class="chips">
-        <label class="chip"><input type="checkbox" id="emJp"> <span data-i18n="em_jp">Japanese</span></label>
-        <label class="chip"><input type="checkbox" id="emForeign"> <span data-i18n="em_foreign">Foreign</span></label>
-        <label class="chip"><input type="checkbox" id="emStartup"> <span data-i18n="em_startup">Startup</span></label>
-        <label class="chip"><input type="checkbox" id="emAny" checked> <span data-i18n="type_any">Any</span></label>
-      </div>
-    </div>
-    <div class="visa-box"><div class="check-row"><input type="checkbox" id="visaOnly"><label for="visaOnly" data-i18n="visa_only">Only show jobs with visa sponsorship</label></div></div>
-    <button type="button" class="btn btn-primary" id="saveSearch" data-i18n="save_search">Save & search</button>
-  </div>
-</section>
-<section id="step4" data-step="4" class="hidden">
-  <div class="card">
-    <h2 data-i18n="search_title">Choose field & search</h2>
-    <p class="muted" data-i18n="search_intro">Select areas you care about. We look for related roles, not only exact titles.</p>
-    <div id="fieldPacks"></div>
-    <div class="field" style="margin-top:12px"><label for="extraKw" data-i18n="extra_kw">Extra keywords (optional)</label><input type="text" id="extraKw" placeholder="hotel, inbound, tour…"></div>
-    <button type="button" class="btn btn-primary" id="findBtn" data-i18n="find_jobs">Search jobs</button>
-  </div>
-  <div id="japanSitesWrap" class="hidden">
-    <div class="section-label" data-i18n="japan_sites">Japan job boards (recommended)</div>
-    <div class="japan-sites" id="japanSites"></div>
-  </div>
-  <div id="resultsMeta" class="muted" style="margin:8px 0 12px"></div>
-  <div id="results"></div>
-</section>
-<section id="step5" data-step="5" class="hidden">
-  <div class="card">
-    <h2 data-i18n="apps_title">My applications</h2>
-    <div class="chips" style="margin-bottom:12px">
-      <label class="chip"><input type="radio" name="appFilter" value="all" checked> <span data-i18n="filter_all">All</span></label>
-      <label class="chip"><input type="radio" name="appFilter" value="applied"> <span data-i18n="filter_applied">Applied</span></label>
-      <label class="chip"><input type="radio" name="appFilter" value="opened"> <span data-i18n="filter_opened">Opened</span></label>
-    </div>
-    <div id="appList"><p class="muted" data-i18n="no_apps">No applications yet.</p></div>
-  </div>
-  <div class="card">
-    <h2 data-i18n="resume_tools">Resume tools</h2>
-    <div class="btn-row">
-      <button type="button" class="btn btn-secondary" id="dlCvPdf" data-i18n="dl_cv">Download CV as PDF</button>
-      <button type="button" class="btn btn-secondary" id="genRireki" data-i18n="gen_rirekisho">Generate Japanese Rirekisho</button>
-    </div>
-  </div>
-  <div class="card scam-card">
-    <h2 data-i18n="scam_title">Scam safety</h2>
-    <p data-i18n="scam_body">Never pay for a job offer. Verify the employer on their official website. Beware of “training fees” or “visa processing fees”.</p>
-  </div>
-  <div class="card">
-    <h2 data-i18n="backup_title">Backup & restore</h2>
-    <p class="muted" data-i18n="backup_hint">Download a single HTML file with your progress, or restore from a previous backup.</p>
-    <div class="btn-row">
-      <button type="button" class="btn btn-secondary" id="backupBtn" data-i18n="backup">Backup progress</button>
-      <label class="btn btn-secondary file-btn"><span data-i18n="restore">Restore</span><input type="file" id="restoreFile" accept=".html,.json,text/html,application/json"></label>
-    </div>
-  </div>
-</section>
-</main>
 
-<div class="site-copy" id="siteCopy">
-  <div>© 2026 Rafat Kotaki. All rights reserved.</div>
-  <div><strong>FindJobNow</strong> · V1.0.0</div>
+      <div class="field" style="margin-top:14px">
+        <label data-i18n="paste_label">Paste CV text</label>
+        <textarea id="cvPaste" rows="5" placeholder="Paste your resume text here…"></textarea>
+      </div>
+      <button class="btn btn-primary" id="parseBtn" data-i18n="parse_btn">Parse CV</button>
+      <div id="parseStatus" class="muted" style="margin-top:8px"></div>
+    </div>
+
+    <div id="profileCard" class="card" style="display:none">
+      <h2 data-i18n="profile_title">Profile Summary</h2>
+      <p class="muted" data-i18n="profile_edit">All fields are editable.</p>
+      <div class="field"><label data-i18n="lbl_name">Name</label><input id="pName" type="text"></div>
+      <div class="field"><label data-i18n="lbl_titles">Job titles</label><input id="pTitles" type="text" placeholder="e.g. Software Engineer, Product Manager"></div>
+      <div class="field"><label data-i18n="lbl_skills">Skills (comma-separated)</label><input id="pSkills" type="text"></div>
+      <div class="field"><label data-i18n="lbl_years">Years of experience</label><input id="pYears" type="number" min="0" max="40"></div>
+      <div class="field"><label data-i18n="lbl_en">English level</label>
+        <select id="pEn"><option value="Native">Native</option><option value="Fluent">Fluent</option><option value="Business">Business</option><option value="Conversational">Conversational</option><option value="Basic">Basic</option></select>
+      </div>
+      <div class="field"><label data-i18n="lbl_jp">Japanese level</label>
+        <select id="pJp"><option value="Native">Native</option><option value="Fluent">Fluent</option><option value="Business">Business</option><option value="Conversational">Conversational</option><option value="Basic">Basic</option><option value="None">None</option></select>
+      </div>
+      <div class="field"><label data-i18n="lbl_visa">Visa status</label>
+        <select id="pVisa"><option value="Yes">Has work visa / PR</option><option value="Need">Needs sponsorship</option><option value="Unknown">Unknown</option></select>
+      </div>
+      <button class="btn btn-primary" id="saveProfile" data-i18n="save_profile">Save Profile</button>
+    </div>
+  </div>
+
+  <!-- MATCHING -->
+  <div id="view-match" class="view">
+    <div class="card">
+      <h2 data-i18n="match_title">Job Matching</h2>
+      <p class="muted" data-i18n="match_intro">Based on your profile skills and language/visa preferences.</p>
+      <div class="field">
+        <label data-i18n="pref_loc">Preferred location</label>
+        <select id="prefLoc">
+          <option value="Any">Any / Remote</option>
+          <option value="Tokyo">Tokyo</option>
+          <option value="Osaka">Osaka</option>
+          <option value="Remote">Remote only</option>
+        </select>
+      </div>
+      <div class="field">
+        <label data-i18n="pref_visa">Visa sponsorship needed?</label>
+        <select id="prefVisa">
+          <option value="Any">Any</option>
+          <option value="Yes">Only jobs with visa support</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" id="runMatch" data-i18n="run_match">Find Matching Jobs</button>
+    </div>
+
+    <div class="section-title" data-i18n="rec_boards">Recommended Job Boards</div>
+    <div id="recBoards"></div>
+
+    <div class="section-title" data-i18n="sample_jobs">Sample Matching Jobs</div>
+    <div id="matchResults">
+      <div class="empty"><p data-i18n="match_empty">Save a profile and run matching to see sample jobs.</p></div>
+    </div>
+  </div>
+
+  <!-- JOB BOARDS -->
+  <div id="view-boards" class="view">
+    <div class="section-title" data-i18n="boards_title">Japan Job Board Directory</div>
+    <div class="filters" id="boardFilters">
+      <button class="filter-btn active" data-cat="All">All</button>
+      <button class="filter-btn" data-cat="Tech">Tech</button>
+      <button class="filter-btn" data-cat="Teaching">Teaching</button>
+      <button class="filter-btn" data-cat="General">General</button>
+      <button class="filter-btn" data-cat="Startup">Startup</button>
+      <button class="filter-btn" data-cat="Multilingual">Multilingual</button>
+    </div>
+    <div id="boardList"></div>
+  </div>
+
+  <!-- TRACKER -->
+  <div id="view-tracker" class="view">
+    <div class="card">
+      <h2 data-i18n="tracker_title">Application Tracker</h2>
+      <p class="muted" data-i18n="tracker_intro">Mark jobs from matching or boards. Data stays in this browser.</p>
+      <div class="field">
+        <label data-i18n="add_job">Add a job manually</label>
+        <input id="newJobTitle" type="text" placeholder="Job title">
+        <input id="newJobCompany" type="text" placeholder="Company" style="margin-top:6px">
+        <button class="btn btn-secondary btn-sm" id="addJobBtn" style="margin-top:8px" data-i18n="add_btn">Add as Interested</button>
+      </div>
+    </div>
+    <div id="kanban" class="kanban"></div>
+    <div id="trackerEmpty" class="empty" style="display:none">
+      <p data-i18n="tracker_empty">No applications yet. Try marking a job as “Interested”.</p>
+    </div>
+  </div>
+
+  <!-- TOOLS -->
+  <div id="view-tools" class="view">
+    <div class="card">
+      <h2 data-i18n="cover_title">Cover Letter Draft</h2>
+      <p class="muted" data-i18n="cover_intro">Uses your saved profile + a job title/company.</p>
+      <div class="field"><label data-i18n="cover_job">Job title</label><input id="coverJob" type="text" placeholder="e.g. Frontend Engineer"></div>
+      <div class="field"><label data-i18n="cover_co">Company</label><input id="coverCo" type="text" placeholder="e.g. Example Inc."></div>
+      <button class="btn btn-primary" id="genCover" data-i18n="gen_cover">Generate Draft</button>
+      <div class="cover-out" id="coverOut" style="margin-top:12px;display:none"></div>
+      <button class="btn btn-secondary btn-sm" id="copyCover" style="margin-top:8px;display:none" data-i18n="copy_btn">Copy to clipboard</button>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="rireki_title">Japan Resume (Rirekisho) Checklist</h2>
+      <ul class="checklist" id="rirekiList">
+        <li><input type="checkbox" data-key="photo"><div><span data-i18n="rk1">Photo (3×4 cm, formal)</span></div></li>
+        <li><input type="checkbox" data-key="name"><div><span data-i18n="rk2">Full name in kanji / romaji</span></div></li>
+        <li><input type="checkbox" data-key="dob"><div><span data-i18n="rk3">Date of birth & age</span></div></li>
+        <li><input type="checkbox" data-key="address"><div><span data-i18n="rk4">Current address & phone</span></div></li>
+        <li><input type="checkbox" data-key="edu"><div><span data-i18n="rk5">Education history (newest first)</span></div></li>
+        <li><input type="checkbox" data-key="work"><div><span data-i18n="rk6">Work history with company names</span></div></li>
+        <li><input type="checkbox" data-key="licenses"><div><span data-i18n="rk7">Licenses / certifications</span></div></li>
+        <li><input type="checkbox" data-key="motivation"><div><span data-i18n="rk8">Motivation / self-PR section</span></div></li>
+        <li><input type="checkbox" data-key="commute"><div><span data-i18n="rk9">Commute time if required</span></div></li>
+        <li><input type="checkbox" data-key="handwrite"><div><span data-i18n="rk10">Handwritten or clean digital format</span></div></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="scam_title">Scam Safety Checklist</h2>
+      <ul class="checklist" id="scamList">
+        <li>
+          <input type="checkbox" data-key="money">
+          <div>
+            <span data-i18n="sc1">Does the employer ask for money (registration, training, equipment)?</span>
+            <div class="warn-text" data-i18n="sc1w" style="display:none">⚠ Warning: Legitimate employers never ask candidates to pay.</div>
+          </div>
+        </li>
+        <li>
+          <input type="checkbox" data-key="personal">
+          <div>
+            <span data-i18n="sc2">Are they asking for bank details, My Number, or passport before an offer?</span>
+            <div class="warn-text" data-i18n="sc2w" style="display:none">⚠ High risk. Share sensitive data only after a formal offer.</div>
+          </div>
+        </li>
+        <li>
+          <input type="checkbox" data-key="urgency">
+          <div>
+            <span data-i18n="sc3">Is there extreme pressure to accept immediately or wire money?</span>
+            <div class="warn-text" data-i18n="sc3w" style="display:none">⚠ Common scam tactic. Take time to verify.</div>
+          </div>
+        </li>
+        <li>
+          <input type="checkbox" data-key="email">
+          <div>
+            <span data-i18n="sc4">Is the email domain free (gmail etc.) instead of a company domain?</span>
+            <div class="warn-text" data-i18n="sc4w" style="display:none">⚠ Suspicious. Prefer official company email addresses.</div>
+          </div>
+        </li>
+        <li>
+          <input type="checkbox" data-key="interview">
+          <div>
+            <span data-i18n="sc5">Have they refused a proper interview or video call?</span>
+            <div class="warn-text" data-i18n="sc5w" style="display:none">⚠ Red flag. Real companies interview candidates.</div>
+          </div>
+        </li>
+      </ul>
+      <p class="muted" style="margin-top:12px" data-i18n="scam_report">
+        Report scams to the National Consumer Affairs Center of Japan or police if money was lost.
+      </p>
+      <a href="https://www.cao.go.jp/consumer/" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" data-i18n="scam_link">Official resources →</a>
+    </div>
+  </div>
 </div>
 
-<nav class="footer-nav" id="footerNav">
-  <button type="button" class="btn btn-secondary" id="btnBack" data-i18n="back">Back</button>
-  <button type="button" class="btn btn-primary" id="btnNext" data-i18n="next">Next</button>
+<!-- Bottom nav -->
+<nav class="bottom-nav">
+  <button type="button" data-view="home" class="active"><span>🏠</span><span data-i18n="nav_home">Home</span></button>
+  <button type="button" data-view="cv"><span>📄</span><span data-i18n="nav_cv">CV</span></button>
+  <button type="button" data-view="match"><span>🎯</span><span data-i18n="nav_match">Match</span></button>
+  <button type="button" data-view="boards"><span>🗂</span><span data-i18n="nav_boards">Boards</span></button>
+  <button type="button" data-view="tracker"><span>📋</span><span data-i18n="nav_tracker">Tracker</span></button>
+  <button type="button" data-view="tools"><span>🛠</span><span data-i18n="nav_tools">Tools</span></button>
 </nav>
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
-<div id="printArea"></div>
-<div id="rirekishoArea"></div>
-<script>
-const $=id=>document.getElementById(id),$$=sel=>Array.from(document.querySelectorAll(sel));
-const L=(k,d)=>{try{const v=localStorage.getItem(k);return v!=null?JSON.parse(v):d}catch{return d}};
-const W=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
-const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
-const safeHttpsUrl=u=>{try{const x=new URL(String(u||""),location.href);if(x.protocol==="https:"||x.protocol==="http:")return x.href}catch{}return""};
-const okE=e=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(e||"").trim());
-const today=()=>new Date().toISOString().slice(0,10);
-const canon=u=>String(u||"").split("#")[0].split("?")[0].replace(/\/+$/,"").toLowerCase();
-let toastTimer;function say(msg,ok){const el=$("toast");if(!el)return;el.textContent=msg;el.className="toast show"+(ok?" ok":/error|fail|could|please/i.test(msg||"")?" err":"");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),4000)}
-let LANG=L("fj_lang","en")||"en",THEME=L("fj_theme","dark")||"dark";
-document.documentElement.setAttribute("data-theme",THEME);document.documentElement.lang=LANG;
-const I18N={en:{welcome_title:"Find English-friendly jobs in Japan",welcome_sub:"Free, private, no signup. Your CV never leaves this device.",upload_cv:"Upload CV",skip_cv:"Skip — search without a CV",no_exp_toggle:"I have no work experience",entry_eng:"English level",eng_native:"Native / bilingual",eng_fluent:"Fluent",eng_conv:"Conversational",entry_jp:"Japanese level",jp_none:"None",jp_conv:"Conversational",entry_visa_lbl:"Working visa",entry_visa_either:"Either — have visa or need sponsorship",entry_visa_need:"Need working visa / sponsorship",entry_visa_have:"Already have status to work in Japan",entry_city:"Preferred city",entry_type:"Work type",type_full:"Full-time",type_part:"Part-time",type_remote:"Remote",type_any:"Any",profile_title:"Profile summary",lbl_name:"Name",lbl_exp:"Experience",lbl_skills:"Key skills",add_skill_ph:"Add a skill…",lbl_langs:"Languages",lbl_jlpt:"Japanese level (manual)",lbl_titles:"Recommended job titles",lbl_contact:"Contact",lbl_phone:"Phone",lbl_email:"Email",lbl_note:"Application note",copy:"Copy",confirm_continue:"Confirm & continue",parse_fail_title:"Couldn’t read that CV",parse_fail_msg:"Scanned PDFs and image-only files aren’t supported. Try a text-based PDF or Word file, or enter your details manually.",enter_manual:"Enter details myself",prefs_title:"Search preferences",pref_loc:"Location",loc_japan:"Japan",loc_overseas:"Overseas",loc_both:"Both",loc_any:"Any",pref_city:"City",pref_lang:"Language",lang_en:"English",lang_jp_conv:"Japanese conversation",lang_jp_biz:"Japanese business",pref_style:"Work style",pref_employer:"Employer type",em_jp:"Japanese",em_foreign:"Foreign",em_startup:"Startup",visa_only:"Only show jobs with visa sponsorship",save_search:"Save & search",search_title:"Choose field & search",search_intro:"Select areas you care about. We look for related roles, not only exact titles.",extra_kw:"Extra keywords (optional)",find_jobs:"Search jobs",japan_sites:"Japan job boards (recommended)",apps_title:"My applications",filter_all:"All",filter_applied:"Applied",filter_opened:"Opened",no_apps:"No applications yet.",resume_tools:"Resume tools",dl_cv:"Download CV as PDF",gen_rirekisho:"Generate Japanese Rirekisho",scam_title:"Scam safety",scam_body:"Never pay for a job offer. Verify the employer on their official website. Beware of “training fees” or “visa processing fees”.",backup_title:"Backup & restore",backup_hint:"Download a single HTML file with your progress, or restore from a previous backup.",backup:"Backup progress",restore:"Restore",back:"Back",next:"Next",step_of:(i,n)=>`Step ${i} of ${n}`,step_names:["Welcome","Profile","Preferences","Search","Tools"],yrs:n=>n?`${n}+ years`:"—",empty_results:"No direct listings matched. Live feeds skew toward tech. For travel/hospitality roles, use the Japan sites above.",apply_site:"Apply on employer site ↗",email_cv:"Email + CV",mark_applied:"Mark as applied",why_matched:"Why it matched:",requirements:"Requirements",reading_cv:"Reading your CV…",analysing:"Analysing…",cv_ready:"CV ready ✓",confirm_ok:"Profile confirmed ✓",copied:"Copied ✓",searching:"Searching job boards…",found:n=>`Found ${n} matching roles`,visa_badge:"Visa support",en_badge:"English OK",entry_badge:"Entry friendly",remote_badge:"Remote",need_name_email:"Please enter your name and a valid email.",need_field:"Select at least one field or enter keywords.",pack_travel:"Travel & tourism",pack_sales:"Sales & business development",pack_marketing:"Marketing",pack_ops:"Operations & project",pack_other:"Other / open search"},
-jp:{welcome_title:"日本の英語OK求人を探そう",welcome_sub:"無料・プライバシー重視・登録不要。履歴書は端末内だけで解析します。",upload_cv:"履歴書をアップロード",skip_cv:"スキップ — 履歴書なしで検索",no_exp_toggle:"職歴がありません",entry_eng:"英語レベル",eng_native:"ネイティブ / バイリンガル",eng_fluent:"流暢",eng_conv:"日常会話",entry_jp:"日本語レベル",jp_none:"なし",jp_conv:"日常会話",entry_visa_lbl:"就労ビザ",entry_visa_either:"どちらでも（ビザあり / 要サポート）",entry_visa_need:"就労ビザ・スポンサーが必要",entry_visa_have:"すでに日本で働ける在留資格あり",entry_city:"希望の都市",entry_type:"雇用形態",type_full:"正社員",type_part:"パート・アルバイト",type_remote:"リモート",type_any:"指定なし",profile_title:"プロフィール確認",lbl_name:"氏名",lbl_exp:"経験年数",lbl_skills:"主要スキル",add_skill_ph:"スキルを追加…",lbl_langs:"言語",lbl_jlpt:"日本語レベル（手動）",lbl_titles:"おすすめ職種",lbl_contact:"連絡先",lbl_phone:"電話",lbl_email:"メール",lbl_note:"応募メモ",copy:"コピー",confirm_continue:"確認して続ける",parse_fail_title:"履歴書を読めませんでした",parse_fail_msg:"スキャンPDFや画像のみのファイルは非対応です。テキストPDFまたはWordで再試行するか、手動入力してください。",enter_manual:"自分で入力する",prefs_title:"検索条件",pref_loc:"勤務地",loc_japan:"日本",loc_overseas:"海外",loc_both:"両方",loc_any:"指定なし",pref_city:"都市",pref_lang:"言語",lang_en:"英語",lang_jp_conv:"日本語（会話）",lang_jp_biz:"日本語（ビジネス）",pref_style:"働き方",pref_employer:"企業タイプ",em_jp:"日系",em_foreign:"外資",em_startup:"スタートアップ",visa_only:"ビザスポンサーのある求人のみ",save_search:"保存して検索",search_title:"分野を選んで検索",search_intro:"関心のある分野を選んでください。職名の完全一致だけでなく関連職種も探します。",extra_kw:"追加キーワード（任意）",find_jobs:"求人を検索",japan_sites:"日本の求人サイト（おすすめ）",apps_title:"応募履歴",filter_all:"すべて",filter_applied:"応募済",filter_opened:"開いた",no_apps:"まだ応募がありません。",resume_tools:"履歴書ツール",dl_cv:"CVをPDFでダウンロード",gen_rirekisho:"日本語履歴書を作成",scam_title:"詐欺に注意",scam_body:"内定やオファーのために金銭を要求する会社は避けてください。公式サイトで企業を確認し、「研修費」「ビザ手数料」などの請求に注意してください。",backup_title:"バックアップと復元",backup_hint:"進捗を含むHTMLファイルをダウンロード、または以前のバックアップから復元できます。",backup:"進捗をバックアップ",restore:"復元",back:"戻る",next:"次へ",step_of:(i,n)=>`ステップ ${i} / ${n}`,step_names:["ようこそ","プロフィール","条件","検索","ツール"],yrs:n=>n?`${n}年以上`:"—",empty_results:"直接の求人が見つかりませんでした。フィードはテック系が多いです。旅行・接客は上の日本サイトをご利用ください。",apply_site:"企業サイトで応募 ↗",email_cv:"メール + CV",mark_applied:"応募済みにする",why_matched:"マッチ理由:",requirements:"要件",reading_cv:"履歴書を読み込み中…",analysing:"解析中…",cv_ready:"履歴書の準備完了 ✓",confirm_ok:"プロフィールを確認しました ✓",copied:"コピーしました ✓",searching:"求人を検索中…",found:n=>`${n}件のマッチする求人`,visa_badge:"ビザサポート",en_badge:"英語OK",entry_badge:"未経験歓迎",remote_badge:"リモート",need_name_email:"氏名と有効なメールを入力してください。",need_field:"分野を選ぶかキーワードを入力してください。",pack_travel:"旅行・観光",pack_sales:"営業・事業開発",pack_marketing:"マーケティング",pack_ops:"オペレーション・PM",pack_other:"その他 / 自由検索"}};
-function t(key){const pack=I18N[LANG]||I18N.en;const v=pack[key];if(typeof v==="function")return v;return v!=null?v:(I18N.en[key]??key)}
-function applyLang(){W("fj_lang",LANG);document.documentElement.lang=LANG;$("langEN")?.classList.toggle("active",LANG==="en");$("langJP")?.classList.toggle("active",LANG==="jp");$$("[data-i18n]").forEach(el=>{const k=el.getAttribute("data-i18n");const val=t(k);if(typeof val==="string")el.textContent=val});$$("[data-i18n-placeholder]").forEach(el=>{const k=el.getAttribute("data-i18n-placeholder");const val=t(k);if(typeof val==="string")el.placeholder=val});updateProgress();if(typeof renderFieldPacks==="function")renderFieldPacks();if(typeof renderApps==="function")renderApps()}
-let STEP=1;const STEPS=5;let CF=null,RAW_ANA=null,ANA=null,ANA_CONFIRMED=false,SELECTED=new Set(),FIELD_SEL=new Set(),APPLIED=[],LAST_JOBS=[];
-function updateProgress(){const pct=(STEP/STEPS)*100;$("progressFill").style.width=pct+"%";const names=t("step_names");$("stepLabel").textContent=(typeof t("step_of")==="function"?t("step_of")(STEP,STEPS):`Step ${STEP} of ${STEPS}`);$("stepName").textContent=names[STEP-1]||"";$("btnBack").style.visibility=STEP<=1?"hidden":"visible";if(STEP>=STEPS)$("btnNext").classList.add("hidden");else $("btnNext").classList.remove("hidden")}
-function showStep(n){STEP=Math.max(1,Math.min(STEPS,n));for(let i=1;i<=STEPS;i++){const el=$("step"+i);if(el)el.classList.toggle("hidden",i!==STEP)}updateProgress();window.scrollTo({top:0,behavior:"smooth"});persist()}
-const cvDb=()=>new Promise((res,rej)=>{const q=indexedDB.open("findjobnow_cv_db2",1);q.onupgradeneeded=()=>q.result.createObjectStore("files");q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)});
-async function saveCV(name,buf){const db=await cvDb();await new Promise((res,rej)=>{const tx=db.transaction("files","readwrite");tx.objectStore("files").put({name,buf},"current");tx.oncomplete=res;tx.onerror=()=>rej(tx.error)});db.close()}
-async function loadCV(){const db=await cvDb();const it=await new Promise((res,rej)=>{const q=db.transaction("files").objectStore("files").get("current");q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)});db.close();return it}
-function loadPdfJs(){return new Promise((ok,no)=>{if(window.pdfjsLib)return ok();const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";s.onload=()=>{pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";ok()};s.onerror=()=>no(new Error("pdf"));document.head.appendChild(s)})}
-async function unzipSimple(buf){const u8=new Uint8Array(buf);const view=new DataView(buf);const files={};let eocd=-1;for(let i=u8.length-22;i>=0;i--){if(view.getUint32(i,true)===0x06054b50){eocd=i;break}}if(eocd<0)return files;const total=view.getUint16(eocd+10,true);let offset=view.getUint32(eocd+16,true);for(let i=0;i<total;i++){if(view.getUint32(offset,true)!==0x02014b50)break;const comp=view.getUint16(offset+10,true);const csize=view.getUint32(offset+20,true);const nlen=view.getUint16(offset+28,true);const elen=view.getUint16(offset+30,true);const clen=view.getUint16(offset+32,true);const name=new TextDecoder().decode(u8.subarray(offset+46,offset+46+nlen));const lhoff=view.getUint32(offset+42,true);offset+=46+nlen+elen+clen;if(view.getUint32(lhoff,true)!==0x04034b50)continue;const lnlen=view.getUint16(lhoff+26,true);const lelen=view.getUint16(lhoff+28,true);const dataStart=lhoff+30+lnlen+lelen;const data=u8.subarray(dataStart,dataStart+csize);if(comp===0)files[name]=data;else if(comp===8){try{const ds=new DecompressionStream("deflate-raw");const stream=new Blob([data]).stream().pipeThrough(ds);const ab=await new Response(stream).arrayBuffer();files[name]=new Uint8Array(ab)}catch{}}}return files}
-async function extractDocx(buf){try{const files=await unzipSimple(buf);const xml=files["word/document.xml"];if(!xml)return"";const text=new TextDecoder().decode(xml);return text.replace(/<w:tab[^/]*\/>/g,"\t").replace(/<\/w:p>/g,"\n").replace(/<[^>]+>/g," ").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,"\"").replace(/&#39;/g,"'").replace(/[ \t]+\n/g,"\n").replace(/\n{3,}/g,"\n\n").trim()}catch{return""}}
-async function cvText(file,buf){const name=(file.name||"").toLowerCase();if(name.endsWith(".txt")||(file.type||"").includes("text"))return new TextDecoder().decode(buf);if(name.endsWith(".docx")||(file.type||"").includes("wordprocessingml"))return extractDocx(buf);if(name.endsWith(".pdf")||(file.type||"").includes("pdf")){await loadPdfJs();const doc=await pdfjsLib.getDocument({data:buf.slice(0)}).promise;let t="";for(let i=1;i<=Math.min(doc.numPages,12);i++){const page=await doc.getPage(i);const content=await page.getTextContent();t+=content.items.map(it=>it.str).join(" ")+"\n"}return t}return new TextDecoder("utf-8",{fatal:false}).decode(buf).replace(/[^\x09\x0a\x0d\x20-\x7e\u00a0-\uffff]/g," ")}
-const SKILL_PACKS={travel:["hotel","hospitality","resort","tour operator","dmc","ota","gds","amadeus","sabre","itinerary","reservation","concierge","inbound","outbound","mice","guest relations","front desk","guest service","travel","tourism","airline","cruise"],teaching:["esl","tefl","tesol","celta","alt","jet","classroom management","curriculum","english teacher","instructor"],retail:["customer service","pos","cashier","barista","server","hospitality","retail","sales associate"],eng:["javascript","typescript","python","java","react","node","aws","docker","sql","api","frontend","backend","fullstack","devops","kubernetes","go","rust","swift","kotlin"],general:["project management","excel","powerpoint","communication","leadership","teamwork","marketing","sales","operations","hr","recruiting","accounting","finance","design","figma","photoshop"]};
-const TITLE_HINTS=[{t:"Hotel Front Desk / Guest Relations",k:/hotel|front desk|guest relation|concierge|hospitality/i},{t:"Tour Coordinator / Inbound Travel",k:/tour|inbound|outbound|itinerary|travel agent|dmc/i},{t:"English Teacher / ALT",k:/teacher|esl|tefl|tesol|alt|jet|instructor/i},{t:"Customer Success / Support",k:/customer success|customer support|client success|cs agent/i},{t:"Sales / Business Development",k:/sales|business development|account executive|bdm/i},{t:"Marketing Specialist",k:/marketing|seo|content|social media|campaign/i},{t:"Operations / Project Coordinator",k:/operations|project coordinator|project manager|ops/i},{t:"Software Engineer",k:/software engineer|developer|full.?stack|frontend|backend/i},{t:"Administrative Assistant",k:/admin|administrative|office assistant|secretary/i},{t:"Retail / Store Staff",k:/retail|store|cashier|sales associate/i}];
-function analyse(text){const t=String(text||""),low=t.toLowerCase();let name="";const nameM=t.match(/(?:name|氏名|名前)[:：\s]*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+|[ぁ-んァ-ヶー一-龥]{2,20})/i)||t.match(/^([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,3})\s*$/m);if(nameM)name=nameM[1].trim();let phone="";const ph=t.match(/(?:\+?\d{1,3}[\s-]?)?(?:\(?\d{2,4}\)?[\s-]?)?\d{2,4}[\s-]?\d{3,4}[\s-]?\d{3,4}/);if(ph)phone=ph[0].trim();let em="";const emM=t.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);if(emM)em=emM[0];let yrs=0;const yrM=t.match(/(\d{1,2})\+?\s*(?:years?|yrs?|年)/i);if(yrM)yrs=Math.min(40,parseInt(yrM[1],10)||0);let jlpt="";const jl=t.match(/JLPT\s*N([1-5])/i)||t.match(/日本語能力試験\s*N([1-5])/i);if(jl)jlpt="N"+jl[1];let visaStatus="";if(/永住者|permanent resident/i.test(t))visaStatus="Permanent resident";else if(/日本人の配偶者|spouse visa/i.test(t))visaStatus="Spouse visa";else if(/技術・人文知識・国際業務|engineer.?humanities/i.test(t))visaStatus="Engineer/Humanities";else if(/特定技能|specified skills/i.test(t))visaStatus="Specified Skills";else if(/留学|student visa/i.test(t))visaStatus="Student";const langs=[];if(/english|英語/i.test(t))langs.push("English");if(/japanese|日本語|jlpt|nihongo/i.test(t))langs.push(jlpt?"Japanese ("+jlpt+")":"Japanese");const skills=new Set();Object.values(SKILL_PACKS).flat().forEach(kw=>{const re=new RegExp("\\b"+kw.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\b","i");if(re.test(low))skills.add(kw.replace(/\b\w/g,c=>c.toUpperCase()))});const recs=[];TITLE_HINTS.forEach(h=>{if(h.k.test(t))recs.push({t:h.t,s:1})});if(!recs.length)recs.push({t:"Customer Success / Support",s:0},{t:"Administrative Assistant",s:0});return{name,phone,em,yrs,langs,skills:[...skills].slice(0,24),recs:recs.slice(0,8),jlpt,visaStatus,kw:[...skills].slice(0,12),tips:[]}}
-function renderProfile(){const a=ANA||RAW_ANA||{};$("meName").value=a.name||$("meName").value||"";$("mePhone").value=a.phone||$("mePhone").value||"";$("meEmail").value=a.em||$("meEmail").value||"";$("yrsDisplay").textContent=typeof t("yrs")==="function"?t("yrs")(a.yrs||0):(a.yrs?a.yrs+"+":"—");const sc=$("skillChips");sc.innerHTML="";(a.skills||[]).forEach(s=>{const el=document.createElement("span");el.className="chip on";el.innerHTML=esc(s)+' <span class="x" data-skill="'+esc(s)+'">×</span>';sc.appendChild(el)});sc.querySelectorAll(".x").forEach(x=>x.onclick=()=>{const s=x.getAttribute("data-skill");if(ANA)ANA.skills=(ANA.skills||[]).filter(k=>k!==s);if(RAW_ANA)RAW_ANA.skills=(RAW_ANA.skills||[]).filter(k=>k!==s);renderProfile()});$("langDisplay").textContent=(a.langs||[]).join(" · ")||"—";if(a.jlpt)$("jlptSelect").value=a.jlpt;const tc=$("titleChips");tc.innerHTML="";(a.recs||[]).forEach(r=>{const checked=SELECTED.has(r.t)||SELECTED.size===0;if(checked)SELECTED.add(r.t);const lab=document.createElement("label");lab.className="chip";lab.innerHTML=`<input type="checkbox" value="${esc(r.t)}" ${checked?"checked":""}> <span>${esc(r.t)}</span>`;lab.querySelector("input").onchange=e=>{if(e.target.checked)SELECTED.add(r.t);else SELECTED.delete(r.t)};tc.appendChild(lab)});if(!$("meEssay").dataset.touched){const y=a.yrs?a.yrs+"+ years of experience":"relevant experience";const sk=(a.skills||[]).slice(0,4).join(", ");$("meEssay").value=`Dear Hiring Manager,\n\nI am writing to apply for this position. I bring ${y}${sk?". My strengths include "+sk:""}. I would welcome the chance to discuss how I can contribute.\n\nBest regards`}}
-function FIELD_PACKS(){return[{id:"travel",label:t("pack_travel"),subs:[{id:"hotels",label:"Hotels / resorts",q:["hotel","resort","front desk","guest relations","hospitality"]},{id:"inbound",label:"Inbound / tourism",q:["inbound","tourism","tour guide","itinerary"]},{id:"tours",label:"Tours / DMC",q:["tour operator","dmc","private tour","outbound"]},{id:"airline",label:"Airline / cruise",q:["airline","airport","cruise","cabin"]}]},{id:"sales",label:t("pack_sales"),subs:[{id:"b2b",label:"B2B sales",q:["b2b sales","account executive","business development"]},{id:"retail",label:"Retail sales",q:["retail","store","sales associate"]}]},{id:"marketing",label:t("pack_marketing"),subs:[{id:"digital",label:"Digital / content",q:["digital marketing","seo","content","social media"]},{id:"brand",label:"Brand / PR",q:["brand","pr","communications"]}]},{id:"ops",label:t("pack_ops"),subs:[{id:"ops",label:"Operations",q:["operations","ops coordinator"]},{id:"pm",label:"Project management",q:["project manager","project coordinator","scrum"]}]},{id:"other",label:t("pack_other"),subs:[{id:"teach",label:"Teaching / ALT",q:["english teacher","alt","esl","tefl"]},{id:"admin",label:"Admin / office",q:["administrative","office assistant","secretary"]},{id:"eng",label:"Engineering",q:["software engineer","developer","frontend","backend"]},{id:"cs",label:"Customer success",q:["customer success","customer support","client success"]}]}]}
-function renderFieldPacks(){const box=$("fieldPacks");if(!box)return;box.innerHTML="";FIELD_PACKS().forEach(pack=>{const h=document.createElement("div");h.className="section-label";h.textContent=pack.label;box.appendChild(h);const row=document.createElement("div");row.className="chips";pack.subs.forEach(sub=>{const id=pack.id+":"+sub.id;const lab=document.createElement("label");lab.className="chip";lab.innerHTML=`<input type="checkbox" value="${id}" ${FIELD_SEL.has(id)?"checked":""}> <span>${esc(sub.label)}</span>`;lab.querySelector("input").onchange=e=>{if(e.target.checked)FIELD_SEL.add(id);else FIELD_SEL.delete(id)};row.appendChild(lab)});box.appendChild(row)})}
-function japanSiteUrls(){const kws=[];FIELD_PACKS().forEach(p=>p.subs.forEach(s=>{if(FIELD_SEL.has(p.id+":"+s.id))kws.push(...s.q)}));const extra=($("extraKw")?.value||"").trim();if(extra)kws.push(...extra.split(/[\s,]+/).filter(Boolean));const q=encodeURIComponent((kws[0]||"english")+" "+(kws[1]||"japan"));return[{name:"GaijinPot",url:`https://jobs.gaijinpot.com/job/index/lang/en?job_key=${q}`},{name:"Daijob",url:`https://www.daijob.com/en/jobs/search?job_search_form_with_keyword%5Bkeyword%5D=${q}`},{name:"CareerCross",url:`https://www.careercross.com/en/job-search?keywords=${q}`},{name:"Jobs in Japan",url:`https://jobsinjapan.com/job-listings/?search_keywords=${q}`}]}
-function renderJapanSites(){const wrap=$("japanSitesWrap"),box=$("japanSites");const scope=($$('input[name="locScope"]:checked')[0]||{}).value||"japan";if(scope==="overseas"){wrap.classList.add("hidden");return}wrap.classList.remove("hidden");box.innerHTML=japanSiteUrls().map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.name)}</a>`).join("")}
-const DIRECT={remotive:p=>`https://remotive.com/api/remote-jobs?search=${encodeURIComponent(p.q||"")}&limit=30`,jobicy:p=>`https://jobicy.com/api/v2/remote-jobs?count=30&tag=${encodeURIComponent(p.q||"marketing")}`};
-function MAP(kind,raw){if(kind==="remotive")return((raw&&raw.jobs)||[]).map(j=>({title:j.title,company:j.company_name,loc:j.candidate_required_location||"Remote",url:j.url,text:((j.category||"")+" "+(j.description||"").replace(/<[^>]+>/g," ")).slice(0,800),full:(j.description||"").replace(/<[^>]+>/g," ").slice(0,6000),date:j.publication_date,src:"Remotive",remote:true}));if(kind==="jobicy")return((raw&&raw.jobs)||[]).map(j=>({title:j.jobTitle,company:j.companyName,loc:j.jobGeo||"Remote",url:j.url,text:(j.jobExcerpt||"").slice(0,800),full:(j.jobDescription||"").replace(/<[^>]+>/g," ").slice(0,6000),date:j.pubDate,src:"Jobicy",remote:/remote/i.test(j.jobGeo||"")}));return[]}
-async function jget(url,ms){const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),ms||8000);try{const r=await fetch(url,{signal:ctl.signal});if(!r.ok)return null;return await r.json()}catch{return null}finally{clearTimeout(t)}}
-function scoreJob(j,titles,kws){const title=String(j.title||"").toLowerCase(),body=String(j.text||j.full||"").toLowerCase(),company=String(j.company||"").toLowerCase(),text=title+" "+body+" "+company;let s=0;const why=[];const allKws=[...new Set([...(kws||[]),...(titles||[]).flatMap(t=>t.toLowerCase().split(/\W+/))])].filter(w=>w.length>=3);allKws.forEach(kw=>{const re=new RegExp("\\b"+kw.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\b","i");if(re.test(title)){s+=6;why.push(kw)}else if(re.test(text)){s+=2;if(why.length<4)why.push(kw)}});const visaOnly=$("visaOnly")?.checked;const hasVisa=/visa sponsor|visa support|sponsorship|relocation|ビザサポート|就労ビザ|在留資格/i.test(text);if(hasVisa){s+=4;why.push("visa")}if(visaOnly&&!hasVisa)s-=20;if(/english|英語/i.test(text))s+=2;if(/no experience|entry.?level|new grad|未経験/i.test(text))s+=2;if(j.remote||/fully remote|100%\s*remote/i.test(text))s+=1;const scope=($$('input[name="locScope"]:checked')[0]||{}).value||"japan";if(scope==="japan"&&/japan|tokyo|osaka|kyoto|yokohama|remote.*japan/i.test(text))s+=3;if(scope==="japan"&&/united states|usa|europe|london|berlin/i.test(j.loc||"")&&!/japan/i.test(text))s-=4;const userJlpt=($("jlptSelect")?.value||"").toUpperCase();const reqN1=/jlpt\s*n1|n1\s*required|日本語能力試験\s*n1/i.test(text);if(userJlpt&&userJlpt!=="N1"&&userJlpt!==""&&reqN1)s-=5;return{score:Math.max(0,s),why:[...new Set(why)].slice(0,4)}}
-function extractBadges(j){const text=(j.title+" "+(j.text||"")+" "+(j.full||"")).toLowerCase();const badges=[];if(/visa sponsor|visa support|sponsorship|relocation|ビザサポート|就労ビザ|在留資格/i.test(text))badges.push({cls:"visa",label:"🛂 "+t("visa_badge")});if(/english.?ok|英語OK|english.*working|working.*english/i.test(text))badges.push({cls:"en",label:"🌐 "+t("en_badge")});const jl=text.match(/jlpt\s*n([1-5])/i);if(jl)badges.push({cls:"jp",label:"🇯🇵 N"+jl[1]});else if(/japanese required|日本語必須|jlpt/i.test(text))badges.push({cls:"jp",label:"🇯🇵 Japanese required"});if(/no experience|entry.?level|new grad|未経験/i.test(text))badges.push({cls:"entry",label:"🌱 "+t("entry_badge")});const yr=text.match(/(\d+)\+?\s*years?/i);if(yr)badges.push({cls:"yrs",label:"⏱ "+yr[1]+"+ yrs"});if(j.remote||/fully remote|100%\s*remote/i.test(text))badges.push({cls:"remote",label:"🏠 "+t("remote_badge")});return badges}
-function renderJobs(jobs){const box=$("results"),meta=$("resultsMeta");if(!jobs.length){meta.textContent="";box.innerHTML=`<div class="card empty-state"><p>${t("empty_results")}</p></div>`;renderJapanSites();return}meta.textContent=typeof t("found")==="function"?t("found")(jobs.length):jobs.length+" jobs";box.innerHTML=jobs.map((j,idx)=>{const badges=extractBadges(j).map(b=>`<span class="badge ${b.cls}">${b.label}</span>`).join("");const why=(j.why||[]).length?`<div class="why">${t("why_matched")} ${esc(j.why.join(", "))}</div>`:"";const reqs=(j.full||j.text||"").split(/[•\n]|requirements?:/i).slice(1,6).filter(x=>x.trim().length>10).slice(0,4);const reqHtml=reqs.length?`<ul>${reqs.map(r=>`<li>${esc(r.trim().slice(0,120))}</li>`).join("")}</ul>`:"";return`<article class="job" data-idx="${idx}"><div class="job-head"><h3 class="job-title">${esc(j.title)}</h3><span class="match-pill">${j.score||0}%</span></div><div class="job-meta">${esc(j.company)} · ${esc(j.loc||"—")} · ${esc(j.src||"")}</div><div class="badges">${badges}</div>${why}<div class="job-actions"><button type="button" class="btn btn-primary btn-sm act-apply" data-idx="${idx}">${t("apply_site")}</button><button type="button" class="btn btn-secondary btn-sm act-email" data-idx="${idx}">${t("email_cv")}</button><button type="button" class="btn btn-ghost act-mark" data-idx="${idx}">${t("mark_applied")}</button></div><details><summary>${t("requirements")}</summary>${reqHtml||`<p>${esc((j.text||"").slice(0,400))}</p>`}</details></article>`}).join("");box.querySelectorAll(".act-apply").forEach(btn=>btn.onclick=()=>{const j=LAST_JOBS[+btn.dataset.idx];if(!j)return;const note=$("meEssay")?.value||coverNote(j);copyTxt(note,t("copied"));setApp(j,"opened","website");const url=safeHttpsUrl(j.url);if(url)window.open(url,"_blank","noopener,noreferrer")});box.querySelectorAll(".act-email").forEach(btn=>btn.onclick=()=>{const j=LAST_JOBS[+btn.dataset.idx];if(!j)return;const m=readMe();const sub=encodeURIComponent(`Application: ${j.title} — ${m.name||""}`);const body=encodeURIComponent(($("meEssay")?.value||coverNote(j))+"\n\n(Please attach my CV)");setApp(j,"opened","email");location.href=`mailto:?subject=${sub}&body=${body}`});box.querySelectorAll(".act-mark").forEach(btn=>btn.onclick=()=>{const j=LAST_JOBS[+btn.dataset.idx];if(!j)return;setApp(j,"applied","manual");say(t("confirm_ok"),1);btn.textContent="✓"})}
-function coverNote(j){const y=ANA&&ANA.yrs?ANA.yrs+"+ years of experience":"relevant experience";const s=ANA&&ANA.skills?.length?" My strengths include "+ANA.skills.slice(0,4).join(", ")+".":"";const name=($("meName")?.value||ANA?.name||"").trim();return`Dear Hiring Manager,\n\nI am writing to apply for the ${j.title} position${j.company?" at "+j.company:""}. I bring ${y}.${s} Please find my CV attached. I would welcome the chance to discuss how I can contribute to your team.\n\nThank you for your time.\n\nBest regards${name?",\n"+name:""}`}
-function copyTxt(text,msg){if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(text).then(()=>say(msg||t("copied"),1)).catch(()=>fallbackCopy(text,msg))}else fallbackCopy(text,msg)}
-function fallbackCopy(text,msg){try{const a=document.createElement("textarea");a.value=text;a.style.cssText="position:fixed;opacity:0.01;left:0;top:0";document.body.appendChild(a);a.select();document.execCommand("copy");a.remove();say(msg||t("copied"),1)}catch{say("Copy manually")}}
-async function searchJobs(){const kws=[];FIELD_PACKS().forEach(p=>p.subs.forEach(s=>{if(FIELD_SEL.has(p.id+":"+s.id))kws.push(...s.q)}));const extra=($("extraKw")?.value||"").trim();if(extra)kws.push(...extra.split(/[\s,]+/).filter(Boolean));const titles=[...SELECTED];if(!kws.length&&!titles.length&&!extra){say(t("need_field"));return}say(t("searching"),1);$("findBtn").disabled=true;renderJapanSites();const q=(kws[0]||titles[0]||"english").toString();const feeds=await Promise.all([jget(DIRECT.remotive({q}),9000).then(d=>MAP("remotive",d)).catch(()=>[]),jget(DIRECT.jobicy({q}),9000).then(d=>MAP("jobicy",d)).catch(()=>[])]);let jobs=feeds.flat().filter(Boolean);const visaOnly=$("visaOnly")?.checked;jobs=jobs.map(j=>{const{score,why}=scoreJob(j,titles,kws);return{...j,score:Math.min(99,score*3),why}});if(visaOnly)jobs=jobs.filter(j=>{const text=(j.title+" "+(j.text||"")+" "+(j.full||"")).toLowerCase();return /visa sponsor|visa support|sponsorship|relocation|ビザサポート|就労ビザ|在留資格/i.test(text)});const seen=new Set();jobs=jobs.sort((a,b)=>b.score-a.score||(b.date||"").localeCompare(a.date||"")).filter(j=>{const k=(j.company||"").toLowerCase();if(seen.has(k))return false;seen.add(k);return true}).slice(0,60);LAST_JOBS=jobs;renderJobs(jobs);$("findBtn").disabled=false;if(!jobs.length)say(t("empty_results"))}
-function loadApplied(){let a=L("fj_applied2",null);if(!Array.isArray(a))a=[];APPLIED=a.filter(x=>x&&x.k)}
-function saveApplied(){W("fj_applied2",APPLIED.slice(0,500))}
-function getApp(j){const k=canon(j.url);const k2=((j.company||"")+"|"+(j.title||"")).toLowerCase();return APPLIED.find(a=>a.k===k||a.k2===k2)}
-function setApp(j,st,m){let a=getApp(j);if(!a){a={k:canon(j.url),k2:((j.company||"")+"|"+(j.title||"")).toLowerCase(),t:j.title,c:j.company,u:j.url,d:today(),st,m};APPLIED.unshift(a)}else{a.st=st;a.m=m;a.d=today()}saveApplied();if(STEP===5)renderApps()}
-function renderApps(){const filter=($$('input[name="appFilter"]:checked')[0]||{}).value||"all";let list=APPLIED;if(filter==="applied")list=list.filter(a=>a.st==="applied");if(filter==="opened")list=list.filter(a=>a.st==="opened");const box=$("appList");if(!list.length){box.innerHTML=`<p class="muted">${t("no_apps")}</p>`;return}box.innerHTML=list.slice(0,50).map(a=>`<div class="app-item"><div><strong>${esc(a.t)}</strong><br><span class="muted">${esc(a.c)} · ${esc(a.d)}</span></div><span class="status-pill ${a.st==="applied"?"applied":""}">${esc(a.st)}</span></div>`).join("")}
-function downloadCvPdf(){const name=$("meName")?.value||ANA?.name||"Candidate";const phone=$("mePhone")?.value||ANA?.phone||"";const email=$("meEmail")?.value||ANA?.em||"";const skills=(ANA?.skills||[]).join(", ");const yrs=ANA?.yrs?ANA.yrs+"+ years":"";const langs=(ANA?.langs||[]).join(", ");const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>CV — ${esc(name)}</title><style>body{font-family:system-ui,sans-serif;max-width:700px;margin:40px auto;color:#111;line-height:1.45}h1{font-size:24px;margin:0 0 4px}h2{font-size:14px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #ccc;padding-bottom:4px;margin:20px 0 8px}.meta{color:#444;font-size:14px}</style></head><body><h1>${esc(name)}</h1><div class="meta">${esc(email)}${phone?" · "+esc(phone):""}</div>${yrs?"<p><b>Experience:</b> "+esc(yrs)+"</p>":""}${langs?"<p><b>Languages:</b> "+esc(langs)+"</p>":""}${skills?"<h2>Skills</h2><p>"+esc(skills)+"</p>":""}<h2>Profile</h2><p>${esc(($("meEssay")?.value||"").slice(0,600))}</p></body></html>`;$("printArea").innerHTML=html;$("printArea").style.display="block";window.print();setTimeout(()=>{$("printArea").style.display="none"},500)}
-function generateRirekisho(){const name=$("meName")?.value||ANA?.name||"";const phone=$("mePhone")?.value||ANA?.phone||"";const email=$("meEmail")?.value||ANA?.em||"";const html=`<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title>履歴書</title><style>@page{size:A4;margin:12mm}body{font-family:"Hiragino Sans","Noto Sans JP",sans-serif;font-size:11pt;color:#000;margin:0}table{width:100%;border-collapse:collapse}td,th{border:1px solid #333;padding:6px 8px;vertical-align:top}.photo{width:30mm;height:40mm;border:1px solid #333;text-align:center;color:#999;font-size:9pt}h1{text-align:center;font-size:18pt;margin:0 0 12px;letter-spacing:.5em}.label{background:#f5f5f5;width:22%;font-size:10pt}</style></head><body><h1>履 歴 書</h1><table><tr><td class="label">氏名</td><td colspan="2">${esc(name)}</td><td rowspan="3" class="photo">写真<br>(任意)</td></tr><tr><td class="label">ふりがな</td><td colspan="2"></td></tr><tr><td class="label">生年月日</td><td colspan="2"></td></tr><tr><td class="label">住所</td><td colspan="3"></td></tr><tr><td class="label">電話</td><td>${esc(phone)}</td><td class="label">メール</td><td>${esc(email)}</td></tr><tr><td class="label">学歴・職歴</td><td colspan="3" style="height:120px"></td></tr><tr><td class="label">免許・資格</td><td colspan="3" style="height:60px">${esc(ANA?.jlpt?"JLPT "+ANA.jlpt:"")}</td></tr><tr><td class="label">志望動機</td><td colspan="3" style="height:80px">${esc(($("meEssay")?.value||"").slice(0,300))}</td></tr><tr><td class="label">本人希望</td><td colspan="3"></td></tr></table><p style="font-size:9pt;margin-top:8px;color:#666">※ 印刷後に手書きで追記してください。写真は任意です。</p></body></html>`;$("rirekishoArea").innerHTML=html;$("rirekishoArea").style.display="block";window.print();setTimeout(()=>{$("rirekishoArea").style.display="none"},500)}
-function persist(){const state={step:STEP,ana:ANA,raw:RAW_ANA,confirmed:ANA_CONFIRMED,selected:[...SELECTED],fields:[...FIELD_SEL],me:readMe(),prefs:readPrefs(),at:new Date().toISOString()};W("fj_state",state)}
-function readMe(){return{name:$("meName")?.value||"",phone:$("mePhone")?.value||"",email:$("meEmail")?.value||"",essay:$("meEssay")?.value||""}}
-function readPrefs(){return{locScope:($$('input[name="locScope"]:checked')[0]||{}).value||"japan",city:$("prefCity")?.value||"",visaOnly:!!$("visaOnly")?.checked,jlpt:$("jlptSelect")?.value||""}}
-function restoreState(){const s=L("fj_state",null);if(!s)return;if(s.ana)ANA=s.ana;if(s.raw)RAW_ANA=s.raw;ANA_CONFIRMED=!!s.confirmed;SELECTED=new Set(s.selected||[]);FIELD_SEL=new Set(s.fields||[]);if(s.me){if($("meName"))$("meName").value=s.me.name||"";if($("mePhone"))$("mePhone").value=s.me.phone||"";if($("meEmail"))$("meEmail").value=s.me.email||"";if($("meEssay"))$("meEssay").value=s.me.essay||""}if(s.prefs){const radio=$$(`input[name="locScope"][value="${s.prefs.locScope}"]`)[0];if(radio)radio.checked=true;if($("prefCity"))$("prefCity").value=s.prefs.city||"";if($("visaOnly"))$("visaOnly").checked=!!s.prefs.visaOnly;if($("jlptSelect"))$("jlptSelect").value=s.prefs.jlpt||""}if(s.step)showStep(s.step)}
-function doBackup(){persist();const payload={v:118,state:L("fj_state"),applied:APPLIED,lang:LANG,theme:THEME};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="FindJobNow-backup-"+today()+".json";a.click();URL.revokeObjectURL(a.href);say(t("copied"),1)}
-function doRestore(file){const reader=new FileReader();reader.onload=()=>{try{const data=JSON.parse(reader.result);if(data.state)W("fj_state",data.state);if(data.applied){APPLIED=data.applied;saveApplied()}if(data.lang){LANG=data.lang;applyLang()}if(data.theme){THEME=data.theme;document.documentElement.setAttribute("data-theme",THEME);W("fj_theme",THEME)}restoreState();renderProfile();renderFieldPacks();renderApps();say(t("confirm_ok"),1)}catch{say("Could not restore that file")}};reader.readAsText(file)}
-function wire(){$("langEN").onclick=()=>{LANG="en";applyLang()};$("langJP").onclick=()=>{LANG="jp";applyLang()};$("themeBtn").onclick=()=>{THEME=THEME==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",THEME);W("fj_theme",THEME)};$("saveBtn").onclick=doBackup;$("btnBack").onclick=()=>showStep(STEP-1);$("btnNext").onclick=()=>{if(STEP===1)showStep(2);else if(STEP===2){if(!($("meName")?.value||"").trim()||!okE($("meEmail")?.value)){say(t("need_name_email"));return}showStep(3)}else if(STEP===3)showStep(4);else if(STEP===4)showStep(5)};$("cvFile").onchange=async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;if(!/\.(pdf|doc|docx|txt)$/i.test(f.name)){say("PDF, Word or TXT only");return}if(f.size>5*1024*1024){say("File too large (max 5 MB)");return}say(t("reading_cv"),1);let buf;try{buf=await f.arrayBuffer()}catch{say("Could not read file");return}CF=new File([buf],f.name,{type:f.type});try{await saveCV(f.name,buf)}catch{}say(t("analysing"),1);const text=await cvText(f,buf);const ok=text.trim().length>60;RAW_ANA=ok?analyse(text):null;ANA=null;ANA_CONFIRMED=false;if(!ok){$("profileCard").classList.add("hidden");$("parseFailCard").classList.remove("hidden")}else{$("profileCard").classList.remove("hidden");$("parseFailCard").classList.add("hidden");SELECTED=new Set((RAW_ANA.recs||[]).map(r=>r.t).slice(0,3));ANA={...RAW_ANA};renderProfile()}showStep(2);say(t("cv_ready"),1)};$("skipCv").onclick=e=>{e.preventDefault();RAW_ANA=null;ANA=null;ANA_CONFIRMED=false;$("profileCard").classList.remove("hidden");$("parseFailCard").classList.add("hidden");renderProfile();showStep(2)};$("manualEntry").onclick=()=>{$("profileCard").classList.remove("hidden");$("parseFailCard").classList.add("hidden");ANA={name:"",phone:"",em:"",yrs:0,langs:[],skills:[],recs:TITLE_HINTS.slice(0,4).map(h=>({t:h.t})),kw:[]};RAW_ANA=ANA;renderProfile()};$("confirmProfile").onclick=()=>{if(!($("meName")?.value||"").trim()||!okE($("meEmail")?.value)){say(t("need_name_email"));return}if(!ANA&&RAW_ANA)ANA={...RAW_ANA};if(ANA){ANA.name=$("meName").value.trim();ANA.phone=$("mePhone").value.trim();ANA.em=$("meEmail").value.trim();ANA.jlpt=$("jlptSelect").value}ANA_CONFIRMED=true;SELECTED=new Set($$("#titleChips input:checked").map(c=>c.value));persist();say(t("confirm_ok"),1);showStep(3)};$("addSkill").addEventListener("keydown",e=>{if(e.key!=="Enter")return;e.preventDefault();const v=$("addSkill").value.trim();if(!v)return;if(!ANA)ANA={skills:[]};if(!ANA.skills)ANA.skills=[];if(!ANA.skills.includes(v))ANA.skills.push(v);$("addSkill").value="";renderProfile()});$("copyPhone").onclick=()=>copyTxt($("mePhone").value,t("copied"));$("copyEmail").onclick=()=>copyTxt($("meEmail").value,t("copied"));$("meEssay").addEventListener("input",()=>{$("meEssay").dataset.touched="1"});$("saveSearch").onclick=()=>{persist();showStep(4);renderFieldPacks();renderJapanSites()};$("findBtn").onclick=searchJobs;$("dlCvPdf").onclick=downloadCvPdf;$("genRireki").onclick=generateRirekisho;$("backupBtn").onclick=doBackup;$("restoreFile").onchange=e=>{const f=e.target.files&&e.target.files[0];if(f)doRestore(f)};$$('input[name="appFilter"]').forEach(r=>r.onchange=renderApps);if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{})}}
-loadApplied();wire();applyLang();restoreState();renderFieldPacks();updateProgress();loadCV().then(it=>{if(it&&it.buf)CF=new File([it.buf],it.name||"cv.pdf")}).catch(()=>{});
+
+<div class="toast" id="toast"></div>
+
+<!-- Backup modal (simple) -->
+<dialog id="backupDialog" style="border:1px solid var(--border);border-radius:16px;background:var(--panel);color:var(--text);padding:20px;max-width:360px;width:90%">
+  <h3 style="margin:0 0 12px" data-i18n="backup_title">Backup / Restore</h3>
+  <p class="muted" data-i18n="backup_intro">Export all local data as JSON or import a previous backup.</p>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="exportBtn" data-i18n="export_btn">Export JSON</button>
+    <button class="btn btn-secondary" id="importBtn" data-i18n="import_btn">Import JSON</button>
+    <input type="file" id="importFile" accept="application/json,.json" style="display:none">
+    <button class="btn btn-ghost" id="closeBackup" data-i18n="close_btn">Close</button>
+  </div>
+</dialog>
+
+<script type="module">
+// ─── i18n ───────────────────────────────────────────────
+const I18N = {
+  en: {
+    hero_title: "Find English-Friendly Jobs in Japan — Free, Private, No Signup.",
+    hero_sub: "Everything stays on your device. No account. No tracking.",
+    cta_upload: "Upload CV",
+    cta_browse: "Browse Job Boards Without CV",
+    sec_features: "What you get",
+    f1: "On-device CV parsing (PDF or text)",
+    f2: "Skill-based job matching with scores",
+    f3: "Curated Japan job board directory",
+    f4: "Application tracker (kanban)",
+    f5: "Cover letter draft + Rirekisho checklist",
+    f6: "Scam safety checklist",
+    f7: "Full backup / restore as JSON",
+    cv_title: "Your Profile",
+    cv_intro: "Upload a PDF or paste text. Parsing runs only on this device.",
+    drop_label: "Tap to choose PDF or TXT",
+    drop_hint: "or paste text below",
+    paste_label: "Paste CV text",
+    parse_btn: "Parse CV",
+    profile_title: "Profile Summary",
+    profile_edit: "All fields are editable.",
+    lbl_name: "Name",
+    lbl_titles: "Job titles",
+    lbl_skills: "Skills (comma-separated)",
+    lbl_years: "Years of experience",
+    lbl_en: "English level",
+    lbl_jp: "Japanese level",
+    lbl_visa: "Visa status",
+    save_profile: "Save Profile",
+    match_title: "Job Matching",
+    match_intro: "Based on your profile skills and language/visa preferences.",
+    pref_loc: "Preferred location",
+    pref_visa: "Visa sponsorship needed?",
+    run_match: "Find Matching Jobs",
+    rec_boards: "Recommended Job Boards",
+    sample_jobs: "Sample Matching Jobs",
+    match_empty: "Save a profile and run matching to see sample jobs.",
+    boards_title: "Japan Job Board Directory",
+    tracker_title: "Application Tracker",
+    tracker_intro: "Mark jobs from matching or boards. Data stays in this browser.",
+    add_job: "Add a job manually",
+    add_btn: "Add as Interested",
+    tracker_empty: "No applications yet. Try marking a job as “Interested”.",
+    cover_title: "Cover Letter Draft",
+    cover_intro: "Uses your saved profile + a job title/company.",
+    cover_job: "Job title",
+    cover_co: "Company",
+    gen_cover: "Generate Draft",
+    copy_btn: "Copy to clipboard",
+    rireki_title: "Japan Resume (Rirekisho) Checklist",
+    rk1: "Photo (3×4 cm, formal)",
+    rk2: "Full name in kanji / romaji",
+    rk3: "Date of birth & age",
+    rk4: "Current address & phone",
+    rk5: "Education history (newest first)",
+    rk6: "Work history with company names",
+    rk7: "Licenses / certifications",
+    rk8: "Motivation / self-PR section",
+    rk9: "Commute time if required",
+    rk10: "Handwritten or clean digital format",
+    scam_title: "Scam Safety Checklist",
+    sc1: "Does the employer ask for money (registration, training, equipment)?",
+    sc1w: "⚠ Warning: Legitimate employers never ask candidates to pay.",
+    sc2: "Are they asking for bank details, My Number, or passport before an offer?",
+    sc2w: "⚠ High risk. Share sensitive data only after a formal offer.",
+    sc3: "Is there extreme pressure to accept immediately or wire money?",
+    sc3w: "⚠ Common scam tactic. Take time to verify.",
+    sc4: "Is the email domain free (gmail etc.) instead of a company domain?",
+    sc4w: "⚠ Suspicious. Prefer official company email addresses.",
+    sc5: "Have they refused a proper interview or video call?",
+    sc5w: "⚠ Red flag. Real companies interview candidates.",
+    scam_report: "Report scams to the National Consumer Affairs Center of Japan or police if money was lost.",
+    scam_link: "Official resources →",
+    nav_home: "Home",
+    nav_cv: "CV",
+    nav_match: "Match",
+    nav_boards: "Boards",
+    nav_tracker: "Tracker",
+    nav_tools: "Tools",
+    backup_title: "Backup / Restore",
+    backup_intro: "Export all local data as JSON or import a previous backup.",
+    export_btn: "Export JSON",
+    import_btn: "Import JSON",
+    close_btn: "Close",
+    toast_saved: "Profile saved",
+    toast_parsed: "CV parsed — review and edit fields",
+    toast_exported: "Backup downloaded",
+    toast_imported: "Data restored",
+    toast_copied: "Copied to clipboard",
+    toast_added: "Added to tracker",
+    interested: "Interested",
+    applied: "Applied",
+    interview: "Interview",
+    offer: "Offer",
+    rejected: "Rejected",
+    match_pct: "match",
+    best_for: "Best for",
+    mark_interested: "Mark Interested",
+    open_job: "Open",
+  },
+  ja: {
+    hero_title: "日本の英語対応求人を探そう — 無料・プライバシー重視・登録不要",
+    hero_sub: "データはすべて端末内に保存。アカウント不要・追跡なし。",
+    cta_upload: "CVをアップロード",
+    cta_browse: "CVなしで求人サイトを見る",
+    sec_features: "できること",
+    f1: "端末内CV解析（PDF / テキスト）",
+    f2: "スキルに基づく求人マッチング",
+    f3: "日本の求人サイト一覧",
+    f4: "応募トラッカー（カンバン）",
+    f5: "カバーレター下書き + 履歴書チェックリスト",
+    f6: "詐欺対策チェックリスト",
+    f7: "JSONでのバックアップ / 復元",
+    cv_title: "プロフィール",
+    cv_intro: "PDFをアップロードするかテキストを貼り付け。解析はこの端末のみで行われます。",
+    drop_label: "PDFまたはTXTを選択",
+    drop_hint: "または下にテキストを貼り付け",
+    paste_label: "CVテキストを貼り付け",
+    parse_btn: "CVを解析",
+    profile_title: "プロフィール概要",
+    profile_edit: "すべての項目を編集できます。",
+    lbl_name: "氏名",
+    lbl_titles: "職種",
+    lbl_skills: "スキル（カンマ区切り）",
+    lbl_years: "経験年数",
+    lbl_en: "英語レベル",
+    lbl_jp: "日本語レベル",
+    lbl_visa: "ビザ状況",
+    save_profile: "プロフィールを保存",
+    match_title: "求人マッチング",
+    match_intro: "プロフィールのスキルと言語・ビザ設定に基づきます。",
+    pref_loc: "希望勤務地",
+    pref_visa: "ビザサポートが必要？",
+    run_match: "マッチする求人を探す",
+    rec_boards: "おすすめ求人サイト",
+    sample_jobs: "サンプルマッチ求人",
+    match_empty: "プロフィールを保存してマッチングを実行してください。",
+    boards_title: "日本の求人サイト一覧",
+    tracker_title: "応募トラッカー",
+    tracker_intro: "マッチングやサイトから求人をマーク。データはこのブラウザに保存されます。",
+    add_job: "手動で求人を追加",
+    add_btn: "興味ありとして追加",
+    tracker_empty: "まだ応募がありません。「興味あり」で求人をマークしてみてください。",
+    cover_title: "カバーレター下書き",
+    cover_intro: "保存したプロフィールと職種・会社名を使います。",
+    cover_job: "職種",
+    cover_co: "会社名",
+    gen_cover: "下書きを生成",
+    copy_btn: "クリップボードにコピー",
+    rireki_title: "日本式履歴書チェックリスト",
+    rk1: "写真（3×4cm・フォーマル）",
+    rk2: "氏名（漢字 / ローマ字）",
+    rk3: "生年月日・年齢",
+    rk4: "現住所・電話番号",
+    rk5: "学歴（新しい順）",
+    rk6: "職歴（会社名含む）",
+    rk7: "免許・資格",
+    rk8: "志望動機 / 自己PR",
+    rk9: "通勤時間（必要な場合）",
+    rk10: "手書きまたはきれいなデジタル形式",
+    scam_title: "詐欺対策チェックリスト",
+    sc1: "登録料・研修費・機材代などを求められたか？",
+    sc1w: "⚠ 警告：正当な雇用主は候補者に金銭を求めません。",
+    sc2: "内定前に銀行口座・マイナンバー・パスポートを求められたか？",
+    sc2w: "⚠ 高リスク。正式な内定後にのみ共有してください。",
+    sc3: "即決や送金を強く急かされたか？",
+    sc3w: "⚠ よくある詐欺手法。時間をかけて確認を。",
+    sc4: "会社ドメインではなく無料メール（gmailなど）か？",
+    sc4w: "⚠ 疑わしい。公式の会社メールを優先。",
+    sc5: "面接やビデオ通話を拒否されたか？",
+    sc5w: "⚠ 危険信号。本物の会社は面接します。",
+    scam_report: "金銭被害があった場合は国民生活センターや警察に相談してください。",
+    scam_link: "公式情報 →",
+    nav_home: "ホーム",
+    nav_cv: "CV",
+    nav_match: "マッチ",
+    nav_boards: "サイト",
+    nav_tracker: "管理",
+    nav_tools: "ツール",
+    backup_title: "バックアップ / 復元",
+    backup_intro: "ローカルデータをJSONで書き出すか、以前のバックアップを読み込みます。",
+    export_btn: "JSONを書き出し",
+    import_btn: "JSONを読み込み",
+    close_btn: "閉じる",
+    toast_saved: "プロフィールを保存しました",
+    toast_parsed: "CVを解析しました — 内容を確認・編集してください",
+    toast_exported: "バックアップをダウンロードしました",
+    toast_imported: "データを復元しました",
+    toast_copied: "クリップボードにコピーしました",
+    toast_added: "トラッカーに追加しました",
+    interested: "興味あり",
+    applied: "応募済",
+    interview: "面接",
+    offer: "内定",
+    rejected: "不採用",
+    match_pct: "マッチ",
+    best_for: "向いている人",
+    mark_interested: "興味あり",
+    open_job: "開く",
+  }
+};
+
+let lang = localStorage.getItem("fjn_lang") || "en";
+
+function t(key) {
+  return (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key;
+}
+
+function applyI18n() {
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const key = el.getAttribute("data-i18n");
+    if (I18N[lang][key] !== undefined) el.textContent = I18N[lang][key];
+  });
+  document.getElementById("langEN").classList.toggle("active", lang === "en");
+  document.getElementById("langJP").classList.toggle("active", lang === "ja");
+  document.documentElement.lang = lang === "ja" ? "ja" : "en";
+}
+
+document.getElementById("langEN").onclick = () => { lang = "en"; localStorage.setItem("fjn_lang", "en"); applyI18n(); renderTracker(); renderBoards(); };
+document.getElementById("langJP").onclick = () => { lang = "ja"; localStorage.setItem("fjn_lang", "ja"); applyI18n(); renderTracker(); renderBoards(); };
+
+// ─── Toast ──────────────────────────────────────────────
+function toast(msg, type = "ok") {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.className = "toast show " + type;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove("show"), 2600);
+}
+
+// ─── Navigation ─────────────────────────────────────────
+function showView(name) {
+  document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
+  const target = document.getElementById("view-" + name);
+  if (target) target.classList.add("active");
+  document.querySelectorAll(".bottom-nav button").forEach((b) => {
+    b.classList.toggle("active", b.dataset.view === name);
+  });
+  window.scrollTo(0, 0);
+}
+
+document.querySelectorAll(".bottom-nav button").forEach((btn) => {
+  btn.addEventListener("click", () => showView(btn.dataset.view));
+});
+document.getElementById("ctaUpload").onclick = () => showView("cv");
+document.getElementById("ctaBrowse").onclick = () => showView("boards");
+
+// ─── IndexedDB ──────────────────────────────────────────
+const DB_NAME = "FindJobNow";
+const DB_VER = 1;
+let db;
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = (e) => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains("profile")) d.createObjectStore("profile");
+      if (!d.objectStoreNames.contains("applications")) d.createObjectStore("applications", { keyPath: "id" });
+      if (!d.objectStoreNames.contains("settings")) d.createObjectStore("settings");
+    };
+    req.onsuccess = () => { db = req.result; resolve(db); };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function idbGet(store, key) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, "readonly");
+    const req = tx.objectStore(store).get(key);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function idbSet(store, key, value) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, "readwrite");
+    const req = key !== undefined
+      ? tx.objectStore(store).put(value, key)
+      : tx.objectStore(store).put(value);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function idbGetAll(store) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, "readonly");
+    const req = tx.objectStore(store).getAll();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function idbClear(store) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, "readwrite");
+    const req = tx.objectStore(store).clear();
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// ─── Skills dictionary (100+) ───────────────────────────
+const SKILL_LIST = [
+  "javascript","typescript","python","java","c#","c++","go","rust","ruby","php","swift","kotlin",
+  "react","vue","angular","next.js","node.js","express","django","flask","spring","laravel",
+  "sql","mysql","postgresql","mongodb","redis","elasticsearch","aws","azure","gcp","docker",
+  "kubernetes","terraform","linux","git","ci/cd","jenkins","github actions","graphql","rest",
+  "html","css","sass","tailwind","figma","ui/ux","product management","agile","scrum","jira",
+  "sales","marketing","seo","content writing","copywriting","social media","hr","recruiting",
+  "accounting","finance","excel","powerpoint","project management","customer support","cs",
+  "english teaching","esl","tefl","tesol","japanese","translation","interpretation",
+  "data analysis","machine learning","ai","deep learning","pandas","numpy","tableau","power bi",
+  "devops","sre","security","cybersecurity","networking","system admin","it support",
+  "hospitality","tourism","hotel","inbound","customer service","retail","logistics",
+  "supply chain","operations","business development","b2b","b2c","crm","salesforce",
+  "communication","leadership","team management","presentation","negotiation","research"
+];
+
+// ─── Sample jobs ────────────────────────────────────────
+const SAMPLE_JOBS = [
+  { id: "j1", title: "Frontend Engineer", company: "Tokyo Tech Startup", skills: ["javascript","react","typescript","css","html"], english_level: "Business", japanese_level: "Basic", visa_support: true, location: "Tokyo", url: "https://www.wantedly.com/", description: "Build modern web apps with React." },
+  { id: "j2", title: "Backend Engineer (Python)", company: "Fintech JP", skills: ["python","django","sql","aws","docker"], english_level: "Fluent", japanese_level: "None", visa_support: true, location: "Tokyo", url: "https://japan-dev.com/", description: "API development for financial services." },
+  { id: "j3", title: "English Teacher (Eikaiwa)", company: "Global English School", skills: ["english teaching","esl","tefl","communication"], english_level: "Native", japanese_level: "Basic", visa_support: true, location: "Osaka", url: "https://www.gaijinpot.com/jobs/", description: "Full-time conversation classes." },
+  { id: "j4", title: "Product Manager", company: "SaaS Scale-up", skills: ["product management","agile","scrum","jira","communication"], english_level: "Fluent", japanese_level: "Conversational", visa_support: false, location: "Tokyo", url: "https://www.linkedin.com/jobs/", description: "Own roadmap for B2B product." },
+  { id: "j5", title: "DevOps Engineer", company: "Cloud Infra Co", skills: ["aws","docker","kubernetes","terraform","linux","ci/cd"], english_level: "Business", japanese_level: "None", visa_support: true, location: "Remote", url: "https://remoteok.com/", description: "Infrastructure as code, multi-cloud." },
+  { id: "j6", title: "Full-stack Developer", company: "Agency Tokyo", skills: ["javascript","node.js","react","sql","git"], english_level: "Business", japanese_level: "Basic", visa_support: true, location: "Tokyo", url: "https://www.wantedly.com/", description: "Client projects, modern stack." },
+  { id: "j7", title: "Data Analyst", company: "E-commerce Giant", skills: ["sql","python","tableau","excel","data analysis"], english_level: "Fluent", japanese_level: "Business", visa_support: false, location: "Tokyo", url: "https://www.daijob.com/", description: "Business intelligence dashboards." },
+  { id: "j8", title: "Customer Success Manager", company: "B2B Software", skills: ["customer support","crm","salesforce","communication","english"], english_level: "Fluent", japanese_level: "Conversational", visa_support: true, location: "Tokyo", url: "https://www.gaijinpot.com/jobs/", description: "Support enterprise accounts." },
+  { id: "j9", title: "iOS Developer", company: "Mobile Studio", skills: ["swift","ios","git","ui/ux"], english_level: "Business", japanese_level: "None", visa_support: true, location: "Tokyo", url: "https://japan-dev.com/", description: "Native iOS apps for startups." },
+  { id: "j10", title: "Marketing Specialist", company: "Inbound Agency", skills: ["marketing","seo","content writing","social media"], english_level: "Fluent", japanese_level: "Basic", visa_support: true, location: "Osaka", url: "https://www.careerengine.jp/", description: "Content & growth for global brands." },
+  { id: "j11", title: "Java Backend Engineer", company: "Enterprise Systems", skills: ["java","spring","sql","aws"], english_level: "Business", japanese_level: "Conversational", visa_support: false, location: "Tokyo", url: "https://www.green-japan.com/", description: "Microservices for large-scale systems." },
+  { id: "j12", title: "UX Designer", company: "Design Studio", skills: ["figma","ui/ux","html","css","research"], english_level: "Fluent", japanese_level: "Basic", visa_support: true, location: "Remote", url: "https://www.wantedly.com/", description: "End-to-end product design." },
+  { id: "j13", title: "Sales Account Executive", company: "SaaS Japan", skills: ["sales","b2b","negotiation","crm","communication"], english_level: "Fluent", japanese_level: "Business", visa_support: false, location: "Tokyo", url: "https://www.linkedin.com/jobs/", description: "Enterprise software sales." },
+  { id: "j14", title: "Machine Learning Engineer", company: "AI Lab", skills: ["python","machine learning","deep learning","pandas","numpy"], english_level: "Fluent", japanese_level: "None", visa_support: true, location: "Tokyo", url: "https://japan-dev.com/", description: "NLP and recommendation systems." },
+  { id: "j15", title: "Hotel Front Desk (English)", company: "Luxury Hotel Group", skills: ["hospitality","customer service","english","tourism"], english_level: "Fluent", japanese_level: "Conversational", visa_support: true, location: "Tokyo", url: "https://www.gaijinpot.com/jobs/", description: "Guest services for international travelers." },
+  { id: "j16", title: "Technical Writer", company: "Developer Tools Co", skills: ["content writing","technical writing","markdown","git"], english_level: "Native", japanese_level: "None", visa_support: true, location: "Remote", url: "https://remoteok.com/", description: "Docs for developer products." },
+  { id: "j17", title: "QA Engineer", company: "Quality First", skills: ["testing","javascript","selenium","agile"], english_level: "Business", japanese_level: "Basic", visa_support: true, location: "Osaka", url: "https://www.wantedly.com/", description: "Automated and manual testing." },
+  { id: "j18", title: "HR Generalist", company: "Global Corp Japan", skills: ["hr","recruiting","communication","excel"], english_level: "Fluent", japanese_level: "Business", visa_support: false, location: "Tokyo", url: "https://www.daijob.com/", description: "Talent acquisition and employee relations." },
+  { id: "j19", title: "React Native Developer", company: "Cross-platform App", skills: ["react","javascript","typescript","mobile"], english_level: "Business", japanese_level: "None", visa_support: true, location: "Tokyo", url: "https://japan-dev.com/", description: "Mobile apps for iOS and Android." },
+  { id: "j20", title: "Business Analyst", company: "Consulting Firm", skills: ["data analysis","excel","powerpoint","communication","research"], english_level: "Fluent", japanese_level: "Business", visa_support: false, location: "Tokyo", url: "https://www.linkedin.com/jobs/", description: "Client-facing analysis and reporting." }
+];
+
+// ─── Job boards ─────────────────────────────────────────
+const JOB_BOARDS = [
+  { name: "GaijinPot Jobs", desc: "Jobs for foreigners in Japan — teaching, IT, hospitality.", best: "Foreigners", cat: "General", url: "https://jobs.gaijinpot.com/" },
+  { name: "Daijob", desc: "Bilingual and high-level positions across industries.", best: "Bilingual professionals", cat: "Multilingual", url: "https://www.daijob.com/" },
+  { name: "Japan Dev", desc: "Tech jobs at Japanese and foreign companies. Engineer-focused.", best: "Software engineers", cat: "Tech", url: "https://japan-dev.com/" },
+  { name: "Wantedly", desc: "Startup and company culture–focused matching. Popular with younger talent.", best: "Startups & culture fit", cat: "Startup", url: "https://www.wantedly.com/" },
+  { name: "Green", desc: "IT and web industry jobs in Japan. Strong for engineers and designers.", best: "IT professionals", cat: "Tech", url: "https://www.green-japan.com/" },
+  { name: "CareerEngine", desc: "Jobs for bilingual and global talent in Japan.", best: "Global talent", cat: "Multilingual", url: "https://www.careerengine.jp/" },
+  { name: "LinkedIn Jobs", desc: "Global platform with many English-friendly roles in Japan.", best: "Professionals", cat: "General", url: "https://www.linkedin.com/jobs/" },
+  { name: "TokyoDev", desc: "Software developer jobs in Tokyo and remote from Japan.", best: "Developers", cat: "Tech", url: "https://www.tokyodev.com/" },
+  { name: "Ohayo Sensei", desc: "Teaching jobs newsletter and listings for English teachers.", best: "English teachers", cat: "Teaching", url: "https://www.ohayosensei.com/" },
+  { name: "Jobs in Japan", desc: "English-friendly jobs across sectors.", best: "Expats", cat: "General", url: "https://jobsinjapan.com/" },
+  { name: "Remote OK", desc: "Remote jobs worldwide; filter for Japan-friendly.", best: "Remote workers", cat: "Tech", url: "https://remoteok.com/" },
+  { name: "Indeed Japan", desc: "Large aggregate job board (Japanese + some English).", best: "All levels", cat: "General", url: "https://jp.indeed.com/" },
+  { name: "CareerCross", desc: "Bilingual job board for professionals in Japan.", best: "Bilingual", cat: "Multilingual", url: "https://www.careercross.com/" },
+  { name: "Findy", desc: "Engineer-focused platform with skill matching.", best: "Engineers", cat: "Tech", url: "https://findy-code.io/" }
+];
+
+// ─── CV parsing ─────────────────────────────────────────
+function extractSkills(text) {
+  const lower = text.toLowerCase();
+  const found = new Set();
+  for (const s of SKILL_LIST) {
+    const re = new RegExp("\\b" + s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+") + "\\b", "i");
+    if (re.test(lower)) found.add(s);
+  }
+  return [...found];
+}
+
+function extractName(text) {
+  const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  for (const line of lines.slice(0, 8)) {
+    if (line.length > 2 && line.length < 50 && !/resume|curriculum|cv|email|@|phone|tel|address/i.test(line)) {
+      if (/^[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3}$/.test(line) || /^[A-Za-z\s.'-]{3,40}$/.test(line)) {
+        return line;
+      }
+    }
+  }
+  return "";
+}
+
+function extractYears(text) {
+  const m = text.match(/(\d{1,2})\+?\s*(?:years?|yrs?)\s*(?:of\s*)?(?:experience|exp)/i);
+  if (m) return parseInt(m[1], 10);
+  const m2 = text.match(/(?:experience|exp)[:\s]+(\d{1,2})\+?\s*(?:years?|yrs?)/i);
+  if (m2) return parseInt(m2[1], 10);
+  return null;
+}
+
+function extractTitles(text) {
+  const titles = [];
+  const patterns = [
+    /(?:title|position|role)[:\s]+([^\n,]{5,50})/gi,
+    /\b(Software Engineer|Frontend Developer|Backend Engineer|Full[- ]?stack Developer|Product Manager|Data Analyst|DevOps Engineer|QA Engineer|UX Designer|iOS Developer|Android Developer|English Teacher|Account Executive|Customer Success|Marketing Specialist|Business Analyst|Machine Learning Engineer)\b/gi
+  ];
+  for (const p of patterns) {
+    let m;
+    while ((m = p.exec(text)) !== null) {
+      const t = (m[1] || m[0]).trim();
+      if (t && !titles.includes(t)) titles.push(t);
+    }
+  }
+  return titles.slice(0, 5);
+}
+
+function guessLanguageLevels(text) {
+  const lower = text.toLowerCase();
+  let en = "Business";
+  let jp = "None";
+  if (/native\s*english|english\s*native|mother tongue.*english/i.test(text)) en = "Native";
+  else if (/fluent\s*english|english\s*fluent|c2|ielts\s*7|toefl/i.test(text)) en = "Fluent";
+  else if (/business\s*english|english\s*business|b2/i.test(text)) en = "Business";
+  if (/native\s*japanese|japanese\s*native|母語/i.test(text)) jp = "Native";
+  else if (/fluent\s*japanese|japanese\s*fluent|n1|jlpt\s*n1/i.test(text)) jp = "Fluent";
+  else if (/business\s*japanese|japanese\s*business|n2|jlpt\s*n2/i.test(text)) jp = "Business";
+  else if (/conversational\s*japanese|japanese\s*conversation|n3|jlpt\s*n3/i.test(text)) jp = "Conversational";
+  else if (/basic\s*japanese|japanese\s*basic|n4|n5/i.test(text)) jp = "Basic";
+  return { en, jp };
+}
+
+async function parsePDF(file) {
+  const pdfjs = await import("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs");
+  pdfjs.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
+  const buf = await file.arrayBuffer();
+  const doc = await pdfjs.getDocument({ data: buf }).promise;
+  let text = "";
+  for (let i = 1; i <= Math.min(doc.numPages, 8); i++) {
+    const page = await doc.getPage(i);
+    const content = await page.getTextContent();
+    text += content.items.map((it) => it.str).join(" ") + "\n";
+  }
+  return text;
+}
+
+async function parseCVText(text) {
+  const skills = extractSkills(text);
+  const name = extractName(text);
+  const years = extractYears(text);
+  const titles = extractTitles(text);
+  const { en, jp } = guessLanguageLevels(text);
+  return {
+    name: name || "",
+    titles: titles.join(", "),
+    skills: skills.join(", "),
+    years: years ?? "",
+    english: en,
+    japanese: jp,
+    visa: "Unknown",
+    raw: text.slice(0, 5000)
+  };
+}
+
+function fillProfileForm(profile) {
+  document.getElementById("pName").value = profile.name || "";
+  document.getElementById("pTitles").value = profile.titles || "";
+  document.getElementById("pSkills").value = profile.skills || "";
+  document.getElementById("pYears").value = profile.years ?? "";
+  document.getElementById("pEn").value = profile.english || "Business";
+  document.getElementById("pJp").value = profile.japanese || "None";
+  document.getElementById("pVisa").value = profile.visa || "Unknown";
+  document.getElementById("profileCard").style.display = "block";
+}
+
+function readProfileForm() {
+  return {
+    name: document.getElementById("pName").value.trim(),
+    titles: document.getElementById("pTitles").value.trim(),
+    skills: document.getElementById("pSkills").value.trim(),
+    years: document.getElementById("pYears").value,
+    english: document.getElementById("pEn").value,
+    japanese: document.getElementById("pJp").value,
+    visa: document.getElementById("pVisa").value
+  };
+}
+
+document.getElementById("parseBtn").onclick = async () => {
+  const status = document.getElementById("parseStatus");
+  status.textContent = "Parsing…";
+  try {
+    let text = document.getElementById("cvPaste").value.trim();
+    const file = document.getElementById("cvFile").files[0];
+    if (file) {
+      if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
+        text = await parsePDF(file);
+      } else {
+        text = await file.text();
+      }
+    }
+    if (!text || text.length < 20) {
+      status.textContent = "Please upload a PDF/TXT or paste more text.";
+      return;
+    }
+    const profile = await parseCVText(text);
+    fillProfileForm(profile);
+    status.textContent = "";
+    toast(t("toast_parsed"));
+  } catch (err) {
+    console.error(err);
+    status.textContent = "Parse failed: " + (err.message || err);
+  }
+};
+
+document.getElementById("saveProfile").onclick = async () => {
+  const profile = readProfileForm();
+  await idbSet("profile", "main", profile);
+  toast(t("toast_saved"));
+};
+
+// ─── Matching ───────────────────────────────────────────
+function scoreJob(job, profile, prefLoc, prefVisa) {
+  const userSkills = (profile.skills || "").toLowerCase().split(/[,;|/]+/).map((s) => s.trim()).filter(Boolean);
+  let skillHits = 0;
+  const reasons = [];
+  for (const js of job.skills) {
+    if (userSkills.some((us) => us.includes(js) || js.includes(us))) {
+      skillHits++;
+      reasons.push(`Your ${js} skill matches`);
+    }
+  }
+  const skillScore = job.skills.length ? (skillHits / job.skills.length) * 70 : 0;
+
+  let langScore = 20;
+  const enMap = { Native: 5, Fluent: 4, Business: 3, Conversational: 2, Basic: 1 };
+  const userEn = enMap[profile.english] || 3;
+  const jobEn = enMap[job.english_level] || 3;
+  if (userEn >= jobEn) {
+    langScore = 20;
+    if (job.english_level === "Native" || job.english_level === "Fluent") reasons.push("English-only / high English role");
+  } else {
+    langScore = 5;
+  }
+
+  let visaScore = 10;
+  if (prefVisa === "Yes" && !job.visa_support) visaScore = 0;
+  else if (job.visa_support) {
+    visaScore = 10;
+    reasons.push("Visa sponsorship available");
+  }
+
+  let locScore = 0;
+  if (prefLoc === "Any" || job.location === prefLoc || (prefLoc === "Remote" && job.location === "Remote")) {
+    locScore = 10;
+  } else if (job.location === "Remote") {
+    locScore = 5;
+  }
+
+  const total = Math.min(100, Math.round(skillScore + langScore + visaScore + locScore));
+  return { score: total, reasons: reasons.slice(0, 4) };
+}
+
+async function runMatching() {
+  const profile = (await idbGet("profile", "main")) || readProfileForm();
+  const prefLoc = document.getElementById("prefLoc").value;
+  const prefVisa = document.getElementById("prefVisa").value;
+  const results = SAMPLE_JOBS.map((job) => {
+    const { score, reasons } = scoreJob(job, profile, prefLoc, prefVisa);
+    return { ...job, score, reasons };
+  }).sort((a, b) => b.score - a.score);
+
+  const container = document.getElementById("matchResults");
+  if (!results.length) {
+    container.innerHTML = `<div class="empty"><p>${t("match_empty")}</p></div>`;
+    return;
+  }
+  container.innerHTML = results.map((job) => `
+    <div class="job-card">
+      <div class="top">
+        <div>
+          <div class="title">${escapeHtml(job.title)}</div>
+          <div class="company">${escapeHtml(job.company)} · ${escapeHtml(job.location)}</div>
+        </div>
+        <span class="pill gold">${job.score}% ${t("match_pct")}</span>
+      </div>
+      <div class="match-bar"><i style="width:${job.score}%"></i></div>
+      <ul class="reasons">${job.reasons.map((r) => `<li>${escapeHtml(r)}</li>`).join("")}</ul>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <a class="btn btn-secondary btn-sm" href="${job.url}" target="_blank" rel="noopener">${t("open_job")}</a>
+        <button class="btn btn-ghost btn-sm" data-add='${JSON.stringify({ title: job.title, company: job.company, url: job.url })}'>${t("mark_interested")}</button>
+      </div>
+    </div>
+  `).join("");
+
+  container.querySelectorAll("[data-add]").forEach((btn) => {
+    btn.onclick = async () => {
+      const data = JSON.parse(btn.getAttribute("data-add"));
+      await addApplication({ ...data, status: "Interested" });
+      toast(t("toast_added"));
+    };
+  });
+
+  // Recommended boards based on skills
+  const userSkills = (profile.skills || "").toLowerCase();
+  const rec = [];
+  if (/react|javascript|python|java|devops|aws|docker|engineer|developer/.test(userSkills)) {
+    rec.push(...JOB_BOARDS.filter((b) => b.cat === "Tech").slice(0, 3));
+  }
+  if (/teach|esl|tefl|english teaching/.test(userSkills)) {
+    rec.push(...JOB_BOARDS.filter((b) => b.cat === "Teaching").slice(0, 2));
+  }
+  if (rec.length < 3) rec.push(...JOB_BOARDS.filter((b) => b.cat === "General" || b.cat === "Multilingual").slice(0, 3));
+  const unique = [...new Map(rec.map((b) => [b.name, b])).values()].slice(0, 4);
+  document.getElementById("recBoards").innerHTML = unique.map((b) => `
+    <div class="board-card">
+      <a href="${b.url}" target="_blank" rel="noopener">${escapeHtml(b.name)}</a>
+      <div class="muted" style="font-size:13px">${escapeHtml(b.desc)}</div>
+      <span class="pill">${t("best_for")}: ${escapeHtml(b.best)}</span>
+    </div>
+  `).join("") || `<div class="muted">${t("match_empty")}</div>`;
+}
+
+document.getElementById("runMatch").onclick = () => runMatching();
+
+// ─── Boards ─────────────────────────────────────────────
+let boardFilter = "All";
+
+function renderBoards() {
+  const list = boardFilter === "All" ? JOB_BOARDS : JOB_BOARDS.filter((b) => b.cat === boardFilter);
+  document.getElementById("boardList").innerHTML = list.map((b) => `
+    <div class="board-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <a href="${b.url}" target="_blank" rel="noopener">${escapeHtml(b.name)}</a>
+        <span class="pill">${escapeHtml(b.cat)}</span>
+      </div>
+      <div class="muted" style="font-size:13px">${escapeHtml(b.desc)}</div>
+      <span class="pill gold">${t("best_for")}: ${escapeHtml(b.best)}</span>
+    </div>
+  `).join("");
+}
+
+document.getElementById("boardFilters").addEventListener("click", (e) => {
+  const btn = e.target.closest(".filter-btn");
+  if (!btn) return;
+  boardFilter = btn.dataset.cat;
+  document.querySelectorAll(".filter-btn").forEach((b) => b.classList.toggle("active", b === btn));
+  renderBoards();
+});
+
+// ─── Application tracker ────────────────────────────────
+const STATUSES = ["Interested", "Applied", "Interview", "Offer", "Rejected"];
+
+async function addApplication({ title, company, url, status = "Interested" }) {
+  const id = "app_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
+  const item = { id, title, company: company || "", url: url || "", status, created: Date.now() };
+  await idbSet("applications", undefined, item);
+  renderTracker();
+}
+
+async function updateStatus(id, status) {
+  const all = await idbGetAll("applications");
+  const item = all.find((a) => a.id === id);
+  if (item) {
+    item.status = status;
+    await idbSet("applications", undefined, item);
+    renderTracker();
+  }
+}
+
+async function deleteApp(id) {
+  const tx = db.transaction("applications", "readwrite");
+  tx.objectStore("applications").delete(id);
+  await new Promise((r) => (tx.oncomplete = r));
+  renderTracker();
+}
+
+async function renderTracker() {
+  const apps = await idbGetAll("applications");
+  const kanban = document.getElementById("kanban");
+  const empty = document.getElementById("trackerEmpty");
+  if (!apps.length) {
+    kanban.innerHTML = "";
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+  const statusLabel = {
+    Interested: t("interested"),
+    Applied: t("applied"),
+    Interview: t("interview"),
+    Offer: t("offer"),
+    Rejected: t("rejected")
+  };
+  kanban.innerHTML = STATUSES.map((st) => {
+    const items = apps.filter((a) => a.status === st);
+    return `
+      <div class="kanban-col">
+        <h4>${statusLabel[st]} (${items.length})</h4>
+        ${items.map((a) => `
+          <div class="app-item">
+            <div class="t">${escapeHtml(a.title)}</div>
+            <div class="c">${escapeHtml(a.company || "")}</div>
+            <select data-id="${a.id}" style="margin-top:6px;width:100%;background:#080e1a;border:1px solid var(--border);border-radius:8px;padding:4px;font-size:12px">
+              ${STATUSES.map((s) => `<option value="${s}" ${s === a.status ? "selected" : ""}>${statusLabel[s]}</option>`).join("")}
+            </select>
+          </div>
+        `).join("") || `<div class="muted" style="font-size:12px">—</div>`}
+      </div>
+    `;
+  }).join("");
+
+  kanban.querySelectorAll("select[data-id]").forEach((sel) => {
+    sel.onchange = () => updateStatus(sel.dataset.id, sel.value);
+  });
+}
+
+document.getElementById("addJobBtn").onclick = async () => {
+  const title = document.getElementById("newJobTitle").value.trim();
+  const company = document.getElementById("newJobCompany").value.trim();
+  if (!title) return;
+  await addApplication({ title, company, status: "Interested" });
+  document.getElementById("newJobTitle").value = "";
+  document.getElementById("newJobCompany").value = "";
+  toast(t("toast_added"));
+};
+
+// ─── Cover letter ───────────────────────────────────────
+document.getElementById("genCover").onclick = async () => {
+  const profile = (await idbGet("profile", "main")) || readProfileForm();
+  const job = document.getElementById("coverJob").value.trim() || "the open position";
+  const co = document.getElementById("coverCo").value.trim() || "your company";
+  const name = profile.name || "[Your Name]";
+  const skills = profile.skills || "relevant skills";
+  const years = profile.years ? `${profile.years} years of experience` : "professional experience";
+  const letter = `Dear Hiring Manager,
+
+I am writing to express my interest in the ${job} position at ${co}. With ${years} and a background that includes ${skills}, I am confident I can contribute to your team.
+
+My experience has prepared me to deliver results in a fast-moving environment, and I am particularly drawn to ${co}'s work. I am proficient in English${profile.japanese && profile.japanese !== "None" ? ` and have ${profile.japanese.toLowerCase()} Japanese ability` : ""}, and I am ready to relocate / work in Japan as required.
+
+I would welcome the opportunity to discuss how my background aligns with your needs. Thank you for your consideration.
+
+Sincerely,
+${name}`;
+  const out = document.getElementById("coverOut");
+  out.style.display = "block";
+  out.textContent = letter;
+  document.getElementById("copyCover").style.display = "inline-flex";
+};
+
+document.getElementById("copyCover").onclick = async () => {
+  const text = document.getElementById("coverOut").textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+    toast(t("toast_copied"));
+  } catch {
+    toast("Copy failed", "err");
+  }
+};
+
+// ─── Scam checklist warnings ────────────────────────────
+document.getElementById("scamList").addEventListener("change", (e) => {
+  const cb = e.target;
+  if (cb.type !== "checkbox") return;
+  const warn = cb.parentElement.querySelector(".warn-text");
+  if (warn) warn.style.display = cb.checked ? "block" : "none";
+});
+
+// ─── Backup / Restore ───────────────────────────────────
+document.getElementById("backupBtn").onclick = () => document.getElementById("backupDialog").showModal();
+document.getElementById("closeBackup").onclick = () => document.getElementById("backupDialog").close();
+
+document.getElementById("exportBtn").onclick = async () => {
+  const profile = await idbGet("profile", "main");
+  const applications = await idbGetAll("applications");
+  const data = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    profile: profile || null,
+    applications
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `FindJobNow-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast(t("toast_exported"));
+};
+
+document.getElementById("importBtn").onclick = () => document.getElementById("importFile").click();
+document.getElementById("importFile").onchange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    if (data.profile) await idbSet("profile", "main", data.profile);
+    if (Array.isArray(data.applications)) {
+      await idbClear("applications");
+      for (const app of data.applications) await idbSet("applications", undefined, app);
+    }
+    if (data.profile) fillProfileForm(data.profile);
+    renderTracker();
+    toast(t("toast_imported"));
+    document.getElementById("backupDialog").close();
+  } catch (err) {
+    toast("Import failed: invalid file", "err");
+  }
+  e.target.value = "";
+};
+
+// ─── Helpers ────────────────────────────────────────────
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+// ─── Init ───────────────────────────────────────────────
+async function init() {
+  await openDB();
+  applyI18n();
+  renderBoards();
+  const profile = await idbGet("profile", "main");
+  if (profile) fillProfileForm(profile);
+  renderTracker();
+
+  if ("serviceWorker" in navigator) {
+    try {
+      await navigator.serviceWorker.register("./sw.js");
+    } catch (_) {}
+  }
+}
+
+init();
 </script>
 </body>
 </html>
