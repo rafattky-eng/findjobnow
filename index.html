@@ -1209,15 +1209,20 @@ async function searchLiveJobs(){
 function siteUrl(s){ return (LANG==="jp" ? (s.url_jp||s.url_en||s.url) : (s.url_en||s.url_jp||s.url)) || "#"; }
 function siteDesc(s){ return (LANG==="jp" ? (s.desc_jp||s.desc_en||s.desc) : (s.desc_en||s.desc_jp||s.desc)) || ""; }
 const JAPAN_SITES = [
-  {name:"GaijinPot Jobs", url_en:"https://jobs.gaijinpot.com", url_jp:"https://jobs.gaijinpot.com/jp", desc_en:"Top English job board for foreigners in Japan. Strong visa sponsorship listings.", desc_jp:"外国人向けの人気英語求人サイト。ビザサポート求人が豊富。", visa:true, eng:5, industries:["All"]},
+  {name:"GaijinPot Jobs", url_en:"https://jobs.gaijinpot.com/en/", url_jp:"https://jobs.gaijinpot.com/jp", desc_en:"Top English job board for foreigners in Japan. Strong visa sponsorship listings.", desc_jp:"外国人向けの人気英語求人サイト。ビザサポート求人が豊富。", visa:true, eng:5, industries:["All"]},
   {name:"Daijob", url_en:"https://www.daijob.com/en/", url_jp:"https://www.daijob.com/", desc_en:"Bilingual professional jobs (IT, engineering, sales).", desc_jp:"バイリンガル向けプロフェッショナル求人。", visa:true, eng:4, industries:["IT","Engineering","Sales"]},
   {name:"CareerCross", url_en:"https://www.careercross.com/en/", url_jp:"https://www.careercross.com/ja/", desc_en:"Bilingual and professional roles across industries.", desc_jp:"バイリンガル・専門職向け求人。", visa:true, eng:4, industries:["IT","Finance","Marketing"]},
+  {name:"LinkedIn Jobs", url_en:"https://www.linkedin.com/jobs/", url_jp:"https://www.linkedin.com/jobs/", desc_en:"Global professional network — search Japan roles.", desc_jp:"グローバルなプロフェッショナル求人（日本の求人も検索可）。", visa:false, eng:5, industries:["All"]},
+  {name:"Indeed Japan", url_en:"https://jp.indeed.com/", url_jp:"https://jp.indeed.com/", desc_en:"Large job search (filter for English / visa).", desc_jp:"大規模な求人検索サイト。", visa:false, eng:3, industries:["All"]},
+  {name:"Robert Walters", url_en:"https://www.robertwalters.co.jp/en/", url_jp:"https://www.robertwalters.co.jp/", desc_en:"Professional recruitment agency jobs in Japan.", desc_jp:"人材紹介エージェントの求人。", visa:true, eng:4, industries:["Finance","IT","Sales"]},
+  {name:"Michael Page Japan", url_en:"https://www.michaelpage.co.jp/en", url_jp:"https://www.michaelpage.co.jp/", desc_en:"Specialist recruitment for mid–senior roles.", desc_jp:"中堅〜シニア向け専門人材紹介。", visa:true, eng:4, industries:["Finance","IT","Marketing"]},
+  {name:"JAC Recruitment", url_en:"https://www.jac-recruitment.jp/en/", url_jp:"https://www.jac-recruitment.jp/", desc_en:"Bilingual recruitment agency focused on Japan.", desc_jp:"日本に強いバイリンガル人材紹介。", visa:true, eng:4, industries:["All"]},
+  {name:"JETRO HR Portal", url_en:"https://www.jetro.go.jp/en/hrportal/", url_jp:"https://www.jetro.go.jp/hrportal/", desc_en:"Official portal for professionals seeking work in Japan.", desc_jp:"日本で働くプロ向けの公式ポータル。", visa:true, eng:4, industries:["All"]},
+  {name:"TokyoDev", url_en:"https://www.tokyodev.com/", url_jp:"https://www.tokyodev.com/", desc_en:"Developer-focused jobs in Tokyo and remote Japan.", desc_jp:"東京・リモートのエンジニア求人。", visa:true, eng:5, industries:["IT","Engineering"]},
+  {name:"Japan Dev", url_en:"https://japan-dev.com/", url_jp:"https://japan-dev.com/", desc_en:"Tech & engineering jobs at Japanese and global companies.", desc_jp:"日本のテック・エンジニア求人。", visa:true, eng:5, industries:["IT","Engineering"]},
+  {name:"Wantedly", url_en:"https://www.wantedly.com/", url_jp:"https://www.wantedly.com/", desc_en:"Company culture–focused matching (many startups).", desc_jp:"企業文化重視のマッチング求人（スタートアップ多数）。", visa:false, eng:3, industries:["All"]},
+  {name:"Skillhouse", url_en:"https://www.skillhouse.co.jp/en/", url_jp:"https://www.skillhouse.co.jp/", desc_en:"IT and digital talent recruitment in Japan.", desc_jp:"IT・デジタル人材の求人。", visa:true, eng:4, industries:["IT","Digital"]},
   {name:"YOLO Japan", url_en:"https://www.yolo-japan.com/en/", url_jp:"https://www.yolo-japan.com/", desc_en:"Part-time and full-time jobs for foreigners.", desc_jp:"外国人向けパート・正社員求人。", visa:true, eng:4, industries:["Service","Hospitality"]},
-  {name:"Japan Dev", url_en:"https://japan-dev.com/jobs", url_jp:"https://japan-dev.com/jobs", desc_en:"Tech & engineering jobs at Japanese and global companies.", desc_jp:"日本のテック・エンジニア求人。", visa:true, eng:5, industries:["IT","Engineering"]},
-  {name:"TokyoDev", url_en:"https://www.tokyodev.com/jobs", url_jp:"https://www.tokyodev.com/jobs", desc_en:"Developer-focused jobs in Tokyo and remote Japan.", desc_jp:"東京・リモートのエンジニア求人。", visa:true, eng:5, industries:["IT","Engineering"]},
-  {name:"Wantedly", url_en:"https://www.wantedly.com", url_jp:"https://www.wantedly.com", desc_en:"Company culture–focused job matching (many startups).", desc_jp:"企業文化重視のマッチング求人（スタートアップ多数）。", visa:false, eng:3, industries:["All"]},
-  {name:"Robert Walters", url_en:"https://www.robertwalters.co.jp/en/jobs.html", url_jp:"https://www.robertwalters.co.jp/jobs.html", desc_en:"Professional recruitment agency jobs in Japan.", desc_jp:"人材紹介エージェントの求人。", visa:true, eng:4, industries:["Finance","IT","Sales"]},
-  {name:"Indeed Japan", url_en:"https://jp.indeed.com", url_jp:"https://jp.indeed.com", desc_en:"Large job search (filter for English / visa).", desc_jp:"大規模な求人検索サイト。", visa:false, eng:3, industries:["All"]},
   {name:"Hello Work", url_en:"https://www.hellowork.mhlw.go.jp", url_jp:"https://www.hellowork.mhlw.go.jp", desc_en:"Official public employment service (mainly Japanese).", desc_jp:"ハローワーク（公的職業紹介）。", visa:false, eng:1, industries:["All"]}
 ];
 
@@ -1446,7 +1451,7 @@ function renderLanding(){
   </div>
 
   <p style="margin-top:14px;font-size:12px;color:var(--mu);text-align:center">${t("free_private")}</p>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.7</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.8</div>
 
   <input type="file" id="cvFile" accept=".pdf,.doc,.docx,.txt,application/pdf" class="hidden">
   <div class="hidden" id="pasteModal">
@@ -1508,7 +1513,7 @@ function renderDashboard(){
     <button class="btn secondary" data-go="tracker">${t("tracker")}</button>
     <button class="btn secondary" data-go="directory">🌐 ${t("sites")}</button>
   </div>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.7</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.8</div>
   `;
 }
 
@@ -1610,7 +1615,7 @@ function renderJobs(){
     </div>`;
   }).join("")}
 
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.7</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.8</div>
   `;
 }
 
@@ -1690,7 +1695,7 @@ function renderDirectory(){
         </div>
       </div>
     </div>`).join("")}
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.7</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.8</div>
   `;
 }
 
