@@ -85,6 +85,13 @@ header {
   align-items: center;
   gap: 8px;
 }
+.logo-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
 .logo-icon {
   width: 32px;
   height: 32px;
@@ -844,6 +851,15 @@ main {
   color: var(--mu);
 }
 
+.footer-copy {
+  text-align: center;
+  font-size: 11px;
+  color: var(--mu);
+  opacity: 0.75;
+  margin: 28px 0 12px;
+  line-height: 1.5;
+  padding-bottom: 8px;
+}
 @media (min-width: 640px) {
   .score-grid { grid-template-columns: repeat(4, 1fr); }
   .value-grid { grid-template-columns: repeat(4, 1fr); }
@@ -859,7 +875,7 @@ main {
 <body>
 <div class="app" id="app">
 <header>
-  <div class="logo"><div class="logo-icon">🔍</div> FindJob Now</div>
+  <div class="logo"><img src="./icon-192.png" alt="FindJob Now" class="logo-img" width="32" height="32"> FindJob Now</div>
   <div class="header-actions">
     <div class="lang-switch">
       <button type="button" id="btnEn" class="active">EN</button>
@@ -878,11 +894,11 @@ main {
 </div>
 <main id="main"></main>
 <nav class="nav-bottom" id="bottomNav">
-  <button data-view="dashboard" class="active"><span>🏠</span>Home</button>
-  <button data-view="tools"><span>📊</span>Analysis</button>
-  <button data-view="jobs"><span>💼</span>Jobs</button>
-  <button data-view="tools"><span>✉️</span>Apply</button>
-  <button data-view="tracker"><span>🗂</span>Tracker</button>
+  <button data-view="dashboard" class="active"><span>🏠</span><span class="nav-label" data-i18n="nav_home">Home</span></button>
+  <button data-view="tools"><span>📊</span><span class="nav-label" data-i18n="nav_analysis">Analysis</span></button>
+  <button data-view="jobs"><span>💼</span><span class="nav-label" data-i18n="nav_jobs">Jobs</span></button>
+  <button data-view="tools" data-tool-focus="letter"><span>✉️</span><span class="nav-label" data-i18n="nav_apply">Apply</span></button>
+  <button data-view="tracker"><span>🗂</span><span class="nav-label" data-i18n="nav_tracker">Tracker</span></button>
 </nav>
 </div>
 <div class="toast" id="toast"></div>
@@ -927,6 +943,7 @@ const I18N = {
     hero_title: "Find Your Next Job In Japan With AI",
     hero_sub: "Upload your CV. Get matched jobs. Discover visa-sponsored opportunities. Apply faster.",
     upload: "Upload CV",
+    paste: "Paste Resume",
     skip: "Continue without CV",
     dash: "Your AI Dashboard",
     resume_score: "Resume Strength",
@@ -943,12 +960,55 @@ const I18N = {
     filters: "Smart Filters",
     no_jobs: "No jobs yet. Upload a CV or adjust filters.",
     backup_ok: "Backup downloaded",
-    restored: "Progress restored"
+    restored: "Progress restored",
+    nav_home: "Home",
+    nav_analysis: "Analysis",
+    nav_jobs: "Jobs",
+    nav_apply: "Apply",
+    nav_tracker: "Tracker",
+    step_upload: "Upload CV",
+    step_analysis: "Career Analysis",
+    step_jobs: "Find Jobs",
+    step_apply: "Apply",
+    step_track: "Track",
+    start_here: "START HERE",
+    upload_your_cv: "Upload your CV",
+    or: "or",
+    strengths: "Strengths",
+    missing: "Missing",
+    best_industries: "Best Industries",
+    quick_actions: "Quick Actions",
+    find_jobs: "Find Jobs",
+    sites: "Sites",
+    tools: "Tools",
+    install_title: "Install FindJob Now",
+    install_1: "Tap the Share button",
+    install_2: "Tap Add to Home Screen",
+    install_3: "Open it like an app",
+    got_it: "Got It",
+    free_private: "Free · Private · No signup · Everything stays on this device",
+    step1_title: "Step 1 — Upload your CV",
+    step1_sub: "PDF, Word, or paste text. Analysis stays on this device.",
+    step2_title: "Step 2 — Review your AI Profile",
+    step2_sub: "Scores, strengths, and best-fit roles",
+    step3_title: "Step 3 — View Matched Jobs",
+    step3_sub: "Filter by visa, English, remote, and more",
+    step4_title: "Step 4 — Generate Application",
+    step4_sub: "Cover letters, CV tips, salary, visa & roadmap",
+    step5_title: "Step 5 — Track Applications",
+    step5_sub: "Drag cards between columns. Stored on this device only.",
+    visa_support: "Visa Support",
+    english_friendly: "English Friendly",
+    remote: "Remote",
+    gen_app: "Generate Application",
+    language: "Language",
+    visa: "Visa"
   },
   jp: {
     hero_title: "AIで日本の仕事を見つけよう",
     hero_sub: "履歴書をアップロード。マッチした求人、ビザ支援求人、応募を加速。",
     upload: "履歴書をアップロード",
+    paste: "履歴書を貼り付け",
     skip: "履歴書なしで続ける",
     dash: "AIダッシュボード",
     resume_score: "履歴書スコア",
@@ -965,7 +1025,49 @@ const I18N = {
     filters: "スマートフィルター",
     no_jobs: "求人がありません。履歴書をアップロードするかフィルターを調整してください。",
     backup_ok: "バックアップをダウンロードしました",
-    restored: "進捗を復元しました"
+    restored: "進捗を復元しました",
+    nav_home: "ホーム",
+    nav_analysis: "分析",
+    nav_jobs: "求人",
+    nav_apply: "応募",
+    nav_tracker: "管理",
+    step_upload: "履歴書",
+    step_analysis: "キャリア分析",
+    step_jobs: "求人検索",
+    step_apply: "応募",
+    step_track: "管理",
+    start_here: "ここから始める",
+    upload_your_cv: "履歴書をアップロード",
+    or: "または",
+    strengths: "強み",
+    missing: "不足",
+    best_industries: "おすすめ業界",
+    quick_actions: "クイックアクション",
+    find_jobs: "求人を探す",
+    sites: "サイト",
+    tools: "ツール",
+    install_title: "FindJob Nowをインストール",
+    install_1: "共有ボタンをタップ",
+    install_2: "ホーム画面に追加をタップ",
+    install_3: "アプリのように開く",
+    got_it: "了解",
+    free_private: "無料 · プライベート · 登録不要 · すべてこの端末に保存",
+    step1_title: "ステップ1 — 履歴書をアップロード",
+    step1_sub: "PDF・Word・テキスト。分析はこの端末のみで行われます。",
+    step2_title: "ステップ2 — AIプロフィールを確認",
+    step2_sub: "スコア、強み、おすすめ職種",
+    step3_title: "ステップ3 — マッチした求人を見る",
+    step3_sub: "ビザ・英語・リモートなどで絞り込み",
+    step4_title: "ステップ4 — 応募書類を作成",
+    step4_sub: "カバーレター、改善提案、給与、ビザ、ロードマップ",
+    step5_title: "ステップ5 — 応募を管理",
+    step5_sub: "カードをドラッグして管理。この端末のみに保存。",
+    visa_support: "ビザ支援",
+    english_friendly: "英語OK",
+    remote: "リモート",
+    gen_app: "応募書類を作成",
+    language: "言語",
+    visa: "ビザ"
   }
 };
 const t = k => (I18N[LANG] && I18N[LANG][k]) || I18N.en[k] || k;
@@ -999,15 +1101,17 @@ const INDUSTRY_LABELS = {
   sales: "Sales", marketing: "Marketing", education: "Education", hr: "HR / Recruiting"
 };
 
+function siteUrl(s){ return (LANG==="jp" ? (s.url_jp||s.url_en||s.url) : (s.url_en||s.url_jp||s.url)) || "#"; }
+function siteDesc(s){ return (LANG==="jp" ? (s.desc_jp||s.desc_en||s.desc) : (s.desc_en||s.desc_jp||s.desc)) || ""; }
 const JAPAN_SITES = [
-  {name:"GaijinPot", url:"https://jobs.gaijinpot.com", desc:"Popular English job board for foreigners in Japan.", visa:true, eng:5, industries:["All"]},
-  {name:"Jobs in Japan", url:"https://jobsinjapan.com", desc:"Long-running English-friendly job site.", visa:true, eng:5, industries:["All"]},
-  {name:"CareerCross", url:"https://www.careercross.com", desc:"Bilingual and professional roles.", visa:true, eng:4, industries:["IT","Finance","Marketing"]},
-  {name:"Daijob", url:"https://www.daijob.com", desc:"Bilingual professional jobs.", visa:true, eng:4, industries:["IT","Engineering","Sales"]},
-  {name:"YOLO Japan", url:"https://www.yolo-japan.com", desc:"Part-time and full-time for foreigners.", visa:true, eng:4, industries:["Service","Hospitality"]},
-  {name:"WeXpats Jobs", url:"https://jobs.wexpats.com", desc:"Jobs and lifestyle support for foreigners.", visa:true, eng:4, industries:["All"]},
-  {name:"Indeed Japan", url:"https://jp.indeed.com", desc:"Large aggregate search (filter for English).", visa:false, eng:3, industries:["All"]},
-  {name:"Hello Work", url:"https://www.hellowork.mhlw.go.jp", desc:"Official public employment service (Japanese).", visa:false, eng:1, industries:["All"]}
+  {name:"GaijinPot", url_en:"https://jobs.gaijinpot.com", url_jp:"https://jobs.gaijinpot.com/jp", desc_en:"Popular English job board for foreigners in Japan.", desc_jp:"外国人向けの人気英語求人サイト。", visa:true, eng:5, industries:["All"]},
+  {name:"Jobs in Japan", url_en:"https://jobsinjapan.com", url_jp:"https://jobsinjapan.com", desc_en:"Long-running English-friendly job site.", desc_jp:"長年続く英語対応の求人サイト。", visa:true, eng:5, industries:["All"]},
+  {name:"CareerCross", url_en:"https://www.careercross.com/en/", url_jp:"https://www.careercross.com/ja/", desc_en:"Bilingual and professional roles.", desc_jp:"バイリンガル・専門職向け求人。", visa:true, eng:4, industries:["IT","Finance","Marketing"]},
+  {name:"Daijob", url_en:"https://www.daijob.com/en/", url_jp:"https://www.daijob.com/", desc_en:"Bilingual professional jobs.", desc_jp:"バイリンガル向けプロフェッショナル求人。", visa:true, eng:4, industries:["IT","Engineering","Sales"]},
+  {name:"YOLO Japan", url_en:"https://www.yolo-japan.com/en/", url_jp:"https://www.yolo-japan.com/", desc_en:"Part-time and full-time for foreigners.", desc_jp:"外国人向けパート・正社員求人。", visa:true, eng:4, industries:["Service","Hospitality"]},
+  {name:"WeXpats Jobs", url_en:"https://jobs.wexpats.com/en", url_jp:"https://jobs.wexpats.com/ja", desc_en:"Jobs and lifestyle support for foreigners.", desc_jp:"外国人向け求人と生活サポート。", visa:true, eng:4, industries:["All"]},
+  {name:"Indeed Japan", url_en:"https://jp.indeed.com", url_jp:"https://jp.indeed.com", desc_en:"Large aggregate search (filter for English).", desc_jp:"大規模な求人検索サイト。", visa:false, eng:3, industries:["All"]},
+  {name:"Hello Work", url_en:"https://www.hellowork.mhlw.go.jp", url_jp:"https://www.hellowork.mhlw.go.jp", desc_en:"Official public employment service (Japanese).", desc_jp:"ハローワーク（公的職業紹介）。", visa:false, eng:1, industries:["All"]}
 ];
 
 const SALARY_BANDS = {
@@ -1189,48 +1293,49 @@ function renderLanding(){
   ${showInstall ? `
   <div class="install-banner" id="installBanner">
     <button class="close-x" id="dismissInstall" aria-label="Dismiss">×</button>
-    <h3>📱 Install FindJob Now</h3>
+    <h3>📱 ${t("install_title")}</h3>
     <ol>
-      <li>Tap the <strong>Share</strong> button</li>
-      <li>Tap <strong>Add to Home Screen</strong></li>
-      <li>Open it like an app</li>
+      <li>${t("install_1")}</li>
+      <li>${t("install_2")}</li>
+      <li>${t("install_3")}</li>
     </ol>
-    <button class="btn secondary" id="gotInstall">Got It</button>
+    <button class="btn secondary" id="gotInstall">${t("got_it")}</button>
   </div>` : ""}
   <div class="hero">
     <h1>${t("hero_title")}</h1>
     <p>${t("hero_sub")}</p>
   </div>
   <div class="start-card">
-    <div class="start-label">👇 START HERE</div>
-    <h2>Upload your CV</h2>
-    <button class="btn btn-lg" id="btnUpload">📄 Upload CV</button>
-    <div class="or">or</div>
-    <button class="btn secondary btn-lg" id="btnPaste">📋 Paste Resume</button>
+    <div class="start-label">👇 ${t("start_here")}</div>
+    <h2>${t("upload_your_cv")}</h2>
+    <button class="btn btn-lg" id="btnUpload">📄 ${t("upload")}</button>
+    <div class="or">${t("or")}</div>
+    <button class="btn secondary btn-lg" id="btnPaste">📋 ${t("paste")}</button>
   </div>
   <div class="step-guide">
     <span class="hand">👇</span>
     <div>
-      <div class="step-text">Step 1 — Upload your CV</div>
-      <div class="step-sub">PDF, Word, or paste text. Analysis stays on this device.</div>
+      <div class="step-text">${t("step1_title")}</div>
+      <div class="step-sub">${t("step1_sub")}</div>
     </div>
   </div>
   <div class="value-grid">
-    <div class="value-card"><strong>Resume Analysis</strong><span>Score + gaps + recommendations</span></div>
-    <div class="value-card"><strong>Career Matching</strong><span>Industries & titles ranked for you</span></div>
-    <div class="value-card"><strong>Visa Guidance</strong><span>Sponsorship types & job fit</span></div>
-    <div class="value-card"><strong>Application Tools</strong><span>Cover letters, tracker, salary</span></div>
+    <div class="value-card"><strong>${LANG==="jp"?"履歴書分析":"Resume Analysis"}</strong><span>${LANG==="jp"?"スコア・改善提案":"Score + gaps + recommendations"}</span></div>
+    <div class="value-card"><strong>${LANG==="jp"?"キャリアマッチ":"Career Matching"}</strong><span>${LANG==="jp"?"業界・職種ランキング":"Industries & titles ranked for you"}</span></div>
+    <div class="value-card"><strong>${LANG==="jp"?"ビザ案内":"Visa Guidance"}</strong><span>${LANG==="jp"?"スポンサーシップの種類":"Sponsorship types & job fit"}</span></div>
+    <div class="value-card"><strong>${LANG==="jp"?"応募ツール":"Application Tools"}</strong><span>${LANG==="jp"?"レター・トラッカー・給与":"Cover letters, tracker, salary"}</span></div>
   </div>
   <div style="text-align:center;margin-top:8px">
     <button class="btn ghost" id="btnSkip" style="max-width:280px;min-height:48px;font-size:15px">${t("skip")}</button>
   </div>
-  <p style="margin-top:16px;font-size:12px;color:var(--mu);text-align:center">Free · Private · No signup · Everything stays on this device</p>
+  <p style="margin-top:16px;font-size:12px;color:var(--mu);text-align:center">${t("free_private")}</p>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.1</div>
   <input type="file" id="cvFile" accept=".pdf,.doc,.docx,.txt,application/pdf" class="hidden">
   <div class="hidden" id="pasteModal">
     <div class="card" style="margin-top:12px">
-      <h3>Paste your resume text</h3>
-      <div class="field"><textarea id="pasteText" placeholder="Paste the full text of your CV here…" style="min-height:180px"></textarea></div>
-      <button class="btn" id="btnPasteGo">Analyze Pasted Text</button>
+      <h3>${t("paste")}</h3>
+      <div class="field"><textarea id="pasteText" placeholder="${LANG==="jp"?"履歴書のテキストをここに貼り付け…":"Paste the full text of your CV here…"}" style="min-height:180px"></textarea></div>
+      <button class="btn" id="btnPasteGo">${LANG==="jp"?"貼り付けたテキストを分析":"Analyze Pasted Text"}</button>
     </div>
   </div>
   `;
@@ -1244,8 +1349,8 @@ function renderDashboard(){
   <div class="step-guide">
     <span class="hand">👇</span>
     <div>
-      <div class="step-text">Step 2 — Review your AI Profile</div>
-      <div class="step-sub">Scores, strengths, and best-fit roles</div>
+      <div class="step-text">${t("step2_title")}</div>
+      <div class="step-sub">${t("step2_sub")}</div>
     </div>
   </div>
   <h2 style="margin:0 0 4px;font-size:20px;font-weight:800">${t("dash")}</h2>
@@ -1274,17 +1379,18 @@ function renderDashboard(){
   <div class="step-guide" style="margin-top:20px">
     <span class="hand">👇</span>
     <div>
-      <div class="step-text">Next — Find Jobs</div>
-      <div class="step-sub">Browse matched roles and apply faster</div>
+      <div class="step-text">${t("find_jobs")}</div>
+      <div class="step-sub">${t("step3_sub")}</div>
     </div>
   </div>
-  <button class="btn btn-lg" data-go="jobs" style="margin-bottom:12px">💼 Find Jobs</button>
+  <button class="btn btn-lg" data-go="jobs" style="margin-bottom:12px">💼 ${t("find_jobs")}</button>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
     <button class="btn secondary" data-go="tools">${t("improve_cv")}</button>
     <button class="btn secondary" data-go="tools">${t("visa_help")}</button>
     <button class="btn secondary" data-go="tracker">${t("tracker")}</button>
-    <button class="btn secondary" data-go="directory">🌐 Sites</button>
+    <button class="btn secondary" data-go="directory">🌐 ${t("sites")}</button>
   </div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.1</div>
   `;
 }
 
@@ -1311,16 +1417,17 @@ function renderJobs(){
   <div class="step-guide">
     <span class="hand">👇</span>
     <div>
-      <div class="step-text">Step 3 — View Matched Jobs</div>
-      <div class="step-sub">Filter by visa, English, remote, and more</div>
+      <div class="step-text">${t("step3_title")}</div>
+      <div class="step-sub">${t("step3_sub")}</div>
     </div>
   </div>
-  <h2 style="margin:0 0 12px;font-size:20px;font-weight:800">Jobs</h2>
+  <h2 style="margin:0 0 12px;font-size:20px;font-weight:800">${t("nav_jobs")}</h2>
   <div class="filters">
-    <label><input type="checkbox" id="fVisa" ${prefs.visaOnly?"checked":""}> 🛂 Visa Support</label>
-    <label><input type="checkbox" id="fRemote"> 🏠 Remote</label>
-    <label><input type="checkbox" id="fEng" ${prefs.englishOnly?"checked":""}> 🌎 English Friendly</label>
+    <label><input type="checkbox" id="fVisa" ${prefs.visaOnly?"checked":""}> 🛂 ${t("visa_support")}</label>
+    <label><input type="checkbox" id="fRemote"> 🏠 ${t("remote")}</label>
+    <label><input type="checkbox" id="fEng" ${prefs.englishOnly?"checked":""}> 🌎 ${t("english_friendly")}</label>
   </div>
+  <div class="footer-copy" style="order:99">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.1</div>
   ${jobs.length===0 ? `<div class="card"><p style="color:var(--mu)">${t("no_jobs")}</p></div>` :
     jobs.map(j=>{
       const q = scoreJobQuality(j, STATE.profile);
@@ -1338,7 +1445,7 @@ function renderJobs(){
         </div>
         <div style="font-size:13px;color:var(--mu);margin-top:6px">${esc((j.description||"").slice(0,100))}…</div>
         <div class="apply-row">
-          <button class="btn" data-save="${esc(j.id)}" style="min-height:48px;font-size:15px">✉️ Generate Application</button>
+          <button class="btn" data-save="${esc(j.id)}" style="min-height:48px;font-size:15px">${t("gen_app")}</button>
         </div>
       </div>`;
     }).join("")}
@@ -1350,11 +1457,11 @@ function renderTools(){
   <div class="step-guide">
     <span class="hand">👇</span>
     <div>
-      <div class="step-text">Step 4 — Generate Application</div>
-      <div class="step-sub">Cover letters, CV tips, salary, visa & roadmap</div>
+      <div class="step-text">${t("step4_title")}</div>
+      <div class="step-sub">${t("step4_sub")}</div>
     </div>
   </div>
-  <h2 style="margin:0 0 12px;font-size:20px;font-weight:800">Tools</h2>
+  <h2 style="margin:0 0 12px;font-size:20px;font-weight:800">${t("tools")}</h2>
   <div class="card" data-tool="letter" style="cursor:pointer"><h3>✉️ ${t("generate_letter")}</h3><p style="font-size:13px;color:var(--mu);margin:0">Professional, email, LinkedIn, Japanese self-intro, interview intro — one click.</p></div>
   <div class="card" data-tool="improve" style="cursor:pointer"><h3>📈 ${t("improve_cv")}</h3><p style="font-size:13px;color:var(--mu);margin:0">See gaps and get rewritten sections to raise your score.</p></div>
   <div class="card" data-tool="salary" style="cursor:pointer"><h3>💴 ${t("salary")}</h3><p style="font-size:13px;color:var(--mu);margin:0">Tokyo / Osaka / Fukuoka bands by industry & level.</p></div>
@@ -1371,8 +1478,8 @@ function renderTracker(){
   <div class="step-guide">
     <span class="hand">👇</span>
     <div>
-      <div class="step-text">Step 5 — Track Applications</div>
-      <div class="step-sub">Drag cards between columns. Stored on this device only.</div>
+      <div class="step-text">${t("step5_title")}</div>
+      <div class="step-sub">${t("step5_sub")}</div>
     </div>
   </div>
   <h2 style="margin:0 0 12px;font-size:20px;font-weight:800">${t("tracker")}</h2>
@@ -1395,16 +1502,16 @@ function renderDirectory(){
   <div class="step-guide">
     <span class="hand">👇</span>
     <div>
-      <div class="step-text">Japan Job Directory</div>
-      <div class="step-sub">Trusted boards with visa & English ratings</div>
+      <div class="step-text">${t("directory")}</div>
+      <div class="step-sub">${LANG==="jp"?"ビザ・英語対応の求人サイト":"Trusted boards with visa & English ratings"}</div>
     </div>
   </div>
   <h2 style="margin:0 0 12px;font-size:20px;font-weight:800">${t("directory")}</h2>
   <div class="filters" style="margin-bottom:14px">
-    <span class="badge visa">🛂 Visa Support</span>
-    <span class="badge eng">🌎 English Friendly</span>
-    <span class="badge remote">🏠 Remote Jobs</span>
-    <span class="badge jlpt">🎌 Japanese Required</span>
+    <span class="badge visa">🛂 ${t("visa_support")}</span>
+    <span class="badge eng">🌎 ${t("english_friendly")}</span>
+    <span class="badge remote">🏠 ${t("remote")}</span>
+    <span class="badge jlpt">🎌 JLPT</span>
   </div>
   ${JAPAN_SITES.map(s=>`
     <div class="card">
@@ -1412,15 +1519,16 @@ function renderDirectory(){
         <div class="dir-logo">${s.name.slice(0,2)}</div>
         <div style="flex:1">
           <strong style="color:var(--tx);font-size:15px">${esc(s.name)}</strong>
-          <div style="font-size:13px;color:var(--mu);margin:6px 0">${esc(s.desc)}</div>
+          <div style="font-size:13px;color:var(--mu);margin:6px 0">${esc(siteDesc(s))}</div>
           <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
-            ${s.visa?`<span class="badge visa">🛂 Visa Support</span>`:""}
+            ${s.visa?`<span class="badge visa">🛂 ${t("visa_support")}</span>`:""}
             <span class="badge eng">🌎 English ★${s.eng}/5</span>
-            <a href="${s.url}" target="_blank" rel="noopener" class="chip">Open ↗</a>
+            <a href="${siteUrl(s)}" target="_blank" rel="noopener" class="chip">${LANG==="jp"?"開く":"Open"} ↗</a>
           </div>
         </div>
       </div>
     </div>`).join("")}
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.1</div>
   `;
 }
 
@@ -1513,6 +1621,7 @@ function render(){
   if(!main) return;
   const v = STATE.view || "landing";
   updateProgress();
+  updateNavLabels();
   if(v === "landing" || !STATE.profile){
     main.innerHTML = renderLanding();
     $("bottomNav").style.display = "none";
@@ -1536,16 +1645,23 @@ function render(){
   });
 }
 
+function updateNavLabels(){
+  $$("#bottomNav [data-i18n]").forEach(el => {
+    const k = el.getAttribute("data-i18n");
+    if(k) el.textContent = t(k);
+  });
+}
+
 function updateProgress(){
   const wrap = $("progressWrap");
   if(!wrap) return;
   const v = STATE.view || "landing";
   const steps = [
-    {id:"landing", label:"Upload CV", num:1},
-    {id:"dashboard", label:"Career Analysis", num:2},
-    {id:"jobs", label:"Find Jobs", num:3},
-    {id:"tools", label:"Apply", num:4},
-    {id:"tracker", label:"Track", num:5}
+    {id:"landing", label:t("step_upload"), num:1},
+    {id:"dashboard", label:t("step_analysis"), num:2},
+    {id:"jobs", label:t("step_jobs"), num:3},
+    {id:"tools", label:t("step_apply"), num:4},
+    {id:"tracker", label:t("step_track"), num:5}
   ];
   let current = 1;
   if(STATE.profile) current = 2;
@@ -1732,6 +1848,7 @@ function wireCommon(){
 $("btnEn")?.addEventListener("click", () => {
   LANG = "en";
   STATE.settings.lang = "en";
+  document.documentElement.lang = "en";
   $("btnEn")?.classList.add("active");
   $("btnJp")?.classList.remove("active");
   persist(); render();
@@ -1739,6 +1856,7 @@ $("btnEn")?.addEventListener("click", () => {
 $("btnJp")?.addEventListener("click", () => {
   LANG = "jp";
   STATE.settings.lang = "jp";
+  document.documentElement.lang = "ja";
   $("btnJp")?.classList.add("active");
   $("btnEn")?.classList.remove("active");
   persist(); render();
@@ -1765,6 +1883,17 @@ if("serviceWorker" in navigator){
 $$("#bottomNav button").forEach(b => {
   b.onclick = () => setView(b.dataset.view);
 });
+
+// Init language UI
+if(LANG === "jp"){
+  $("btnJp")?.classList.add("active");
+  $("btnEn")?.classList.remove("active");
+  document.documentElement.lang = "ja";
+} else {
+  $("btnEn")?.classList.add("active");
+  $("btnJp")?.classList.remove("active");
+  document.documentElement.lang = "en";
+}
 
 render();
 
