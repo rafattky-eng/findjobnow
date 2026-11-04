@@ -1,4 +1,4 @@
-// FindJob Now V.210 PWA service worker.
+// FindJob Now V.118 PWA service worker.
 // Caches the app shell and PDF.js for best-effort offline loading. Live job searches need internet.
 const V = "fj-v210";
 // Works at the domain root (Cloudflare) and in a sub-folder (GitHub Pages: /findjobnow/)

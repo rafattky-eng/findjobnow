@@ -2,34 +2,18 @@
   "id": "./",
   "name": "FindJob Now",
   "short_name": "FindJob",
-  "description": "AI Career Copilot for foreigners seeking jobs in Japan \u2014 free, private, no signup.",
+  "description": "AI Career Copilot for foreigners seeking jobs in Japan. Upload CV, get matched jobs, visa guidance, apply faster — free, private, no signup.",
   "lang": "en",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "display_override": [
-    "standalone",
-    "minimal-ui"
-  ],
+  "display_override": ["standalone", "minimal-ui"],
   "orientation": "any",
-  "background_color": "#07090D",
-  "theme_color": "#07090D",
-  "categories": [
-    "business",
-    "productivity"
-  ],
+  "background_color": "#0C2340",
+  "theme_color": "#0C2340",
+  "categories": ["business", "productivity"],
   "icons": [
-    {
-      "src": "./icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "./icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    }
+    {"src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"}
   ]
 }
