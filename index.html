@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#0C2340">
 <meta name="description" content="AI Career Copilot for foreigners seeking jobs in Japan. Upload CV, get matched jobs, visa guidance, apply faster — free, private, no signup.">
 <meta name="application-name" content="FindJob Now">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; worker-src 'self' blob: https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://boards-api.greenhouse.io https://api.lever.co https://api.ashbyhq.com https://remotive.com https://jobicy.com; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; worker-src 'self' blob: https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.google.com https://www.gstatic.com https://icons.duckduckgo.com; font-src 'self' data:; connect-src 'self' https://boards-api.greenhouse.io https://api.lever.co https://api.ashbyhq.com https://remotive.com https://jobicy.com; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; upgrade-insecure-requests">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
@@ -737,11 +737,6 @@ main {
   border-color: var(--ac);
   background: rgba(244, 180, 0, 0.12);
 }
-.dir-card {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-}
 .dir-logo {
   width: 48px;
   height: 48px;
@@ -750,10 +745,39 @@ main {
   display: grid;
   place-items: center;
   font-weight: 800;
-  color: var(--ac);
+  color: #fff;
   flex-shrink: 0;
-  font-size: 14px;
+  font-size: 13px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid var(--bd);
 }
+.dir-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #fff;
+  padding: 6px;
+  display: block;
+}
+.dir-logo .mark {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.dir-card {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.dir-card .dir-body { flex: 1; min-width: 0; }
+.dir-card strong { display: block; color: var(--tx); font-size: 15px; font-weight: 700; }
+.dir-card .dir-desc { font-size: 13px; color: var(--mu); margin: 3px 0 0; line-height: 1.35; }
+
 .list-check {
   margin: 0;
   padding: 0;
@@ -1209,21 +1233,20 @@ async function searchLiveJobs(){
 function siteUrl(s){ return (LANG==="jp" ? (s.url_jp||s.url_en||s.url) : (s.url_en||s.url_jp||s.url)) || "#"; }
 function siteDesc(s){ return (LANG==="jp" ? (s.desc_jp||s.desc_en||s.desc) : (s.desc_en||s.desc_jp||s.desc)) || ""; }
 const JAPAN_SITES = [
-  {name:"GaijinPot Jobs", url_en:"https://jobs.gaijinpot.com/en/", url_jp:"https://jobs.gaijinpot.com/jp", desc_en:"Top English job board for foreigners in Japan. Strong visa sponsorship listings.", desc_jp:"外国人向けの人気英語求人サイト。ビザサポート求人が豊富。", visa:true, eng:5, industries:["All"]},
-  {name:"Daijob", url_en:"https://www.daijob.com/en/", url_jp:"https://www.daijob.com/", desc_en:"Bilingual professional jobs (IT, engineering, sales).", desc_jp:"バイリンガル向けプロフェッショナル求人。", visa:true, eng:4, industries:["IT","Engineering","Sales"]},
-  {name:"CareerCross", url_en:"https://www.careercross.com/en/", url_jp:"https://www.careercross.com/ja/", desc_en:"Bilingual and professional roles across industries.", desc_jp:"バイリンガル・専門職向け求人。", visa:true, eng:4, industries:["IT","Finance","Marketing"]},
-  {name:"LinkedIn Jobs", url_en:"https://www.linkedin.com/jobs/", url_jp:"https://www.linkedin.com/jobs/", desc_en:"Global professional network — search Japan roles.", desc_jp:"グローバルなプロフェッショナル求人（日本の求人も検索可）。", visa:false, eng:5, industries:["All"]},
-  {name:"Indeed Japan", url_en:"https://jp.indeed.com/", url_jp:"https://jp.indeed.com/", desc_en:"Large job search (filter for English / visa).", desc_jp:"大規模な求人検索サイト。", visa:false, eng:3, industries:["All"]},
-  {name:"Robert Walters", url_en:"https://www.robertwalters.co.jp/en/", url_jp:"https://www.robertwalters.co.jp/", desc_en:"Professional recruitment agency jobs in Japan.", desc_jp:"人材紹介エージェントの求人。", visa:true, eng:4, industries:["Finance","IT","Sales"]},
-  {name:"Michael Page Japan", url_en:"https://www.michaelpage.co.jp/en", url_jp:"https://www.michaelpage.co.jp/", desc_en:"Specialist recruitment for mid–senior roles.", desc_jp:"中堅〜シニア向け専門人材紹介。", visa:true, eng:4, industries:["Finance","IT","Marketing"]},
-  {name:"JAC Recruitment", url_en:"https://www.jac-recruitment.jp/en/", url_jp:"https://www.jac-recruitment.jp/", desc_en:"Bilingual recruitment agency focused on Japan.", desc_jp:"日本に強いバイリンガル人材紹介。", visa:true, eng:4, industries:["All"]},
-  {name:"JETRO HR Portal", url_en:"https://www.jetro.go.jp/en/hrportal/", url_jp:"https://www.jetro.go.jp/hrportal/", desc_en:"Official portal for professionals seeking work in Japan.", desc_jp:"日本で働くプロ向けの公式ポータル。", visa:true, eng:4, industries:["All"]},
-  {name:"TokyoDev", url_en:"https://www.tokyodev.com/", url_jp:"https://www.tokyodev.com/", desc_en:"Developer-focused jobs in Tokyo and remote Japan.", desc_jp:"東京・リモートのエンジニア求人。", visa:true, eng:5, industries:["IT","Engineering"]},
-  {name:"Japan Dev", url_en:"https://japan-dev.com/", url_jp:"https://japan-dev.com/", desc_en:"Tech & engineering jobs at Japanese and global companies.", desc_jp:"日本のテック・エンジニア求人。", visa:true, eng:5, industries:["IT","Engineering"]},
-  {name:"Wantedly", url_en:"https://www.wantedly.com/", url_jp:"https://www.wantedly.com/", desc_en:"Company culture–focused matching (many startups).", desc_jp:"企業文化重視のマッチング求人（スタートアップ多数）。", visa:false, eng:3, industries:["All"]},
-  {name:"Skillhouse", url_en:"https://www.skillhouse.co.jp/en/", url_jp:"https://www.skillhouse.co.jp/", desc_en:"IT and digital talent recruitment in Japan.", desc_jp:"IT・デジタル人材の求人。", visa:true, eng:4, industries:["IT","Digital"]},
-  {name:"YOLO Japan", url_en:"https://www.yolo-japan.com/en/", url_jp:"https://www.yolo-japan.com/", desc_en:"Part-time and full-time jobs for foreigners.", desc_jp:"外国人向けパート・正社員求人。", visa:true, eng:4, industries:["Service","Hospitality"]},
-  {name:"Hello Work", url_en:"https://www.hellowork.mhlw.go.jp", url_jp:"https://www.hellowork.mhlw.go.jp", desc_en:"Official public employment service (mainly Japanese).", desc_jp:"ハローワーク（公的職業紹介）。", visa:false, eng:1, industries:["All"]}
+  {name:"CareerCross", domain:"careercross.com", url_en:"https://www.careercross.com/en/", url_jp:"https://www.careercross.com/ja/", desc_en:"Bilingual and international professional jobs", desc_jp:"バイリンガル・国際プロフェッショナル求人", visa:true, eng:4, color:"#E31C23", mark:"CC"},
+  {name:"Daijob", domain:"daijob.com", url_en:"https://www.daijob.com/en/", url_jp:"https://www.daijob.com/", desc_en:"Jobs for multilingual professionals", desc_jp:"マルチリンガル向けプロ求人", visa:true, eng:4, color:"#0080FF", mark:"Dj"},
+  {name:"GaijinPot Jobs", domain:"gaijinpot.com", url_en:"https://jobs.gaijinpot.com/en/", url_jp:"https://jobs.gaijinpot.com/jp", desc_en:"English-friendly jobs in Japan", desc_jp:"外国人向け英語求人", visa:true, eng:5, color:"#1A73E8", mark:"G"},
+  {name:"LinkedIn Jobs", domain:"linkedin.com", url_en:"https://www.linkedin.com/jobs/", url_jp:"https://www.linkedin.com/jobs/", desc_en:"International companies and professional careers", desc_jp:"国際企業・キャリア求人", visa:false, eng:5, color:"#0A66C2", mark:"in"},
+  {name:"Indeed Japan", domain:"indeed.com", url_en:"https://jp.indeed.com/", url_jp:"https://jp.indeed.com/", desc_en:"General job search across Japan", desc_jp:"日本全国の求人検索", visa:false, eng:3, color:"#2164F3", mark:"i"},
+  {name:"Robert Walters Japan", domain:"robertwalters.co.jp", url_en:"https://www.robertwalters.co.jp/en/", url_jp:"https://www.robertwalters.co.jp/", desc_en:"Professional and management recruitment", desc_jp:"プロ・マネジメント人材紹介", visa:true, eng:4, color:"#1B2A4A", mark:"rw"},
+  {name:"Michael Page Japan", domain:"michaelpage.co.jp", url_en:"https://www.michaelpage.co.jp/en", url_jp:"https://www.michaelpage.co.jp/", desc_en:"International recruitment and senior positions", desc_jp:"国際人材・シニア職紹介", visa:true, eng:4, color:"#1F2A44", mark:"Pg"},
+  {name:"JAC Recruitment Japan", domain:"jac-recruitment.jp", url_en:"https://www.jac-recruitment.jp/en/", url_jp:"https://www.jac-recruitment.jp/", desc_en:"Experienced professionals and management", desc_jp:"経験者・マネジメント人材", visa:true, eng:4, color:"#00A0E9", mark:"JAC"},
+  {name:"JETRO Open for Professionals", domain:"jetro.go.jp", url_en:"https://www.jetro.go.jp/en/hrportal/", url_jp:"https://www.jetro.go.jp/hrportal/", desc_en:"Careers with Japanese companies", desc_jp:"日本企業でのキャリア", visa:true, eng:4, color:"#003366", mark:"JT"},
+  {name:"TokyoDev", domain:"tokyodev.com", url_en:"https://www.tokyodev.com/", url_jp:"https://www.tokyodev.com/", desc_en:"English-friendly technology jobs", desc_jp:"英語OKのテック求人", visa:true, eng:5, color:"#5B5FEF", mark:"</>"},
+  {name:"Japan Dev", domain:"japan-dev.com", url_en:"https://japan-dev.com/", url_jp:"https://japan-dev.com/", desc_en:"International IT and technology jobs", desc_jp:"国際IT・テクノロジー求人", visa:true, eng:5, color:"#22C55E", mark:"{}"},
+  {name:"Wantedly", domain:"wantedly.com", url_en:"https://www.wantedly.com/", url_jp:"https://www.wantedly.com/", desc_en:"Startups and growing companies", desc_jp:"スタートアップ・成長企業", visa:false, eng:3, color:"#21BDDB", mark:"W"},
+  {name:"Skillhouse", domain:"skillhouse.co.jp", url_en:"https://www.skillhouse.co.jp/en/", url_jp:"https://www.skillhouse.co.jp/", desc_en:"IT and technology recruitment", desc_jp:"IT・テクノロジー人材紹介", visa:true, eng:4, color:"#E53935", mark:"Sh"},
+  {name:"Japan Times Jobs", domain:"japantimes.co.jp", url_en:"https://www.japantimes.co.jp/jobs/", url_jp:"https://www.japantimes.co.jp/jobs/", desc_en:"Job opportunities in Japan", desc_jp:"日本の求人情報", visa:false, eng:4, color:"#111111", mark:"jt"}
 ];
 
 const SALARY_BANDS = {
@@ -1451,7 +1474,7 @@ function renderLanding(){
   </div>
 
   <p style="margin-top:14px;font-size:12px;color:var(--mu);text-align:center">${t("free_private")}</p>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.8</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.9</div>
 
   <input type="file" id="cvFile" accept=".pdf,.doc,.docx,.txt,application/pdf" class="hidden">
   <div class="hidden" id="pasteModal">
@@ -1513,7 +1536,7 @@ function renderDashboard(){
     <button class="btn secondary" data-go="tracker">${t("tracker")}</button>
     <button class="btn secondary" data-go="directory">🌐 ${t("sites")}</button>
   </div>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.8</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.9</div>
   `;
 }
 
@@ -1593,20 +1616,21 @@ function renderJobs(){
       :"Best source for visa sponsorship in Japan. Links follow your EN/JP language."}
   </p>
   ${JAPAN_SITES.map(s => {
-    const q = titles[0] ? encodeURIComponent(titles[0]) : "";
-    let href = siteUrl(s);
-    // append search query when possible for a few boards
-    if(q && /gaijinpot/i.test(s.name)) href = (LANG==="jp"?"https://jobs.gaijinpot.com/jp":"https://jobs.gaijinpot.com") + "/?job_search%5Bkeyword%5D="+q;
-        return `<div class="card">
+    const href = siteUrl(s);
+    const fav = s.domain ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(s.domain)}&sz=128` : "";
+    const bg = s.color || "#0D3B66";
+    return `<div class="card" style="padding:12px 14px">
       <div class="dir-card">
-        <div class="dir-logo">${s.name.slice(0,2)}</div>
-        <div style="flex:1">
-          <strong style="color:var(--tx);font-size:15px">${esc(s.name)}</strong>
-          <div style="font-size:13px;color:var(--mu);margin:4px 0">${esc(siteDesc(s))}</div>
+        <div class="dir-logo" style="background:${bg}">
+          ${fav ? `<img src="${fav}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">` : ""}
+          <span class="mark" style="display:${fav ? "none" : "grid"};background:${bg}">${esc(s.mark || s.name.slice(0,2))}</span>
+        </div>
+        <div class="dir-body">
+          <strong>${esc(s.name)}</strong>
+          <div class="dir-desc">${esc(siteDesc(s))}</div>
           <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px">
             ${s.visa?`<span class="badge visa">🛂 ${t("visa_support")}</span>`:""}
-            <span class="badge eng">🌎 ★${s.eng}/5</span>
-            <a class="btn" href="${href}" target="_blank" rel="noopener" style="width:auto;min-height:44px;padding:10px 16px;font-size:14px;text-decoration:none">
+            <a class="btn" href="${href}" target="_blank" rel="noopener" style="width:auto;min-height:40px;padding:8px 14px;font-size:13px;text-decoration:none">
               ${LANG==="jp"?"サイトを開く":"Open site"} ↗
             </a>
           </div>
@@ -1615,7 +1639,7 @@ function renderJobs(){
     </div>`;
   }).join("")}
 
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.8</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.9</div>
   `;
 }
 
@@ -1680,22 +1704,28 @@ function renderDirectory(){
     <span class="badge remote">🏠 ${t("remote")}</span>
     <span class="badge jlpt">🎌 JLPT</span>
   </div>
-  ${JAPAN_SITES.map(s=>`
-    <div class="card">
+  ${JAPAN_SITES.map(s => {
+    const href = siteUrl(s);
+    const fav = s.domain ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(s.domain)}&sz=128` : "";
+    const bg = s.color || "#0D3B66";
+    return `<div class="card" style="padding:12px 14px">
       <div class="dir-card">
-        <div class="dir-logo">${s.name.slice(0,2)}</div>
-        <div style="flex:1">
-          <strong style="color:var(--tx);font-size:15px">${esc(s.name)}</strong>
-          <div style="font-size:13px;color:var(--mu);margin:6px 0">${esc(siteDesc(s))}</div>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+        <div class="dir-logo" style="background:${bg}">
+          ${fav ? `<img src="${fav}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">` : ""}
+          <span class="mark" style="display:${fav ? "none" : "grid"};background:${bg}">${esc(s.mark || s.name.slice(0,2))}</span>
+        </div>
+        <div class="dir-body">
+          <strong>${esc(s.name)}</strong>
+          <div class="dir-desc">${esc(siteDesc(s))}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px">
             ${s.visa?`<span class="badge visa">🛂 ${t("visa_support")}</span>`:""}
-            <span class="badge eng">🌎 English ★${s.eng}/5</span>
-            <a href="${siteUrl(s)}" target="_blank" rel="noopener" class="chip">${LANG==="jp"?"開く":"Open"} ↗</a>
+            <a class="btn" href="${href}" target="_blank" rel="noopener" style="width:auto;min-height:40px;padding:8px 14px;font-size:13px;text-decoration:none">${LANG==="jp"?"開く":"Open"} ↗</a>
           </div>
         </div>
       </div>
-    </div>`).join("")}
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.8</div>
+    </div>`;
+  }).join("")}
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.1.9</div>
   `;
 }
 
