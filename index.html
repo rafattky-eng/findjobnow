@@ -1029,6 +1029,19 @@ main {
 .welcome-card h2{margin:0 0 4px;font-size:20px}
 .welcome-card p{margin:0 0 12px;color:var(--mu);font-size:14px}
 .welcome-card .btn{margin-bottom:8px}
+
+/* ===== v2.4 language analysis ===== */
+.lang-row{padding:14px}
+.lang-row.warn{border-color:var(--ac)}
+.lang-title{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.lang-title strong{font-size:17px}
+.lang-title .det{font-size:12px;color:var(--ok);font-weight:700}
+.lang-title .rm{margin-left:auto;background:none;border:0;color:var(--er);font-size:20px;padding:0 4px;min-height:32px}
+.lf{margin-bottom:10px}
+.lf label{display:block;font-size:13px;color:var(--mu);margin-bottom:4px;font-weight:600}
+.lang-row select,#langAddSel{width:100%;background:var(--input);border:1px solid var(--bd);border-radius:12px;padding:13px 12px;color:var(--tx);font-size:16px;min-height:48px}
+.lang-hint{font-size:12px;color:var(--ac);margin-top:5px;font-weight:600}
+.lang-hint.est{color:var(--mu)}
 </style>
 
 </head>
@@ -1188,7 +1201,25 @@ const I18N = {
     confirm_over: "Clear your CV profile, roles and job results? Your tracker is kept.",
     restore: "Restore from backup file",
     cleared: "Profile cleared. Upload a new CV.",
-    searching_for: "Searching for"
+    searching_for: "Searching for",
+    not_spec: "Not specified – please confirm",
+    lc_title: "Confirm your languages",
+    lc_sub: "We read your CV. Please check each level and correct anything wrong. Your scores use what you confirm.",
+    lc_detected: "Detected in CV",
+    lc_speak: "Speaking / Listening",
+    lc_read: "Reading / Writing",
+    lc_jlpt: "JLPT certificate (optional)",
+    lc_none: "None",
+    lc_add: "Add another language",
+    lc_confirm: "Confirm & Analyze",
+    lc_back: "Back",
+    lc_preview: "Live preview",
+    lc_jlpt_est: "Estimated from your JLPT level – please confirm",
+    lc_card: "Languages",
+    lc_edit: "Edit / confirm languages",
+    lc_ja_speak: "Japanese – speaking",
+    lc_ja_read: "Japanese – reading",
+    lc_toast: "Please confirm your language levels"
   },
   jp: {
     hero_title: "AIで日本の仕事を見つけよう",
@@ -1271,7 +1302,25 @@ const I18N = {
     confirm_over: "プロフィール・職種・求人結果を削除しますか？トラッカーは残ります。",
     restore: "バックアップから復元",
     cleared: "削除しました。新しい履歴書をアップロードしてください。",
-    searching_for: "検索中の職種"
+    searching_for: "検索中の職種",
+    not_spec: "未指定 – 確認してください",
+    lc_title: "言語レベルを確認",
+    lc_sub: "履歴書から読み取りました。各レベルを確認し、間違いがあれば修正してください。確認した内容でスコアを計算します。",
+    lc_detected: "履歴書から検出",
+    lc_speak: "会話・聞き取り",
+    lc_read: "読み書き",
+    lc_jlpt: "日本語能力試験（任意）",
+    lc_none: "なし",
+    lc_add: "言語を追加",
+    lc_confirm: "確認して分析",
+    lc_back: "戻る",
+    lc_preview: "リアルタイム予測",
+    lc_jlpt_est: "JLPTから推定 – 確認してください",
+    lc_card: "言語",
+    lc_edit: "言語レベルを編集・確認",
+    lc_ja_speak: "日本語 – 会話",
+    lc_ja_read: "日本語 – 読み書き",
+    lc_toast: "言語レベルを確認してください"
   }
 };
 const t = k => (I18N[LANG] && I18N[LANG][k]) || I18N.en[k] || k;
@@ -1440,6 +1489,207 @@ const ROADMAPS = {
   default: ["Entry Role","Specialist","Senior Specialist","Manager","Director"]
 };
 
+// ---------- Language proficiency engine ----------
+const LANG_LEVELS = [
+  {id:"native",         en:"Native",                     jp:"ネイティブ",           score:100},
+  {id:"fluent",         en:"Fluent / Full Professional", jp:"流暢・ビジネス上級",   score:92},
+  {id:"business",       en:"Business Proficiency",       jp:"ビジネスレベル",       score:82},
+  {id:"conversational", en:"Conversational",             jp:"日常会話レベル",       score:65},
+  {id:"intermediate",   en:"Intermediate",               jp:"中級",                 score:50},
+  {id:"basic",          en:"Basic",                      jp:"初級",                 score:30}
+];
+const levelLabel = id => { const l = LANG_LEVELS.find(x => x.id === id); return l ? (LANG === "jp" ? l.jp : l.en) : ""; };
+const levelScore = id => { const l = LANG_LEVELS.find(x => x.id === id); return l ? l.score : null; };
+const jlptToLevel = n => ({N1:"fluent", N2:"business", N3:"intermediate", N4:"basic", N5:"basic"}[n] || "");
+
+const LANG_DEFS = [
+  {name:"English",    re:/english|英語/i},
+  {name:"Arabic",     re:/arabic|アラビア語/i},
+  {name:"Chinese",    re:/chinese|mandarin|cantonese|中国語/i},
+  {name:"Korean",     re:/korean|韓国語/i},
+  {name:"Spanish",    re:/spanish|スペイン語/i},
+  {name:"French",     re:/french|フランス語/i},
+  {name:"German",     re:/german|ドイツ語/i},
+  {name:"Portuguese", re:/portuguese|ポルトガル語/i},
+  {name:"Italian",    re:/italian|イタリア語/i},
+  {name:"Russian",    re:/russian|ロシア語/i},
+  {name:"Hindi",      re:/hindi/i},
+  {name:"Urdu",       re:/urdu/i},
+  {name:"Bengali",    re:/bengali|bangla/i},
+  {name:"Tagalog",    re:/tagalog|filipino/i},
+  {name:"Vietnamese", re:/vietnamese|ベトナム語/i},
+  {name:"Indonesian", re:/indonesian|bahasa/i},
+  {name:"Thai",       re:/\bthai\b|タイ語/i},
+  {name:"Turkish",    re:/turkish/i},
+  {name:"Persian",    re:/persian|farsi/i},
+  {name:"Nepali",     re:/nepali/i}
+];
+
+// Reads a proficiency level out of a piece of text ("" if none found).
+function levelFrom(str){
+  const s = " " + String(str||"").toLowerCase() + " ";
+  if(/native|mother[\s-]?tongue|first language|母語|母国語|ネイティブ/.test(s)) return "native";
+  if(/\bfluent|fluency|full professional|full business|full working|bilingual|\bc2\b|excellent|流暢|ビジネス上級|\badvanced\b/.test(s)) return "fluent";
+  if(/business|professional working|limited working|working proficiency|\bc1\b|\bb2\b|upper[\s-]intermediate|ビジネス/.test(s)) return "business";
+  if(/conversational|daily conversation|日常会話|会話レベル/.test(s)) return "conversational";
+  if(/intermediate|\bb1\b|moderate|中級/.test(s)) return "intermediate";
+  if(/basic|beginner|elementary|\ba1\b|\ba2\b|survival|limited|初級|入門/.test(s)) return "basic";
+  return "";
+}
+
+const JA_RE   = /japanese|nihongo|jlpt|日本語/i;
+const CUE_RE  = /(speak\w*|spoken|listen\w*|oral|verbal|read\w*|writ\w*|kanji|literacy|会話|話す|聞く|スピーキング|リスニング|読|書|リーディング|ライティング)/ig;
+const isReadCue = w => /^(read|writ|kanji|literacy|読|書|リーディング|ライティング)/i.test(w);
+
+// Assign levels found in a segment to Japanese speaking / reading. Returns true if the segment had skill cues.
+function assignJapaneseSkills(seg, info){
+  const cues = []; let m; CUE_RE.lastIndex = 0;
+  while((m = CUE_RE.exec(seg))) cues.push({ i:m.index, e:m.index + m[0].length, type: isReadCue(m[0]) ? "read" : "speak" });
+  if(!cues.length) return false;
+  cues.forEach((c,k) => {
+    let lvl = levelFrom(seg.slice(c.e, cues[k+1] ? cues[k+1].i : seg.length));            // "Speaking: Conversational"
+    if(!lvl) lvl = levelFrom(seg.slice(cues[k-1] ? cues[k-1].e : 0, c.i));                  // "Conversational speaking"
+    for(let j = k+1; !lvl && j < cues.length; j++)                                          // "Speaking & Reading: Intermediate"
+      lvl = levelFrom(seg.slice(cues[j].e, cues[j+1] ? cues[j+1].i : seg.length));
+    if(lvl){ if(c.type === "speak") info.jaSpeak = info.jaSpeak || lvl; else info.jaRead = info.jaRead || lvl; }
+  });
+  return true;
+}
+
+function emptyLangInfo(){ return { items:[{name:"English", level:"", found:false}], jaSpeak:"", jaRead:"", jlpt:"", jaFound:false, jaReadFromJlpt:false }; }
+
+function detectLanguages(text){
+  const t = String(text||"");
+  const info = emptyLangInfo();
+  const lines = t.split(/\r?\n/);
+
+  // ---- Japanese (speaking/listening and reading/writing separately) ----
+  const jm = t.match(/JLPT\s*[:\-]?\s*(?:level\s*)?N([1-5])/i) || t.match(/日本語能力試験[^\n]{0,8}N([1-5])/) || t.match(/\bN([1-5])\b\s*(?:level|certif)/i);
+  if(jm) info.jlpt = "N" + jm[1];
+  info.jaFound = JA_RE.test(t);
+  let general = "", carry = 0;
+  lines.forEach(line => {
+    const hasJA = JA_RE.test(line);
+    if(hasJA) carry = 3; else if(carry > 0) carry--;
+    const startsWithCue = /^\s*[-•·*]?\s*(speak|spoken|listen|oral|verbal|read|writ|会話|読|書)/i.test(line);
+    if(!hasJA && !(carry > 0 && startsWithCue)) return;
+    let ctx = !hasJA;                       // follow-up lines such as "Speaking: Good conversational"
+    line.split(/[;,|•·]/).forEach(seg => {
+      if(JA_RE.test(seg)) ctx = true;
+      if(!ctx) return;
+      if(assignJapaneseSkills(seg, info)) return;
+      if(JA_RE.test(seg)){
+        const lv = levelFrom(seg.replace(/jlpt\s*n[1-5]/ig, ""));
+        if(lv && !general) general = lv;
+      }
+    });
+  });
+  if(general){
+    if(!info.jaSpeak) info.jaSpeak = general;
+    if(!info.jaRead && general !== "conversational") info.jaRead = general;   // "conversational" describes speaking only
+  }
+  if(!info.jaRead && info.jlpt){ info.jaRead = jlptToLevel(info.jlpt); info.jaReadFromJlpt = true; }
+
+  // ---- Other languages ----
+  const found = {};
+  lines.forEach((line, li) => {
+    line.split(/[;,|•·]/).forEach(seg => {
+      const names = LANG_DEFS.filter(d => d.re.test(seg));
+      if(!names.length || (JA_RE.test(seg) && names.length === 0)) return;
+      let lvl = levelFrom(seg);
+      if(!lvl && seg.trim().length < 30){            // level on the next short line: "Arabic\\n  Native"
+        const nx = (lines[li+1] || "").trim();
+        if(nx && nx.length < 40 && !LANG_DEFS.some(d => d.re.test(nx)) && !JA_RE.test(nx)) lvl = levelFrom(nx);
+      }
+      names.forEach(d => { if(!found[d.name]) found[d.name] = {name:d.name, level:lvl, found:true}; else if(!found[d.name].level && lvl) found[d.name].level = lvl; });
+    });
+  });
+  const items = Object.values(found);
+  if(!items.some(x => x.name === "English")) items.unshift({name:"English", level:"", found:false});
+  info.items = items;
+  return info;
+}
+
+function langsFromInfo(li){
+  const out = [];
+  (li?.items||[]).forEach(x => { if(x.level || x.found) out.push(x.level ? `${x.name} (${levelLabel(x.level)})` : x.name); });
+  if(li && (li.jaSpeak || li.jaRead || li.jlpt || li.jaFound)){
+    const bits = [];
+    if(li.jaSpeak) bits.push("speaking: " + levelLabel(li.jaSpeak));
+    if(li.jaRead) bits.push("reading: " + levelLabel(li.jaRead));
+    if(li.jlpt) bits.push(li.jlpt);
+    out.push("Japanese" + (bits.length ? " (" + bits.join(", ") + ")" : ""));
+  }
+  return out;
+}
+
+// Language score reflects the confirmed proficiency. Unspecified levels are left out, never counted as low.
+function computeLangScores(li){
+  li = li || {};
+  const speak = levelScore(li.jaSpeak);
+  let read = levelScore(li.jaRead);
+  if(read == null && li.jlpt) read = levelScore(jlptToLevel(li.jlpt));
+  let ja = null;
+  if(speak != null && read != null) ja = 0.55 * speak + 0.45 * read;
+  else if(speak != null) ja = speak;
+  else if(read != null) ja = read;
+  if(ja != null && li.jlpt){ const j = levelScore(jlptToLevel(li.jlpt)); if(j != null) ja = Math.max(ja, j - 5); }
+  const items = li.items || [];
+  const eng = levelScore((items.find(x => /^english$/i.test(x.name)) || {}).level);
+  const others = items.filter(x => !/^english$/i.test(x.name) && levelScore(x.level) != null);
+  const bonus = Math.min(6, others.filter(x => levelScore(x.level) >= 65).length * 3);
+  let language = null;
+  if(ja != null && eng != null) language = 0.6 * ja + 0.4 * eng;
+  else if(ja != null) language = ja;
+  else if(eng != null) language = eng;
+  else if(others.length) language = 0.7 * Math.max(...others.map(x => levelScore(x.level)));
+  if(language != null) language = Math.min(100, Math.round(language + bonus));
+  return { language, ja, eng };
+}
+
+function computeScores(core, li){
+  const { yrs = 0, visaStatus = "", resume = 40 } = core || {};
+  const L = computeLangScores(li);
+  const experience = Math.min(95, 40 + yrs * 12);
+  const visa = /permanent|spouse|engineer|humanities|specified/i.test(visaStatus) ? 90 : /student/i.test(visaStatus) ? 50 : 65;
+  // Language part of Japan Readiness: Japanese matters most, English supports it. Unknown parts are skipped.
+  const japLang = L.ja != null ? (L.eng != null ? 0.7 * L.ja + 0.3 * L.eng : L.ja) : L.language;
+  const parts = [[japLang, 0.30], [experience, 0.25], [resume, 0.25], [visa, 0.20]].filter(x => x[0] != null);
+  const wsum = parts.reduce((a,x) => a + x[1], 0);
+  const japan = Math.round(parts.reduce((a,x) => a + x[0] * x[1], 0) / wsum);
+  return { resume, japan, language: L.language, experience, resumeReady: resume, visa };
+}
+
+// Language-related strengths / gaps are rebuilt from the confirmed levels.
+const LANG_TAGS = ["Languages:", "Japanese speaking", "Japanese reading", "Japanese level", "Language skills"];
+function applyLangFeedback(profile, li){
+  const keep = arr => (arr||[]).filter(x => !LANG_TAGS.some(tg => String(x).startsWith(tg)));
+  const st = keep(profile.strengths), ms = keep(profile.missing);
+  const good = (li.items||[]).filter(x => levelScore(x.level) >= 82).map(x => `${x.name} (${levelLabel(x.level)})`);
+  if(good.length) st.push("Languages: " + good.join(", "));
+  if(levelScore(li.jaSpeak) >= 65) st.push("Japanese speaking: " + levelLabel(li.jaSpeak));
+  const rd = levelScore(li.jaRead);
+  if(!li.jaSpeak && !li.jaRead && !li.jlpt) ms.push("Japanese level not confirmed");
+  else if(rd != null && rd < 65) ms.push("Japanese reading / writing – consider JLPT N3 / N2");
+  profile.strengths = st; profile.missing = ms;
+}
+
+function migrateLang(){
+  const pr = STATE.profile;
+  if(!pr || pr.langInfo) return;
+  const li = emptyLangInfo();
+  li.items = [];
+  (pr.langs||[]).forEach(x => {
+    if(/^japanese/i.test(x)){ li.jaFound = true; }
+    else li.items.push({ name: String(x).replace(/\s*\(.*\)$/, ""), level:"", found:true });
+  });
+  if(!li.items.some(x => x.name === "English")) li.items.unshift({name:"English", level:"", found:false});
+  if(pr.jlpt){ li.jlpt = pr.jlpt; li.jaRead = jlptToLevel(pr.jlpt); li.jaReadFromJlpt = true; }
+  pr.langInfo = li;
+  if(STATE.scores) STATE.scores = computeScores({ yrs: pr.yrs||0, visaStatus: pr.visaStatus||"", resume: STATE.scores.resume||40 }, li);
+  persist();
+}
+
 // ---------- CV Analysis (enhanced heuristics) ----------
 function analyse(text){
   const t = String(text||"");
@@ -1466,9 +1716,9 @@ function analyse(text){
   else if(/特定技能|specified skills/i.test(t)) visaStatus = "Specified Skills";
   else if(/留学|student visa/i.test(t)) visaStatus = "Student";
 
-  const langs = [];
-  if(/english|英語/i.test(t)) langs.push("English");
-  if(/japanese|日本語|jlpt|nihongo/i.test(t)) langs.push(jlpt ? "Japanese ("+jlpt+")" : "Japanese");
+  const langInfo = detectLanguages(t);
+  if(!jlpt && langInfo.jlpt) jlpt = langInfo.jlpt;
+  const langs = langsFromInfo(langInfo);
 
   const skills = new Set();
   Object.values(SKILL_PACKS).flat().forEach(kw => {
@@ -1510,19 +1760,12 @@ function analyse(text){
   if(!/summary|objective|profile/i.test(t)) missing.push("Professional summary");
   if(!/\d+%|\d+\+|increased|improved|achieved/i.test(t)) missing.push("Measurable achievements");
   if(skills.size < 3) missing.push("Clear skills section");
-  if(!jlpt && !/japanese|日本語/i.test(t)) missing.push("Japanese level stated");
 
-  // Japan readiness
-  const langScore = jlpt === "N1" ? 95 : jlpt === "N2" ? 85 : jlpt === "N3" ? 70 : jlpt === "N4" ? 55 : jlpt === "N5" ? 40 : (/japanese/i.test(t) ? 45 : 25);
-  const expScore = Math.min(95, 40 + yrs * 12);
-  const resumeReady = resume;
-  const visaScore = /permanent|spouse|engineer|humanities|specified/i.test(visaStatus) ? 90 : /student/i.test(visaStatus) ? 50 : 65;
-  const japan = Math.round((langScore * 0.3 + expScore * 0.25 + resumeReady * 0.25 + visaScore * 0.2));
+  const scores = computeScores({ yrs, visaStatus, resume }, langInfo);
 
   return {
-    name, phone, em, yrs, jlpt, visaStatus, langs, skills: [...skills],
-    recs, indScores, resume, strengths, missing,
-    scores: { resume, japan, language: langScore, experience: expScore, resumeReady, visa: visaScore }
+    name, phone, em, yrs, jlpt, visaStatus, langs, langInfo, skills: [...skills],
+    recs, indScores, resume, strengths, missing, scores
   };
 }
 
@@ -1613,6 +1856,133 @@ function wireRoles(){
     STATE.selectedRoles = selectedRoles().filter(r => r !== v);
     persist(); render();
   }));
+}
+
+// ---------- Language confirmation screen ----------
+function levelOpts(sel){
+  return `<option value="">${esc(t("not_spec"))}</option>` + LANG_LEVELS.map(l => `<option value="${l.id}" ${l.id===sel?"selected":""}>${esc(LANG==="jp"?l.jp:l.en)}</option>`).join("");
+}
+function coreOf(d){
+  if(d.ana) return { yrs:d.ana.yrs, visaStatus:d.ana.visaStatus, resume:d.ana.resume };
+  const p = STATE.profile || {};
+  return { yrs:p.yrs||0, visaStatus:p.visaStatus||"", resume:(STATE.scores&&STATE.scores.resume)||40 };
+}
+function hintBlock(val, estimate){
+  if(!val) return `<div class="lang-hint">⚠ ${esc(t("not_spec"))}</div>`;
+  if(estimate) return `<div class="lang-hint est">ℹ ${esc(t("lc_jlpt_est"))}</div>`;
+  return `<div class="lang-hint hidden"></div>`;
+}
+function renderLangConfirm(){
+  const d = STATE.draft, li = d.langInfo;
+  const used = new Set(li.items.map(x => x.name));
+  const addable = LANG_DEFS.filter(x => !used.has(x.name));
+  return `
+  <div class="step-guide">
+    <span class="hand">🌐</span>
+    <div><div class="step-text">${t("lc_title")}</div><div class="step-sub">${t("lc_sub")}</div></div>
+  </div>
+
+  ${li.items.map((it,i) => `
+  <div class="card lang-row ${it.level?"":"warn"}">
+    <div class="lang-title"><strong>${esc(it.name)}</strong>
+      ${it.found ? `<span class="det">✓ ${t("lc_detected")}</span>` : ""}
+      ${it.name !== "English" ? `<button type="button" class="rm" data-lang-del="${i}" aria-label="Remove">✕</button>` : ""}
+    </div>
+    <div class="lf"><select data-lang-sel="${i}">${levelOpts(it.level)}</select>${hintBlock(it.level)}</div>
+  </div>`).join("")}
+
+  <div class="card lang-row ${(li.jaSpeak && li.jaRead)?"":"warn"}">
+    <div class="lang-title"><strong>🇯🇵 Japanese</strong>${li.jaFound ? `<span class="det">✓ ${t("lc_detected")}</span>` : ""}</div>
+    <div class="lf"><label>${t("lc_speak")}</label><select id="jaSpeak">${levelOpts(li.jaSpeak)}</select>${hintBlock(li.jaSpeak)}</div>
+    <div class="lf"><label>${t("lc_read")}</label><select id="jaRead">${levelOpts(li.jaRead)}</select>${hintBlock(li.jaRead, li.jaReadFromJlpt)}</div>
+    <div class="lf"><label>${t("lc_jlpt")}</label><select id="jaJlpt">
+      <option value="">${t("lc_none")}</option>
+      ${["N5","N4","N3","N2","N1"].map(n => `<option value="${n}" ${li.jlpt===n?"selected":""}>${n}</option>`).join("")}
+    </select></div>
+  </div>
+
+  ${addable.length ? `
+  <div class="role-add" style="margin:0 0 14px">
+    <select id="langAddSel" style="flex:1;min-width:0">${addable.map(x => `<option value="${x.name}">${x.name}</option>`).join("")}</select>
+    <button type="button" class="btn secondary" id="langAddBtn">＋ ${t("add")}</button>
+  </div>` : ""}
+
+  <div class="card" style="text-align:center">
+    <div style="font-size:12px;color:var(--mu);margin-bottom:8px">${t("lc_preview")}</div>
+    <div class="score-grid" style="margin:0">
+      <div class="score-card"><div class="num" id="pvLang">–</div><div class="lbl">${t("language")}</div></div>
+      <div class="score-card"><div class="num" id="pvJapan">–</div><div class="lbl">${t("japan_score")}</div></div>
+    </div>
+  </div>
+
+  <button class="btn btn-lg" id="langConfirmBtn" style="margin-bottom:10px">✔ ${t("lc_confirm")}</button>
+  <button class="btn ghost" id="langBackBtn" style="min-height:46px">${t("lc_back")}</button>
+  `;
+}
+function updatePreview(){
+  const d = STATE.draft; if(!d) return;
+  const sc = computeScores(coreOf(d), d.langInfo);
+  const a = $("pvLang"), b = $("pvJapan");
+  if(a){ a.textContent = sc.language == null ? t("not_spec") : sc.language; a.style.fontSize = sc.language == null ? "13px" : ""; }
+  if(b) b.textContent = sc.japan;
+}
+function wireLangConfirm(){
+  const d = STATE.draft, li = d.langInfo;
+  const after = sel => {
+    const h = sel.parentElement.querySelector(".lang-hint");
+    if(h){ h.classList.toggle("hidden", !!sel.value); h.classList.remove("est"); h.textContent = sel.value ? "" : "⚠ " + t("not_spec"); }
+    const row = sel.closest(".lang-row");
+    if(row && row.querySelector("#jaSpeak")) row.classList.toggle("warn", !(li.jaSpeak && li.jaRead));
+    persist(); updatePreview();
+  };
+  $$("[data-lang-sel]").forEach(sel => sel.onchange = () => { li.items[+sel.dataset.langSel].level = sel.value; sel.closest(".lang-row").classList.toggle("warn", !sel.value); after(sel); });
+  $("jaSpeak").onchange = e => { li.jaSpeak = e.target.value; after(e.target); };
+  $("jaRead").onchange  = e => { li.jaRead = e.target.value; li.jaReadFromJlpt = false; after(e.target); };
+  $("jaJlpt").onchange  = e => {
+    li.jlpt = e.target.value;
+    if(li.jlpt && !li.jaRead){ li.jaRead = jlptToLevel(li.jlpt); li.jaReadFromJlpt = true; persist(); render(); return; }
+    persist(); updatePreview();
+  };
+  $$("[data-lang-del]").forEach(b => b.onclick = () => { li.items.splice(+b.dataset.langDel, 1); persist(); render(); });
+  $("langAddBtn")?.addEventListener("click", () => {
+    const n = $("langAddSel").value; if(!n) return;
+    li.items.push({ name:n, level:"", found:false }); persist(); render();
+  });
+  $("langConfirmBtn").onclick = finalizeLanguages;
+  $("langBackBtn").onclick = () => { const edit = !d.ana; STATE.draft = null; STATE.view = edit ? "dashboard" : "landing"; persist(); render(); window.scrollTo(0,0); };
+  updatePreview();
+}
+function startLangEdit(){
+  if(!STATE.profile) return;
+  migrateLang();
+  STATE.draft = { ana:null, langInfo: JSON.parse(JSON.stringify(STATE.profile.langInfo)) };
+  STATE.view = "langconfirm"; persist(); render(); window.scrollTo(0,0);
+}
+function finalizeLanguages(){
+  const d = STATE.draft; if(!d) return;
+  const li = d.langInfo;
+  if(d.ana){                                   // first analysis of a new CV
+    const ana = d.ana;
+    STATE.profile = {
+      name: ana.name, email: ana.em, phone: ana.phone, skills: ana.skills,
+      langs: langsFromInfo(li), jlpt: li.jlpt, yrs: ana.yrs, visaStatus: ana.visaStatus,
+      strengths: ana.strengths, missing: ana.missing, langInfo: li
+    };
+    applyLangFeedback(STATE.profile, li);
+    STATE.scores = computeScores(coreOf(d), li);
+    STATE.matches = computeMatches(ana);
+    STATE.selectedRoles = allRoles();
+    STATE.jobs = [];
+  } else {                                     // editing languages later: keep roles, jobs, tracker
+    const core = coreOf(d);
+    STATE.profile.langInfo = li; STATE.profile.langs = langsFromInfo(li); STATE.profile.jlpt = li.jlpt;
+    applyLangFeedback(STATE.profile, li);
+    STATE.scores = computeScores(core, li);
+  }
+  STATE.draft = null;
+  STATE.view = "dashboard";
+  persist(); say(LANG==="jp" ? "分析が完了しました" : "Analysis complete", 1);
+  render(); window.scrollTo(0,0);
 }
 
 function startOver(){
@@ -1737,7 +2107,7 @@ function renderLanding(){
   </div>
 
   <p style="margin-top:14px;font-size:12px;color:var(--mu);text-align:center">${t("free_private")}</p>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.3.0</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.4.0</div>
 
   <div style="text-align:center;margin-top:6px"><button class="btn ghost" id="btnRestore" style="max-width:300px;min-height:44px;font-size:14px">⬆ ${t("restore")}</button></div>
   <input type="file" id="restoreFile" accept="application/json,.json" class="hidden">
@@ -1750,6 +2120,18 @@ function renderLanding(){
     </div>
   </div>
   `;
+}
+
+function renderLangCard(p){
+  const li = p.langInfo; if(!li) return "";
+  const row = (k, v) => `<div class="match-row"><span style="min-width:150px;font-size:13px">${esc(k)}</span>${v ? `<strong style="font-size:13px">${esc(v)}</strong>` : `<strong style="font-size:13px;color:var(--ac)">${esc(t("not_spec"))}</strong>`}</div>`;
+  return `<div class="card"><h3>${t("lc_card")}</h3>
+    ${li.items.map(x => row(x.name, levelLabel(x.level))).join("")}
+    ${row(t("lc_ja_speak"), levelLabel(li.jaSpeak))}
+    ${row(t("lc_ja_read"), levelLabel(li.jaRead))}
+    ${li.jlpt ? row("JLPT", li.jlpt) : ""}
+    <button class="btn secondary" data-edit-lang="1" style="margin-top:10px;min-height:46px;font-size:14px">✏ ${t("lc_edit")}</button>
+  </div>`;
 }
 
 function renderDashboard(){
@@ -1773,9 +2155,10 @@ function renderDashboard(){
   <div class="score-grid">
     <div class="score-card"><div class="num">${s.resume||0}</div><div class="lbl">${t("resume_score")}</div></div>
     <div class="score-card"><div class="num">${s.japan||0}</div><div class="lbl">${t("japan_score")}</div></div>
-    <div class="score-card"><div class="num">${s.language||0}</div><div class="lbl">Language</div></div>
+    <div class="score-card" ${s.language==null?'data-edit-lang="1" style="cursor:pointer"':""}>${s.language==null?`<div class="num" style="font-size:14px;line-height:1.35;color:var(--ac)">${t("not_spec")}</div>`:`<div class="num">${s.language}</div>`}<div class="lbl">${t("language")}</div></div>
     <div class="score-card"><div class="num">${s.visa||0}</div><div class="lbl">Visa</div></div>
   </div>
+  ${renderLangCard(p)}
   ${p.strengths?.length ? `<div class="card"><h3>Strengths</h3><ul class="list-check">${p.strengths.map(x=>`<li class="ok">✓ ${esc(x)}</li>`).join("")}</ul>
   ${p.missing?.length?`<h3 style="margin-top:12px">Missing</h3><ul class="list-check">${p.missing.map(x=>`<li class="miss">✗ ${esc(x)}</li>`).join("")}</ul>`:""}</div>`:""}
   <div class="section-title">Best Industries</div>
@@ -1800,7 +2183,7 @@ function renderDashboard(){
     <button class="btn secondary" data-go="tracker">${t("tracker")}</button>
     <button class="btn secondary" data-go="directory">🌐 ${t("sites")}</button>
   </div>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.3.0</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.4.0</div>
   `;
 }
 
@@ -1913,7 +2296,7 @@ function renderJobs(){
     </div>`;
   }).join("")}
 
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.3.0</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.4.0</div>
   `;
 }
 
@@ -1999,7 +2382,7 @@ function renderDirectory(){
       </div>
     </div>`;
   }).join("")}
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.3.0</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.4.0</div>
   `;
 }
 
@@ -2093,7 +2476,15 @@ function render(){
   const v = STATE.view || "landing";
   updateProgress();
   updateNavLabels();
-  if(v === "landing" || !STATE.profile){
+  if(v === "langconfirm" && STATE.draft){
+    main.innerHTML = renderLangConfirm();
+    $("bottomNav").style.display = "none";
+    $("progressWrap")?.classList.add("hidden");
+    wireLangConfirm();
+    return;
+  }
+  if(v === "langconfirm"){ STATE.view = "landing"; }
+  if(v === "landing" || v === "langconfirm" || !STATE.profile){
     main.innerHTML = renderLanding();
     $("bottomNav").style.display = "none";
     $("progressWrap")?.classList.add("hidden");
@@ -2171,8 +2562,8 @@ function wireLanding(){
     runAnalysis(text);
   });
   $("btnSkip")?.addEventListener("click", () => {
-    STATE.profile = { name:"", skills:[], langs:[], yrs:0, strengths:[], missing:["Upload a CV for full analysis"] };
-    STATE.scores = { resume:40, japan:40, language:30, experience:30, visa:50 };
+    STATE.profile = { name:"", skills:[], langs:[], yrs:0, strengths:[], missing:["Upload a CV for full analysis"], langInfo: emptyLangInfo() };
+    STATE.scores = computeScores({ yrs:0, visaStatus:"", resume:40 }, STATE.profile.langInfo);
     STATE.matches = computeMatches({ indScores:{travel:60,hospitality:55,customer:70}, recs:[{t:"Customer Support",ind:"customer"}] });
     STATE.selectedRoles = allRoles();
     STATE.jobs = [];
@@ -2212,6 +2603,8 @@ function wireLanding(){
       if(!data || typeof data !== "object" || !data.settings) throw new Error("bad");
       STATE = purgeDemoJobs(data);
       STATE.view = STATE.profile ? "dashboard" : "landing";
+      STATE.draft = null;
+      migrateLang();
       persist(); render(); say(t("restored"), 1);
     } catch { say("Could not read that backup file", 0); }
   });
@@ -2226,19 +2619,11 @@ function dismissInstall(){
 
 function runAnalysis(text){
   const ana = analyse(text);
-  STATE.profile = {
-    name: ana.name, email: ana.em, phone: ana.phone, skills: ana.skills,
-    langs: ana.langs, jlpt: ana.jlpt, yrs: ana.yrs, visaStatus: ana.visaStatus,
-    strengths: ana.strengths, missing: ana.missing
-  };
-  STATE.scores = ana.scores;
-  STATE.matches = computeMatches(ana);
-  STATE.selectedRoles = allRoles();
-  STATE.jobs = [];
-  STATE.view = "dashboard";
+  STATE.draft = { ana, langInfo: ana.langInfo };
+  STATE.view = "langconfirm";
   persist();
-  say("Analysis complete", 1);
-  render();
+  say(t("lc_toast"), 1);
+  render(); window.scrollTo(0,0);
 }
 
 async function extractPdfText(file){
@@ -2292,6 +2677,7 @@ function wireCommon(){
   $$("[data-go]").forEach(b => b.onclick = () => setView(b.dataset.go));
   $("btnSearchJobs")?.addEventListener("click", () => searchLiveJobs());
   $("btnStartOver")?.addEventListener("click", startOver);
+  $$("[data-edit-lang]").forEach(b => b.onclick = startLangEdit);
   $$("[data-save-job]").forEach(btn => {
     btn.onclick = (e) => {
       e.preventDefault();
@@ -2371,6 +2757,8 @@ if("serviceWorker" in navigator){
 $$("#bottomNav button").forEach(b => {
   b.onclick = () => setView(b.dataset.view);
 });
+
+migrateLang();
 
 // Init language UI
 if(LANG === "jp"){
