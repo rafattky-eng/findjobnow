@@ -1,29 +1,19 @@
 {
+  "id": "./",
   "name": "FindJob Now",
-  "short_name": "FindJob Now",
-  "description": "AI Job Search Copilot for foreigners seeking jobs in Japan. Private, on-device analysis.",
+  "short_name": "FindJob",
+  "description": "AI Job Search Copilot for foreigners in Japan: ATS-fix your CV, score jobs before applying, practise interviews, follow up — free and private.",
+  "lang": "en",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
   "background_color": "#0C2340",
   "theme_color": "#0C2340",
-  "orientation": "portrait-primary",
+  "categories": ["business", "productivity"],
   "icons": [
-    {
-      "src": "./icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "./icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "./apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png"
-    }
+    {"src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"}
   ]
 }
