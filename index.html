@@ -8,7 +8,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="FindJob Now">
 <meta name="theme-color" content="#0C2340">
-<meta name="description" content="AI Career Copilot for foreigners seeking jobs in Japan. Upload CV, get matched jobs, visa guidance, apply faster — free, private, no signup.">
+<meta name="description" content="Guided AI Job Search Copilot for foreigners in Japan. One clear next step at a time: upload CV → AI analysis → choose goal → find realistic jobs → apply → interview → get hired. Free, private, no signup.">
 <meta name="application-name" content="FindJob Now">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; worker-src 'self' blob: https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.google.com https://www.gstatic.com https://icons.duckduckgo.com; font-src 'self' data:; connect-src 'self' https://boards-api.greenhouse.io https://api.lever.co https://api.ashbyhq.com https://remotive.com https://jobicy.com; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; upgrade-insecure-requests">
 <link rel="manifest" href="./manifest.webmanifest">
@@ -1101,10 +1101,12 @@ let STATE = purgeDemoJobs(L("fj2_state", null)) || {
   matches: null,
   jobs: [],
   applications: { saved:[], applied:[], interview:[], offer:[], rejected:[] },
-  preferences: { visaOnly:false, workType:"any", jlptMin:"", englishOnly:false, remoteOnly:false },
+  preferences: { visaOnly:false, workType:"any", jlptMin:"", englishOnly:false, remoteOnly:false, experienceLevel:null },
   settings: { lang: "en", theme: "dark" },
-  view: "landing"
+  view: "landing",
+  journey: { step: 1, mode: null, goal: null, fastMode: false }
 };
+if(!STATE.journey) STATE.journey = { step: 1, mode: null, goal: null, fastMode: false };
 
 let LANG = STATE.settings.lang || "en";
 let THEME = STATE.settings.theme || "dark";
@@ -1123,8 +1125,8 @@ function say(msg, ok){
 // ---------- i18n (minimal core) ----------
 const I18N = {
   en: {
-    hero_title: "Don’t just analyze your resume. Get hired in Japan.",
-    hero_sub: "Your AI job-search copilot: fix your CV for ATS, score every job before you apply, practise interviews and follow up — built for foreigners in Japan.",
+    hero_title: "Get hired in Japan — one clear step at a time",
+    hero_sub: "Guided AI Copilot for foreigners. Upload once → AI tells you exactly what to do next. No confusion. No decision fatigue.",
     upload: "Upload CV",
     paste: "Paste Resume",
     skip: "Continue without CV",
@@ -1206,8 +1208,8 @@ const I18N = {
     searching_for: "Searching for"
   },
   jp: {
-    hero_title: "履歴書の分析で終わらせない。日本で内定を。",
-    hero_sub: "ATS対策、応募前スコア、面接練習、フォローアップまで。日本で働く外国人のためのAI就職コパイロット。",
+    hero_title: "日本で内定を — 次にやることは1つだけ",
+    hero_sub: "外国人のためのガイド付きAIコパイロット。一度アップロード → AIが次にやることを明確に示します。迷わない。",
     upload: "履歴書をアップロード",
     paste: "履歴書を貼り付け",
     skip: "履歴書なしで続ける",
@@ -1799,6 +1801,7 @@ function setView(v){
 
 function renderLanding(){
   const showInstall = !L("fj2_install_dismissed", false) && /iPhone|iPad|iPod/.test(navigator.userAgent);
+  const hasProfile = !!STATE.profile;
   return `
   ${showInstall ? `
   <div class="install-banner" id="installBanner">
@@ -1812,51 +1815,78 @@ function renderLanding(){
     <button class="btn secondary" id="gotInstall">${t("got_it")}</button>
   </div>` : ""}
 
-  ${STATE.profile ? `
+  ${hasProfile ? `
   <div class="welcome-card">
+    <div class="step-guide" style="margin:0 0 12px">
+      <span class="hand">👇</span>
+      <div>
+        <div class="step-text">${LANG==="jp"?"続きから始める":"Continue your journey"}</div>
+        <div class="step-sub">${LANG==="jp"?"プロフィールは端末に保存されています":"Your profile is saved on this device"}</div>
+      </div>
+    </div>
     <h2>👋 ${t("welcome_back")}${STATE.profile.name ? ", "+esc(STATE.profile.name) : ""}</h2>
     <p>${t("welcome_sub")}</p>
     <button class="btn btn-lg" id="btnContinue">▶ ${t("continue_prof")}</button>
-    <button class="btn danger" id="btnStartOver2" style="min-height:46px;font-size:14px">🗑 ${t("start_over")}</button>
-  </div>` : ""}
-
-  <div class="hero" style="padding-bottom:8px">
+    <button class="btn danger" id="btnStartOver2" style="min-height:46px;font-size:14px;margin-top:8px">🗑 ${t("start_over")}</button>
+  </div>` : `
+  <div class="hero" style="padding-bottom:4px">
     <h1 style="font-size:clamp(22px,5.5vw,28px)">${t("hero_title")}</h1>
     <p>${t("hero_sub")}</p>
   </div>
-  ${segHTML()}
 
-  <div class="start-card">
-    <div class="start-label">👇 ${t("start_here")}</div>
-    <h2 style="margin:0 0 6px">${t("upload_your_cv")}</h2>
-    <p style="margin:0 0 16px;font-size:13px;color:var(--mu);font-weight:400">${LANG==="jp"
-      ? "AIが分析し、おすすめ求人とカバーレターを用意します。"
-      : "AI analyzes it, then shows matched jobs and cover letters."}</p>
-    <button class="btn btn-lg" id="btnUpload">📄 ${t("upload")}</button>
+  <!-- GUIDED STEP 1 -->
+  <div class="start-card" style="border-width:2px">
+    <div class="start-label">STEP 1 OF 10</div>
+    <div class="step-guide" style="justify-content:center;margin:8px 0 12px">
+      <span class="hand">👇</span>
+      <div class="step-text" style="font-size:16px">${LANG==="jp"?"まず履歴書をアップロードしてください":"First: Upload your CV"}</div>
+    </div>
+    <h2 style="margin:0 0 8px">${t("upload_your_cv")}</h2>
+    <p style="margin:0 0 18px;font-size:14px;color:var(--mu);font-weight:400;line-height:1.5">
+      ${LANG==="jp"
+        ? "AIが分析し、次にやることを1つだけ教えてくれます。迷いません。"
+        : "AI analyzes it and tells you exactly one next action. No confusion."}
+    </p>
+    <button class="btn btn-lg" id="btnUpload" style="font-size:18px">📄 ${t("upload")}</button>
     <div class="or">${t("or")}</div>
-    <button class="btn secondary btn-lg" id="btnPaste">📋 ${t("paste")}</button>
+    <button class="btn secondary" id="btnPaste" style="min-height:52px">📋 ${t("paste")}</button>
   </div>
 
-  <div class="card" style="margin-top:4px">
-    <div style="font-size:13px;font-weight:700;color:var(--ac);margin-bottom:10px">${LANG==="jp"?"次にやること":"What happens next"}</div>
-    <div style="font-size:14px;color:var(--tx);line-height:1.7">
-      <div>① ${tx("Upload your CV and pick your path","CVをアップロードしてタイプを選択")}</div>
-      <div>② ${tx("Fix it for ATS and rewrite weak bullets","ATS対策と成果ベースのリライト")}</div>
-      <div>③ ${tx("Score jobs, then apply to the best fits","求人を採点し、最適な求人に応募")}</div>
-      <div>④ ${tx("Practise interviews and follow up after 7 days","面接練習と7日後のフォロー")}</div>
+  <div class="card" style="margin-top:12px">
+    <div style="font-size:13px;font-weight:700;color:var(--ac);margin-bottom:10px">${LANG==="jp"?"この後の流れ（ガイド付き）":"Your guided path (10 steps)"}</div>
+    <div style="font-size:13px;color:var(--tx);line-height:1.75">
+      <div>① Upload CV</div>
+      <div>② AI Analysis + scores</div>
+      <div>③ Choose goal (Fast job / Career / Part-time)</div>
+      <div>④ Find realistic jobs</div>
+      <div>⑤ Score each job</div>
+      <div>⑥ Generate application</div>
+      <div>⑦ Interview prep</div>
+      <div>⑧ Tracker</div>
+      <div>⑨ Follow-up</div>
+      <div>⑩ Offer preparation</div>
     </div>
   </div>
 
-  <div style="text-align:center;margin:14px 0 8px">
+  <div class="card" style="margin-top:10px;border-color:var(--ac)">
+    <div style="font-size:13px;font-weight:700;color:var(--ac);margin-bottom:8px">⚡ ${LANG==="jp"?"急いで仕事が必要な人へ":"Need a job fast?"}</div>
+    <p style="font-size:13px;color:var(--mu);margin:0 0 12px">
+      ${LANG==="jp"
+        ? "「今日応募できる現実的な求人」を優先表示します。パート・時給・ビザ支援も対応。"
+        : "We prioritize realistic jobs you can apply to today — including part-time, hourly, and visa-sponsored roles."}
+    </p>
+    <button class="btn secondary" id="btnFastMode" style="min-height:48px;font-size:14px">
+      ⚡ ${LANG==="jp"?"Need a Job Fast モードをON":"Turn on Need a Job Fast mode"}
+    </button>
+  </div>
+
+  <div style="text-align:center;margin:16px 0 8px">
     <button class="btn ghost" id="btnSkip" style="max-width:300px;min-height:48px;font-size:15px">${t("skip")}</button>
   </div>
+  `}
 
-  <div class="value-grid" style="margin-top:8px">
-    ${[["🎯","ATS Optimizer","ATS最適化","Beat the robots","書類選考を突破"],["📊","Application Score","応募スコア","Apply, tailor or skip","応募・修正・見送り"],["✍️","AI Rewriter","リライト","Results, not duties","成果で語る"],["🎤","Interview Coach","面接コーチ","Practise with feedback","フィードバック付き練習"],["🤝","Recruiter Matches","エージェント推薦","The right agencies","最適なエージェント"],["🌱","No-Experience Path","未経験パス","Turn study into proof","学びを実績に"]].map(x=>`<div class="value-card"><strong>${x[0]} ${tx(x[1],x[2])}</strong><span>${tx(x[3],x[4])}</span></div>`).join("")}
-  </div>
-
-  <p style="margin-top:14px;font-size:12px;color:var(--mu);text-align:center">${t("free_private")}</p>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.0.0</div>
+  <p style="margin-top:14px;font-size:12px;color:var(--mu);text-align:center">${t("free_private") || (LANG==="jp"?"無料 · プライベート · 登録不要 · 端末内のみ":"Free · Private · No signup · On this device only")}</p>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.1.0 Guided</div>
 
   <div style="text-align:center;margin-top:6px"><button class="btn ghost" id="btnRestore" style="max-width:300px;min-height:44px;font-size:14px">⬆ ${t("restore")}</button></div>
   <input type="file" id="restoreFile" accept="application/json,.json" class="hidden">
@@ -1875,29 +1905,49 @@ function renderDashboard(){
   const p = STATE.profile || {};
   const s = STATE.scores || {resume:0,japan:0,language:0,experience:0,visa:0};
   const m = STATE.matches || {industries:[],titles:[],avoid:[]};
+  const goal = STATE.journey?.goal;
+  const fast = STATE.journey?.fastMode;
   return `
   <div class="step-guide">
     <span class="hand">👇</span>
     <div>
-      <div class="step-text">${t("step2_title")}</div>
-      <div class="step-sub">${t("step2_sub")}</div>
+      <div class="step-text">${LANG==="jp"?"STEP 2 — AI分析結果":"STEP 2 — AI Analysis"}</div>
+      <div class="step-sub">${LANG==="jp"?"スコアを確認したら、下の大きなボタンを押してください":"Review scores, then tap the big button below"}</div>
     </div>
   </div>
   ${renderCopilot()}
-  <h2 style="margin:0 0 4px;font-size:20px;font-weight:800">${t("dash")}</h2>
-  <div class="mini-row">
-    <button class="btn secondary" data-go="landing" style="min-height:46px;font-size:14px">📄 ${t("upload_new")}</button>
-    <button class="btn danger" id="btnStartOver" style="min-height:46px;font-size:14px">🗑 ${t("start_over").split(" (")[0]}</button>
-  </div>
-  <p style="color:var(--mu);margin:0 0 16px;font-size:14px">${esc(p.name||"Your profile")} · Local only</p>
+  <h2 style="margin:0 0 4px;font-size:20px;font-weight:800">${LANG==="jp"?"あなたの現状":"Your Hiring Snapshot"}</h2>
+  <p style="color:var(--mu);margin:0 0 12px;font-size:14px">${esc(p.name||"Your profile")} · ${LANG==="jp"?"端末内のみ":"Local only"} ${fast?'· ⚡ Fast mode':''}</p>
   <div class="score-grid">
     <div class="score-card"><div class="num">${s.resume||0}</div><div class="lbl">${t("resume_score")}</div></div>
     <div class="score-card"><div class="num">${s.japan||0}</div><div class="lbl">${t("japan_score")}</div></div>
     <div class="score-card"><div class="num">${s.language||0}</div><div class="lbl">Language</div></div>
     <div class="score-card"><div class="num">${s.visa||0}</div><div class="lbl">Visa</div></div>
   </div>
-  ${p.strengths?.length ? `<div class="card"><h3>Strengths</h3><ul class="list-check">${p.strengths.map(x=>`<li class="ok">✓ ${esc(x)}</li>`).join("")}</ul>
-  ${p.missing?.length?`<h3 style="margin-top:12px">Missing</h3><ul class="list-check">${p.missing.map(x=>`<li class="miss">✗ ${esc(x)}</li>`).join("")}</ul>`:""}</div>`:""}
+
+  <!-- ONE PRIMARY ACTION -->
+  <div class="card" style="border:2px solid var(--ac);margin:16px 0">
+    <div class="step-guide" style="margin:0 0 10px">
+      <span class="hand">👇</span>
+      <div class="step-text">${LANG==="jp"?"次にやること（1つだけ）":"Your next action (only one)"}</div>
+    </div>
+    ${!goal ? `
+      <p style="font-size:14px;margin:0 0 12px">${LANG==="jp"?"まず目標を選んでください：":"First choose your goal:"}</p>
+      <div style="display:grid;gap:8px">
+        <button class="btn" id="goalFast" style="min-height:56px">⚡ ${LANG==="jp"?"今すぐ仕事が必要 (Need a Job Fast)":"Need a Job Fast"}</button>
+        <button class="btn secondary" id="goalCareer" style="min-height:52px">💼 ${LANG==="jp"?"キャリアを築きたい":"Build a career"}</button>
+        <button class="btn secondary" id="goalPart" style="min-height:52px">🕒 ${LANG==="jp"?"パート・時給から":"Part-time / Hourly first"}</button>
+      </div>
+    ` : `
+      <p style="font-size:14px;margin:0 0 12px;color:var(--mu)">${LANG==="jp"?"目標: ":"Goal: "}<strong style="color:var(--ac)">${goal==="fast"? (LANG==="jp"?"今すぐ仕事":"Need a Job Fast") : goal==="career"? (LANG==="jp"?"キャリア":"Career") : (LANG==="jp"?"パート優先":"Part-time first")}</strong></p>
+      <button class="btn btn-lg" data-go="jobs" style="font-size:18px">
+        🔍 ${LANG==="jp"?"現実的な求人を探す":"Find realistic jobs for me"}
+      </button>
+    `}
+  </div>
+
+  ${p.strengths?.length ? `<div class="card"><h3>${LANG==="jp"?"強み":"Strengths"}</h3><ul class="list-check">${p.strengths.map(x=>`<li class="ok">✓ ${esc(x)}</li>`).join("")}</ul>
+  ${p.missing?.length?`<h3 style="margin-top:12px">${LANG==="jp"?"改善点":"Missing"}</h3><ul class="list-check">${p.missing.map(x=>`<li class="miss">✗ ${esc(x)}</li>`).join("")}</ul>`:""}</div>`:""}
   <div class="section-title">Best Industries</div>
   <div class="card">
     ${(m.industries||[]).slice(0,5).map(i=>`
@@ -1920,7 +1970,7 @@ function renderDashboard(){
     <button class="btn secondary" data-go="tracker">${t("tracker")}</button>
     <button class="btn secondary" data-go="directory">🌐 ${t("sites")}</button>
   </div>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.0.0</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.1.0 Guided</div>
   `;
 }
 
@@ -2034,7 +2084,7 @@ function renderJobs(){
     </div>`;
   }).join("")}
 
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.0.0</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.1.0 Guided</div>
   `;
 }
 
@@ -2122,7 +2172,7 @@ function renderDirectory(){
       </div>
     </div>`;
   }).join("")}
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.0.0</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.1.0 Guided</div>
   `;
 }
 
@@ -2333,6 +2383,14 @@ function wireLanding(){
   $("btnContinue")?.addEventListener("click", () => setView("dashboard"));
   $("btnStartOver2")?.addEventListener("click", startOver);
   $("btnRestore")?.addEventListener("click", () => $("restoreFile").click());
+  $("btnFastMode")?.addEventListener("click", () => {
+    STATE.journey = STATE.journey || {};
+    STATE.journey.fastMode = true;
+    STATE.journey.goal = "fast";
+    persist();
+    say(LANG==="jp" ? "Need a Job Fast モードON" : "Need a Job Fast mode ON", 1);
+    $("btnFastMode") && ($("btnFastMode").textContent = LANG==="jp" ? "✅ Fastモード ON" : "✅ Fast mode ON");
+  });
   $("restoreFile")?.addEventListener("change", async e => {
     const f = e.target.files?.[0]; if(!f) return;
     try {
@@ -2421,6 +2479,19 @@ function wireCommon(){
   $$("[data-go]").forEach(b => b.onclick = () => setView(b.dataset.go));
   $("btnSearchJobs")?.addEventListener("click", () => searchLiveJobs());
   $("btnStartOver")?.addEventListener("click", startOver);
+  // Goal selection (Guided Journey Step 3)
+  const setGoal = (g) => {
+    STATE.journey = STATE.journey || {};
+    STATE.journey.goal = g;
+    if(g === "fast") STATE.journey.fastMode = true;
+    STATE.journey.step = 4;
+    persist();
+    say(LANG==="jp" ? "目標を設定しました → 求人へ" : "Goal set → finding jobs", 1);
+    render();
+  };
+  $("goalFast")?.addEventListener("click", () => setGoal("fast"));
+  $("goalCareer")?.addEventListener("click", () => setGoal("career"));
+  $("goalPart")?.addEventListener("click", () => setGoal("part"));
   $$("[data-save-job]").forEach(btn => {
     btn.onclick = (e) => {
       e.preventDefault();
