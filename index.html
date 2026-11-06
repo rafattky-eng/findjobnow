@@ -1007,13 +1007,35 @@ main {
   main { padding: 24px; }
   .progress-bar-wrap { top: 56px; }
 }
+
+/* ===== v2.3 additions ===== */
+.logo{cursor:pointer}
+.role-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.role-count{font-size:13px;color:var(--mu);font-weight:600}
+.role-actions{display:flex;gap:8px}
+.role-actions button{background:transparent;border:1px solid var(--bd);color:var(--ac);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:700;min-height:36px}
+.role-item{display:flex;align-items:flex-start;gap:12px;padding:12px;margin-bottom:8px;border:1.5px solid var(--bd);border-radius:12px;cursor:pointer;background:rgba(255,255,255,.03)}
+.role-item.on{border-color:var(--ac);background:rgba(244,180,0,.10)}
+.role-item input{width:26px;height:26px;flex:0 0 26px;margin:2px 0 0;accent-color:#F4B400}
+.role-item strong{display:block;color:var(--tx);font-size:16px}
+.role-item span.why{display:block;font-size:13px;color:var(--mu);margin-top:2px}
+.role-item .rm{margin-left:auto;background:none;border:0;color:var(--er);font-size:20px;padding:0 4px;min-height:32px}
+.role-add{display:flex;gap:8px;margin-top:10px}
+.role-add input{flex:1;min-width:0;background:var(--input);border:1px solid var(--bd);border-radius:12px;padding:12px;color:var(--tx);font-size:16px}
+.role-add button{width:auto;padding:0 18px;min-height:48px}
+.mini-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 14px}
+.btn.danger{background:transparent;border:1.5px solid var(--er);color:var(--er)}
+.welcome-card{border:1.5px solid var(--ac);background:rgba(244,180,0,.08);border-radius:16px;padding:16px;margin-bottom:14px}
+.welcome-card h2{margin:0 0 4px;font-size:20px}
+.welcome-card p{margin:0 0 12px;color:var(--mu);font-size:14px}
+.welcome-card .btn{margin-bottom:8px}
 </style>
 
 </head>
 <body>
 <div class="app" id="app">
 <header>
-  <div class="logo"><img src="./icon-192.png" alt="FindJob Now" class="logo-img" width="32" height="32"> FindJob Now</div>
+  <div class="logo" id="logoHome" role="button" tabindex="0" title="Main menu"><img src="./icon-192.png" alt="FindJob Now" class="logo-img" width="32" height="32"> FindJob Now</div>
   <div class="header-actions">
     <div class="lang-switch">
       <button type="button" id="btnEn" class="active">EN</button>
@@ -1148,7 +1170,25 @@ const I18N = {
     remote: "Remote",
     gen_app: "Generate Application",
     language: "Language",
-    visa: "Visa"
+    visa: "Visa",
+    roles_selected: "selected",
+    sel_all: "Select all",
+    sel_none: "Clear",
+    roles_hint: "Tick the roles you want. Job search uses only the ticked roles.",
+    add_role: "Add your own role…",
+    add: "Add",
+    pick_one: "Please tick at least one role first",
+    main_menu: "Main menu / New CV",
+    welcome_back: "Welcome back",
+    welcome_sub: "Your CV analysis is saved on this device.",
+    continue_prof: "Continue where I left off",
+    upload_new: "Upload a new CV",
+    paste_new: "Paste a new CV",
+    start_over: "Start over (clear my profile)",
+    confirm_over: "Clear your CV profile, roles and job results? Your tracker is kept.",
+    restore: "Restore from backup file",
+    cleared: "Profile cleared. Upload a new CV.",
+    searching_for: "Searching for"
   },
   jp: {
     hero_title: "AIで日本の仕事を見つけよう",
@@ -1213,7 +1253,25 @@ const I18N = {
     remote: "リモート",
     gen_app: "応募書類を作成",
     language: "言語",
-    visa: "ビザ"
+    visa: "ビザ",
+    roles_selected: "件選択中",
+    sel_all: "すべて選択",
+    sel_none: "解除",
+    roles_hint: "希望する職種にチェック。求人検索はチェックした職種のみ使います。",
+    add_role: "職種を追加…",
+    add: "追加",
+    pick_one: "職種を1つ以上選んでください",
+    main_menu: "メインメニュー / 新しい履歴書",
+    welcome_back: "おかえりなさい",
+    welcome_sub: "履歴書の分析結果はこの端末に保存されています。",
+    continue_prof: "続きから始める",
+    upload_new: "新しい履歴書をアップロード",
+    paste_new: "新しい履歴書を貼り付け",
+    start_over: "最初からやり直す（プロフィール削除）",
+    confirm_over: "プロフィール・職種・求人結果を削除しますか？トラッカーは残ります。",
+    restore: "バックアップから復元",
+    cleared: "削除しました。新しい履歴書をアップロードしてください。",
+    searching_for: "検索中の職種"
   }
 };
 const t = k => (I18N[LANG] && I18N[LANG][k]) || I18N.en[k] || k;
@@ -1305,19 +1363,18 @@ function scoreLiveJob(j, titles, skills){
 }
 
 async function searchLiveJobs(){
-  const titles = (STATE.matches?.titles||[]).map(x => x.title || x);
+  const titles = selectedRoles();
   const skills = STATE.profile?.skills || [];
-  const q = titles[0] || skills[0] || "customer service";
+  if(STATE.matches && !titles.length){ say(t("pick_one"), 0); return; }
+  const queries = (titles.length ? titles : [skills[0] || "customer service"]).slice(0,4);
   say(LANG==="jp" ? "求人を検索中…" : "Searching jobs…", 1);
   try {
-    const feeds = await Promise.all([
+    const feeds = await Promise.all(queries.flatMap(q => [
       jget(DIRECT.remotive({q}), 9000).then(d => MAP("remotive", d)).catch(() => []),
       jget(DIRECT.jobicy({q}), 9000).then(d => MAP("jobicy", d)).catch(() => [])
-    ]);
+    ]));
     let jobs = feeds.flat().filter(Boolean);
-    // also try a second query for japan-friendly roles
     if(jobs.length < 8){
-      const q2 = "japan OR tokyo hospitality OR travel";
       const extra = await jget(DIRECT.remotive({q: "hospitality"}), 8000).then(d => MAP("remotive", d)).catch(() => []);
       jobs = jobs.concat(extra||[]);
     }
@@ -1474,13 +1531,97 @@ function computeMatches(ana){
     .map(([k,v]) => ({id:k, label: INDUSTRY_LABELS[k]||k, pct:v}))
     .sort((a,b)=>b.pct-a.pct)
     .slice(0,6);
-  const titles = (ana.recs||[]).map(r => ({
-    title: r.t,
-    why: `Matches your ${r.ind} experience and keywords found in your CV.`
-  }));
+  const seen = new Set();
+  const titles = [];
+  const addT = (title, ind) => {
+    if(!title || seen.has(title)) return;
+    seen.add(title);
+    titles.push({ title, why: `Matches your ${ind} experience and keywords found in your CV.` });
+  };
+  (ana.recs||[]).forEach(r => addT(r.t, r.ind));
+  // fill up to 6 suggestions from the strongest industries so the list is never tiny
+  const ranked = Object.entries(ana.indScores||{}).sort((a,b)=>b[1]-a[1]).map(x=>x[0]);
+  ranked.forEach(ind => TITLE_HINTS.filter(h=>h.ind===ind).forEach(h => { if(titles.length < 6) addT(h.t, h.ind); }));
   const avoid = ["Senior Software Engineer","Japanese Lawyer","Financial Analyst","Quantitative Researcher"]
     .filter(t => !(ana.skills||[]).some(s => t.toLowerCase().includes(s.toLowerCase())));
   return { industries, titles, avoid };
+}
+
+// ---------- Role selection (Best Jobs For You) ----------
+function allRoles(){ return (STATE.matches?.titles||[]).map(x => x.title).filter(Boolean); }
+function selectedRoles(){
+  const all = allRoles();
+  if(!Array.isArray(STATE.selectedRoles)) return all;          // default: everything ticked
+  return STATE.selectedRoles.filter(r => all.includes(r));
+}
+function renderRoleSelector(){
+  const titles = STATE.matches?.titles || [];
+  const sel = new Set(selectedRoles());
+  return `
+  <div class="card" id="roleBox">
+    <div class="role-head">
+      <span class="role-count"><b id="roleCount">${sel.size}</b> / ${titles.length} ${t("roles_selected")}</span>
+      <div class="role-actions">
+        <button type="button" id="roleAll">${t("sel_all")}</button>
+        <button type="button" id="roleNone">${t("sel_none")}</button>
+      </div>
+    </div>
+    <p style="margin:0 0 10px;font-size:13px;color:var(--mu)">${t("roles_hint")}</p>
+    ${titles.map(ti => `
+      <label class="role-item ${sel.has(ti.title)?"on":""}">
+        <input type="checkbox" data-role="${esc(ti.title)}" ${sel.has(ti.title)?"checked":""}>
+        <div><strong>${esc(ti.title)}</strong><span class="why">${esc(ti.why)}</span></div>
+        ${ti.custom ? `<button type="button" class="rm" data-role-del="${esc(ti.title)}" aria-label="Remove">✕</button>` : ""}
+      </label>`).join("") || "<p style='color:var(--mu);font-size:13px'>No titles yet</p>"}
+    <div class="role-add">
+      <input type="text" id="roleNew" maxlength="50" placeholder="${t("add_role")}">
+      <button type="button" class="btn" id="roleAddBtn">${t("add")}</button>
+    </div>
+    ${(STATE.matches?.avoid||[]).length ? `<div style="margin-top:14px;font-size:12px;color:var(--mu)">Avoid for now: ${STATE.matches.avoid.map(a=>`<span class="chip bad">${esc(a)}</span>`).join(" ")}</div>` : ""}
+  </div>`;
+}
+function wireRoles(){
+  const refresh = () => {
+    const sel = new Set(selectedRoles());
+    $$("[data-role]").forEach(cb => { cb.checked = sel.has(cb.dataset.role); cb.closest(".role-item")?.classList.toggle("on", cb.checked); });
+    const c = $("roleCount"); if(c) c.textContent = sel.size;
+  };
+  $$("[data-role]").forEach(cb => cb.addEventListener("change", () => {
+    const sel = new Set(selectedRoles());
+    cb.checked ? sel.add(cb.dataset.role) : sel.delete(cb.dataset.role);
+    STATE.selectedRoles = allRoles().filter(r => sel.has(r));
+    persist(); refresh();
+  }));
+  $("roleAll")?.addEventListener("click", () => { STATE.selectedRoles = allRoles(); persist(); refresh(); });
+  $("roleNone")?.addEventListener("click", () => { STATE.selectedRoles = []; persist(); refresh(); });
+  const add = () => {
+    const inp = $("roleNew"); const v = (inp?.value||"").trim();
+    if(!v) return;
+    STATE.matches.titles = STATE.matches.titles || [];
+    if(!STATE.matches.titles.some(x => x.title.toLowerCase() === v.toLowerCase())){
+      STATE.matches.titles.push({ title: v, why: LANG==="jp" ? "あなたが追加した職種です。" : "Added by you.", custom: true });
+      STATE.selectedRoles = selectedRoles().concat(v);
+    }
+    persist(); render();
+  };
+  $("roleAddBtn")?.addEventListener("click", add);
+  $("roleNew")?.addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); add(); } });
+  $$("[data-role-del]").forEach(b => b.addEventListener("click", e => {
+    e.preventDefault(); e.stopPropagation();
+    const v = b.dataset.roleDel;
+    STATE.matches.titles = STATE.matches.titles.filter(x => x.title !== v);
+    STATE.selectedRoles = selectedRoles().filter(r => r !== v);
+    persist(); render();
+  }));
+}
+
+function startOver(){
+  if(!confirm(t("confirm_over"))) return;
+  STATE.profile = null; STATE.scores = null; STATE.matches = null;
+  STATE.selectedRoles = null; STATE.jobs = [];
+  STATE.view = "landing";
+  persist(); render(); window.scrollTo(0,0);
+  say(t("cleared"), 1);
 }
 
 // ---------- Cover letter templates ----------
@@ -1551,6 +1692,14 @@ function renderLanding(){
     <button class="btn secondary" id="gotInstall">${t("got_it")}</button>
   </div>` : ""}
 
+  ${STATE.profile ? `
+  <div class="welcome-card">
+    <h2>👋 ${t("welcome_back")}${STATE.profile.name ? ", "+esc(STATE.profile.name) : ""}</h2>
+    <p>${t("welcome_sub")}</p>
+    <button class="btn btn-lg" id="btnContinue">▶ ${t("continue_prof")}</button>
+    <button class="btn danger" id="btnStartOver2" style="min-height:46px;font-size:14px">🗑 ${t("start_over")}</button>
+  </div>` : ""}
+
   <div class="hero" style="padding-bottom:8px">
     <h1 style="font-size:clamp(22px,5.5vw,28px)">${t("hero_title")}</h1>
     <p>${t("hero_sub")}</p>
@@ -1588,8 +1737,10 @@ function renderLanding(){
   </div>
 
   <p style="margin-top:14px;font-size:12px;color:var(--mu);text-align:center">${t("free_private")}</p>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.2.0</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.3.0</div>
 
+  <div style="text-align:center;margin-top:6px"><button class="btn ghost" id="btnRestore" style="max-width:300px;min-height:44px;font-size:14px">⬆ ${t("restore")}</button></div>
+  <input type="file" id="restoreFile" accept="application/json,.json" class="hidden">
   <input type="file" id="cvFile" accept=".pdf,.doc,.docx,.txt,application/pdf" class="hidden">
   <div class="hidden" id="pasteModal">
     <div class="card" style="margin-top:12px">
@@ -1614,6 +1765,10 @@ function renderDashboard(){
     </div>
   </div>
   <h2 style="margin:0 0 4px;font-size:20px;font-weight:800">${t("dash")}</h2>
+  <div class="mini-row">
+    <button class="btn secondary" data-go="landing" style="min-height:46px;font-size:14px">📄 ${t("upload_new")}</button>
+    <button class="btn danger" id="btnStartOver" style="min-height:46px;font-size:14px">🗑 ${t("start_over").split(" (")[0]}</button>
+  </div>
   <p style="color:var(--mu);margin:0 0 16px;font-size:14px">${esc(p.name||"Your profile")} · Local only</p>
   <div class="score-grid">
     <div class="score-card"><div class="num">${s.resume||0}</div><div class="lbl">${t("resume_score")}</div></div>
@@ -1630,12 +1785,7 @@ function renderDashboard(){
       <div class="bar"><i style="width:${i.pct}%"></i></div><span class="pct">${i.pct}%</span></div>`).join("")||"<p style='color:var(--mu);font-size:13px'>Upload a CV to see matches</p>"}
   </div>
   <div class="section-title">${t("best_matches")}</div>
-  <div class="card">
-    ${(m.titles||[]).slice(0,5).map(ti=>`
-      <div style="margin-bottom:12px"><strong style="color:var(--tx)">${esc(ti.title)}</strong>
-      <div style="font-size:13px;color:var(--mu);margin-top:2px">${esc(ti.why)}</div></div>`).join("")||"<p style='color:var(--mu);font-size:13px'>No titles yet</p>"}
-    ${(m.avoid||[]).length?`<div style="margin-top:12px;font-size:12px;color:var(--mu)">Avoid for now: ${m.avoid.map(a=>`<span class="chip bad">${esc(a)}</span>`).join(" ")}</div>`:""}
-  </div>
+  ${renderRoleSelector()}
   <div class="step-guide" style="margin-top:20px">
     <span class="hand">👇</span>
     <div>
@@ -1650,7 +1800,7 @@ function renderDashboard(){
     <button class="btn secondary" data-go="tracker">${t("tracker")}</button>
     <button class="btn secondary" data-go="directory">🌐 ${t("sites")}</button>
   </div>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.2.0</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.3.0</div>
   `;
 }
 
@@ -1674,6 +1824,8 @@ function renderJobs(){
   </div>
 
   <h2 style="margin:0 0 10px;font-size:20px;font-weight:800">${t("nav_jobs")}</h2>
+
+  ${(STATE.matches?.titles||[]).length ? `<div class="section-title" style="margin-top:0">${t("best_matches")}</div>${renderRoleSelector()}` : ""}
 
   <button class="btn btn-lg" id="btnSearchJobs" style="margin-bottom:10px">
     🔍 ${LANG==="jp"?"ライブ求人を検索":"Search Live Jobs"}
@@ -1761,7 +1913,7 @@ function renderJobs(){
     </div>`;
   }).join("")}
 
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.2.0</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.3.0</div>
   `;
 }
 
@@ -1847,7 +1999,7 @@ function renderDirectory(){
       </div>
     </div>`;
   }).join("")}
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.2.0</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V2.3.0</div>
   `;
 }
 
@@ -1952,7 +2104,7 @@ function render(){
     if(v === "dashboard") main.innerHTML = renderDashboard();
     else if(v === "jobs"){
       main.innerHTML = renderJobs();
-      if(!(STATE.jobs||[]).length && STATE.profile){
+      if(!(STATE.jobs||[]).length && STATE.profile && selectedRoles().length){
         setTimeout(() => searchLiveJobs(), 300);
       }
     }
@@ -1960,6 +2112,7 @@ function render(){
     else if(v === "tracker"){ main.innerHTML = renderTracker(); wireKanban(); }
     else if(v === "directory") main.innerHTML = renderDirectory();
     wireCommon();
+    wireRoles();
   }
   $$("#bottomNav button").forEach(b => {
     const dv = b.dataset.view;
@@ -2021,6 +2174,8 @@ function wireLanding(){
     STATE.profile = { name:"", skills:[], langs:[], yrs:0, strengths:[], missing:["Upload a CV for full analysis"] };
     STATE.scores = { resume:40, japan:40, language:30, experience:30, visa:50 };
     STATE.matches = computeMatches({ indScores:{travel:60,hospitality:55,customer:70}, recs:[{t:"Customer Support",ind:"customer"}] });
+    STATE.selectedRoles = allRoles();
+    STATE.jobs = [];
     STATE.view = "dashboard";
     persist();
     render();
@@ -2028,6 +2183,7 @@ function wireLanding(){
   $("cvFile")?.addEventListener("change", async e => {
     const f = e.target.files?.[0];
     if(!f) return;
+    e.target.value = "";
     say("Reading CV…",1);
     try {
       let text = "";
@@ -2045,6 +2201,19 @@ function wireLanding(){
       say("Analysis failed — try paste or continue without CV",0);
       console.error(err);
     }
+  });
+  $("btnContinue")?.addEventListener("click", () => setView("dashboard"));
+  $("btnStartOver2")?.addEventListener("click", startOver);
+  $("btnRestore")?.addEventListener("click", () => $("restoreFile").click());
+  $("restoreFile")?.addEventListener("change", async e => {
+    const f = e.target.files?.[0]; if(!f) return;
+    try {
+      const data = JSON.parse(await f.text());
+      if(!data || typeof data !== "object" || !data.settings) throw new Error("bad");
+      STATE = purgeDemoJobs(data);
+      STATE.view = STATE.profile ? "dashboard" : "landing";
+      persist(); render(); say(t("restored"), 1);
+    } catch { say("Could not read that backup file", 0); }
   });
   $("dismissInstall")?.addEventListener("click", dismissInstall);
   $("gotInstall")?.addEventListener("click", dismissInstall);
@@ -2064,6 +2233,8 @@ function runAnalysis(text){
   };
   STATE.scores = ana.scores;
   STATE.matches = computeMatches(ana);
+  STATE.selectedRoles = allRoles();
+  STATE.jobs = [];
   STATE.view = "dashboard";
   persist();
   say("Analysis complete", 1);
@@ -2120,6 +2291,7 @@ function wireKanban(){
 function wireCommon(){
   $$("[data-go]").forEach(b => b.onclick = () => setView(b.dataset.go));
   $("btnSearchJobs")?.addEventListener("click", () => searchLiveJobs());
+  $("btnStartOver")?.addEventListener("click", startOver);
   $$("[data-save-job]").forEach(btn => {
     btn.onclick = (e) => {
       e.preventDefault();
@@ -2182,6 +2354,9 @@ $("btnBackup")?.addEventListener("click", () => {
   a.click();
   say(t("backup_ok"), 1);
 });
+
+$("logoHome")?.addEventListener("click", () => { setView("landing"); window.scrollTo(0,0); });
+$("logoHome")?.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); setView("landing"); } });
 
 // Load pdf.js for better extraction
 const s = document.createElement("script");
