@@ -51,3 +51,9 @@ You now answer 10 short questions (resume optional). Selected options are clearl
 
 ## ユーザー向け（JP）
 履歴書は任意のまま、10の短い質問に答えます。選択中は強調表示。共有は1タップでiOS共有シート。求人画面の上部に日本の求人ボードへのリンク。マッチングはルールベースで端末内のみ。途中でリロードしても未完了ステップから再開します。
+
+
+## UI tweak (same build)
+- Removed Share button from header and bottom nav
+- Added expandable “How to share & install” section on Landing + Dashboard (iOS Safari + Android Chrome steps)
+- Job cards and Career DNA still have 📤 share (contextual only)

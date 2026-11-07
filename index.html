@@ -1119,7 +1119,6 @@ details.mwhy>summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--a
       <button type="button" id="btnEn" class="active">EN</button>
       <button type="button" id="btnJp">JP</button>
     </div>
-    <button class="icon-btn" id="btnShare" type="button" aria-label="Share" title="Share">📤</button>
     <button class="icon-btn" id="btnRestart" type="button" aria-label="Start from the beginning" title="Start from the beginning">🔄</button>
     <button class="icon-btn" id="btnBackup" title="Backup">💾</button>
   </div>
@@ -1138,7 +1137,6 @@ details.mwhy>summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--a
   <button data-view="jobs"><span>💼</span><span class="nav-label" data-i18n="nav_jobs">Jobs</span></button>
   <button data-view="tools"><span>🧰</span><span class="nav-label" data-i18n="nav_tools">Toolkit</span></button>
   <button data-view="tracker"><span>🗂</span><span class="nav-label" data-i18n="nav_tracker">Tracker</span></button>
-  <button data-view="share" id="navShare"><span>📤</span><span class="nav-label" data-i18n="nav_share">Share</span></button>
 </nav>
 </div>
 <div class="toast" id="toast"></div>
@@ -2549,6 +2547,24 @@ function renderLanding(){
   </div>
   `}
 
+  <details class="more" style="margin-top:14px">
+    <summary style="cursor:pointer;font-weight:700;color:var(--ac);min-height:44px;display:flex;align-items:center">📤 ${tx("How to share & install","共有・インストール方法")}</summary>
+    <div style="padding:10px 0 4px;font-size:14px;line-height:1.55;color:var(--mu)">
+      <p style="margin:0 0 8px"><strong style="color:var(--tx)">${tx("Share this app","このアプリを共有")}</strong></p>
+      <ol style="margin:0 0 12px;padding-left:20px">
+        <li>${tx("Tap the Share button on any job card or on your Career DNA card.","求人カードまたはキャリアDNAカードの共有ボタンをタップ。")}</li>
+        <li>${tx("Choose Messages, Mail, LINE, or Copy Link.","メッセージ・メール・LINE・リンクをコピーから選択。")}</li>
+      </ol>
+      <p style="margin:0 0 8px"><strong style="color:var(--tx)">${tx("Add to Home Screen (iPhone)","ホーム画面に追加（iPhone）")}</strong></p>
+      <ol style="margin:0 0 12px;padding-left:20px">
+        <li>${tx("Tap the Share icon in Safari (square with arrow).","Safariの共有アイコン（四角と矢印）をタップ。")}</li>
+        <li>${tx("Scroll and tap “Add to Home Screen”.","下にスクロールして「ホーム画面に追加」をタップ。")}</li>
+        <li>${tx("Open it like an app — works offline.","アプリアイコンから起動。オフラインでも使えます。")}</li>
+      </ol>
+      <p style="margin:0;font-size:12px">${tx("Android: use Chrome menu → “Add to Home screen” or “Install app”.","Android: Chromeメニュー →「ホーム画面に追加」または「アプリをインストール」。")}</p>
+    </div>
+  </details>
+
   <p style="margin-top:14px;font-size:12px;color:var(--mu);text-align:center">${t("free_private") || (LANG==="jp"?"無料 · プライベート · 登録不要 · 端末内のみ":"Free · Private · No signup · On this device only")}</p>
   <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V5.0.0</div>
 
@@ -2670,6 +2686,19 @@ function renderDashboard(){
       <button class="btn secondary" data-go="tools">🧰 ${t("improve_cv")}</button>
       <button class="btn secondary" data-go="tracker">🗂 ${t("tracker")}</button>
       <button class="btn secondary" data-go="directory">🌐 ${t("sites")}</button>
+    </div>
+  </details>
+
+  <details class="more" style="margin-top:12px">
+    <summary style="cursor:pointer;font-weight:700;color:var(--ac);min-height:44px;display:flex;align-items:center">📤 ${tx("How to share & install","共有・インストール方法")}</summary>
+    <div style="padding:8px 0;font-size:13px;line-height:1.5;color:var(--mu)">
+      <p style="margin:0 0 6px"><strong style="color:var(--tx)">${tx("Share a job or your DNA","求人やDNAを共有")}</strong> — ${tx("use the 📤 button on any job card or Career DNA card.","求人カードまたはキャリアDNAカードの📤ボタンを使います。")}</p>
+      <p style="margin:0 0 6px"><strong style="color:var(--tx)">${tx("Add to Home Screen (iPhone)","ホーム画面に追加（iPhone）")}</strong></p>
+      <ol style="margin:0 0 8px;padding-left:18px">
+        <li>${tx("Safari Share icon → “Add to Home Screen”","Safari共有 →「ホーム画面に追加」")}</li>
+        <li>${tx("Opens like an app, works offline","アプリアイコンから起動・オフライン対応")}</li>
+      </ol>
+      <p style="margin:0;font-size:12px">${tx("Android: Chrome menu → Add to Home screen / Install app.","Android: Chromeメニュー → ホーム画面に追加。")}</p>
     </div>
   </details>
   `;
@@ -3647,7 +3676,6 @@ $("btnBackup")?.addEventListener("click", () => {
 });
 
 $("btnBack")?.addEventListener("click", goBack);
-$("btnShare")?.addEventListener("click", () => shareApp());
 $("btnRestart")?.addEventListener("click", () => { if(!STATE.profile && STATE.view === "landing"){ window.scrollTo(0,0); return; } startOver(); });
 $("logoHome")?.addEventListener("click", () => { setView("landing"); window.scrollTo(0,0); });
 $("logoHome")?.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); setView("landing"); } });
@@ -3660,10 +3688,6 @@ if("serviceWorker" in navigator){
 
 $$("#bottomNav button").forEach(b => {
   b.onclick = () => {
-    if(b.dataset.view === "share" || b.id === "navShare"){
-      shareApp();
-      return;
-    }
     STATE._focus = b.dataset.toolFocus || null;
     STATE._tool = b.dataset.toolFocus || null;
     setView(b.dataset.view);
