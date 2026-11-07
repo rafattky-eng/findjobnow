@@ -1044,12 +1044,6 @@ body{background:radial-gradient(1000px 420px at 50% -8%,rgba(45,110,200,.35),tra
 .plan{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:rgba(255,255,255,.07);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-top:8px;color:var(--tx);cursor:pointer;min-height:48px}
 .verdict{font-size:18px;font-weight:800;margin:10px 0;padding:12px;border-radius:12px;background:rgba(255,255,255,.07)}
 .verdict.apply{color:var(--ok)}.verdict.skip{color:var(--er)}.verdict.tailor,.verdict.stretch{color:var(--ac)}
-/* ===== V3.2 ===== */
-.hp-top{display:flex;gap:14px;align-items:center;margin-bottom:10px}
-.hp-num{font-size:46px;font-weight:900;line-height:1}
-.coach{border:2px solid var(--ac);border-radius:16px;padding:12px;margin-top:12px;text-align:center;background:rgba(244,180,0,.08)}
-.lock{border-style:dashed;margin-top:10px}
-.linklike{background:none;border:0;color:var(--ac);text-decoration:underline;font-size:14px;cursor:pointer;min-height:44px;padding:8px}
 </style>
 
 </head>
@@ -1755,7 +1749,7 @@ const toolCards=()=>(STATE.track==="entry"?["starter"]:[]).concat(["ats","score"
 const segHTML=()=>`<div class="seg" id="trackSeg"><button type="button" data-track="pro" class="${STATE.track==="pro"?"on":""}">💼 ${tx("I have experience","経験者")}</button><button type="button" data-track="entry" class="${STATE.track==="entry"?"on":""}">🌱 ${tx("New / no experience","未経験・新卒")}</button></div>`;
 function renderCopilot(){
  const A=STATE.applications,n=k=>(A[k]||[]).length,sent=n("applied")+n("interview")+n("offer")+n("rejected"),rate=sent?Math.round((n("interview")+n("offer"))/sent*100):0;
- const stale=dueFollowUps().length,plan=[];
+ const stale=(A.applied||[]).filter(x=>x.moved&&(Date.now()-new Date(x.moved))/864e5>=7).length,plan=[];
  if(!STATE.track)plan.push(["track:x",tx("Choose your path: experienced or new","あなたのタイプを選択")]);
  if(!cvText())plan.push(["go:landing",tx("Upload your CV to unlock ATS checks","CVをアップロードしてATSチェックを有効化")]);
  if(!STATE._jd)plan.push(["tool:score",tx("Paste a job ad and get your fit score before applying","応募前に求人票で適合度をチェック")]);
@@ -1778,7 +1772,7 @@ NEW_TOOLS.score=p=>{const jt=STATE._jt||{};p.innerHTML=`<div class="card" style=
  $("scJd").value=STATE._jd||"";
  $("scGo").onclick=()=>{const jd=$("scJd").value;if(noCv())return;if(jd.trim().length<60){say(tx("Please paste more of the job ad","求人票をもう少し貼り付けてください"),0);return}STATE._jd=jd;persist();const r=scoreApp(jd);
   const V={apply:tx("✅ Apply now","✅ 今すぐ応募"),tailor:tx("✍️ Tailor your CV first","✍️ CVを調整してから応募"),stretch:tx("⚠️ Stretch — apply with a referral or recruiter","⚠️ ストレッチ — 紹介経由で"),skip:tx("🚫 Skip — scam risk","🚫 見送り — 詐欺リスク")};
-  $("scOut").innerHTML=`<div class="verdict ${r.verdict}">${V[r.verdict]} · ${r.overall}/100</div>${meter(tx("Skills","スキル"),r.kw)}${meter(tx("Language","言語"),r.lang)}${meter(tx("Experience","経験"),r.exp)}${meter(tx("Visa","ビザ"),r.visa)}<h3>${tx("What to fix before applying","応募前に直すこと")}</h3><ul class="list-check">${(r.fix.length?r.fix.map(f=>`<li class="miss">✗ ${esc(f)}</li>`):[`<li class="ok">✓ ${tx("Nothing major to fix","大きな修正はありません")}</li>`]).join("")}</ul><h3>${tx("Scam check details","詐欺チェックの詳細")} · ${esc(r.sc.risk)}</h3><ul class="list-check">${(r.sc.reasons&&r.sc.reasons.length?r.sc.reasons.map(f=>`<li class="miss">⚠ ${esc(f)}</li>`):[`<li class="ok">✓ ${tx("No red flags found","危険信号は見つかりませんでした")}</li>`]).join("")}</ul><button class="btn secondary" id="scSave">${tx("Save to Tracker","トラッカーに保存")}</button>`;
+  $("scOut").innerHTML=`<div class="verdict ${r.verdict}">${V[r.verdict]} · ${r.overall}/100</div>${meter(tx("Skills","スキル"),r.kw)}${meter(tx("Language","言語"),r.lang)}${meter(tx("Experience","経験"),r.exp)}${meter(tx("Visa","ビザ"),r.visa)}<p class="sub">${tx("Scam check","詐欺チェック")}: ${esc(r.sc.risk)} — ${esc(r.sc.reasons.join("; "))}</p>${r.fix.length?`<h3>${tx("Fix before applying","応募前の修正")}</h3><ul class="list-check">${r.fix.map(f=>`<li class="miss">✗ ${esc(f)}</li>`).join("")}</ul>`:""}<button class="btn secondary" id="scSave">${tx("Save to Tracker","トラッカーに保存")}</button>`;
   $("scSave").onclick=()=>{STATE.applications.saved.push({id:"jd-"+Date.now(),title:$("scT").value||"Job",company:$("scC").value||"",url:jt.url||"",score:r.overall,moved:today()});persist();say(tx("Saved to tracker","保存しました"),1);};};};
 NEW_TOOLS.rewrite=p=>{const S=summaries();p.innerHTML=`<div class="card" style="margin-top:12px"><h3>✍️ ${tx("AI Resume Rewriter","履歴書リライト")}</h3><p class="sub">${tx("Paste one weak bullet. Get measurable versions. Replace [brackets] with real facts only.","弱い箇条書きを貼ると成果ベースに変換。[ ]は事実のみで埋めてください。")}</p>${taBox("rwIn","Responsible for handling customer inquiries",80)}<button class="btn" id="rwGo">${tx("Rewrite","書き換え")}</button><div id="rwOut"></div><div class="section-title">${tx("Summary templates","職務要約テンプレート")}</div><div class="letter-box">${esc(S[0])}</div><div class="letter-box" style="margin-top:8px">${esc(S[1])}</div></div>`;
  $("rwGo").onclick=()=>{const v=$("rwIn").value;if(v.trim().length<8){say(tx("Please type a bullet first","先に文を入力してください"),0);return}$("rwOut").innerHTML=rewriteBullet(v).map(x=>`<div class="letter-box" style="margin-top:8px">${esc(x)}</div>`).join("");};};
@@ -1798,120 +1792,6 @@ NEW_TOOLS.premium=p=>{const R=[["Now · Free","ATS check, application score, rew
  p.innerHTML=`<div class="card" style="margin-top:12px"><h3>💎 ${tx("Premium Roadmap","プレミアム計画")}</h3>${R.map(r=>`<div class="roadmap-step"><strong>${tx(r[0],r[2])}</strong><span>${tx(r[1],r[3])}</span></div>`).join("")}</div>`;};
 
 // ---------- Views ----------
-// ===== V3.2 Hiring Probability Engine, Coach, Simulator, Daily, Realistic Jobs, Recruiter Intelligence =====
-const PDF_SRC="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",PDF_WORKER="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-let _pdfP=null;
-function ensurePdfJs(timeout){
- timeout=timeout||15000;
- if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc=PDF_WORKER;return Promise.resolve(window.pdfjsLib);}
- if(_pdfP)return _pdfP;
- _pdfP=new Promise((res,rej)=>{
-  let done=false,t=null;
-  const fin=ok=>{if(done)return;done=true;clearTimeout(t);if(ok&&window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc=PDF_WORKER;res(window.pdfjsLib);}else{_pdfP=null;document.getElementById("pdfjsScript")?.remove();rej(new Error("pdf.js unavailable"));}};
-  t=setTimeout(()=>fin(false),timeout);
-  let el=document.getElementById("pdfjsScript");
-  if(!el){el=document.createElement("script");el.id="pdfjsScript";el.src=PDF_SRC;document.head.appendChild(el);}
-  el.addEventListener("load",()=>fin(true));el.addEventListener("error",()=>fin(false));
- });
- return _pdfP;
-}
-async function extractPdfText(file){
- const lib=await ensurePdfJs();
- const buf=await file.arrayBuffer();
- const pdf=await Promise.race([lib.getDocument({data:buf}).promise,new Promise((_,r)=>setTimeout(()=>r(new Error("pdf timeout")),20000))]);
- let text="";
- for(let i=1;i<=Math.min(pdf.numPages,10);i++){
-  const pg=await pdf.getPage(i),c=await pg.getTextContent();let y=null,line=[];
-  c.items.forEach(it=>{const yy=it.transform?Math.round(it.transform[5]):0;if(y!==null&&Math.abs(yy-y)>3){text+=line.join(" ")+"\n";line=[];}y=yy;line.push(it.str);});
-  text+=line.join(" ")+"\n";
- }
- if(text.replace(/\s/g,"").length<40)throw new Error("PDF_EMPTY");
- return text;
-}
-function showPdfFail(){
- document.getElementById("pdfFail")?.remove();
- const h=`<div class="card" id="pdfFail" style="margin-top:12px;border-color:var(--er)"><p style="margin:0 0 10px;font-weight:700">${tx("We couldn't read your PDF.<br>Please paste the text instead.","PDFを読み取れませんでした。<br>テキストを貼り付けてください。")}</p><button class="btn btn-lg" id="btnPdfPaste">📋 ${tx("Paste CV","CVを貼り付け")}</button></div>`;
- const pm=$("pasteModal");
- if(pm)pm.insertAdjacentHTML("beforebegin",h);else $("main").insertAdjacentHTML("afterbegin",h);
- $("btnPdfPaste").onclick=()=>{const m=$("pasteModal");if(m){m.classList.remove("hidden");m.scrollIntoView({behavior:"smooth"});$("pasteText")?.focus();}};
- say(tx("We couldn't read your PDF. Please paste the text instead.","PDFを読み取れませんでした。テキストを貼り付けてください。"),0);
-}
-const FAST_KW=/part[- ]?time|hourly|entry[- ]level|no experience|未経験|アルバイト|パート|時給|visa sponsor/gi;
-function fastRank(jobs){
- const sc=j=>{const body=(j.title||"")+" "+(j.description||"")+" "+(j.full||"");return (body.match(FAST_KW)||[]).length+(j.visa?2:0)+(/junior|intern|assistant|trainee|staff/i.test(j.title||"")?1:0);};
- const w=jobs.map(j=>({j,s:sc(j)})).sort((a,b)=>b.s-a.s),m=w.filter(x=>x.s>0);
- return (m.length>=3?m:w).map(x=>x.j);
-}
-const dSince=d=>d?Math.floor((Date.now()-new Date(d))/864e5):0;
-const dueFollowUps=()=>[].concat(STATE.applications.saved||[],STATE.applications.applied||[]).filter(x=>x&&x.moved&&dSince(x.moved)>=7);
-Object.values(STATE.applications).flat().forEach(x=>{if(x&&!x.moved)x.moved=today();});
-const isPro=()=>STATE.plan==="pro";
-const clampP=(n,a,b)=>Math.max(a,Math.min(b,Math.round(n)));
-const lockCard=t=>`<div class="card lock"><b>🔒 ${t}</b><div class="sub" style="margin-top:4px">${tx("Pro feature. Free during beta — no payment yet.","Pro機能。ベータ中は無料（課金なし）。")}</div><button class="btn secondary" data-pro="1">${tx("Unlock Pro preview","Proプレビューを解除")}</button></div>`;
-function hiringModel(){
- const p=STATE.profile||{},cv=cvText(),m=STATE.matches||{industries:[]},top=(m.industries||[])[0]||{},sc=STATE.scores||{},lj=JLN[p.jlpt]||0;
- const F=[
-  {id:"eng",w:10,ok:/english/i.test((p.langs||[]).join(" "))||/english/i.test(cv),yes:tx("English fluency","英語力"),no:tx("English level not stated","英語レベルが未記載"),fix:tx("State your English level","英語レベルを明記する"),kind:"cv",eff:1},
-  {id:"ind",w:12,ok:(top.pct||0)>=60,yes:tx((top.label||"Industry")+" background",(top.label||"業界")+"の経験"),no:tx("No clear industry strength","得意業界が不明確"),fix:tx("Add 3 role-specific skills","職種に合うスキルを3つ追加する"),kind:"cv",eff:2},
-  {id:"jlpt",w:14,ok:lj>=3,yes:"JLPT "+(p.jlpt||""),no:tx("No JLPT (N3 or higher)","JLPT（N3以上）なし"),fix:tx("Pass JLPT N3","JLPT N3に合格する"),kind:"jlpt",eff:6},
-  {id:"ach",w:12,ok:/\d+\s?%|¥|\$|increased|improved|achieved|\d{2,}\+?\s?(customers|clients|guests|users|members|people)/i.test(cv),yes:tx("Measurable achievements","数値で示した成果"),no:tx("Missing measurable achievements","数値の成果が不足"),fix:tx("Add measurable achievements","数値の成果を追加する"),kind:"cv",eff:1},
-  {id:"jp",w:10,ok:/japan|tokyo|osaka|kyoto|日本|東京|大阪/i.test(cv)||/permanent|spouse|engineer|humanities|specified/i.test(p.visaStatus||""),yes:tx("Japan experience","日本での経験"),no:tx("Limited Japan-specific experience","日本での経験が少ない"),fix:tx("Add a Japan project, volunteering or study","日本での活動を追加する"),kind:"exp",eff:4},
-  {id:"visa",w:9,ok:!!p.visaStatus||/visa|在留/i.test(cv),yes:tx("Visa status stated","在留資格を記載"),no:tx("Visa status not stated","在留資格が未記載"),fix:tx("Write your visa status on the CV","CVに在留資格を書く"),kind:"cv",eff:1},
-  {id:"sum",w:6,ok:/summary|profile|objective|職務要約|自己pr/i.test(cv),yes:tx("Professional summary","職務要約あり"),no:tx("No professional summary","職務要約なし"),fix:tx("Add a 3-line summary","3行の要約を追加する"),kind:"cv",eff:1},
-  {id:"yrs",w:8,ok:(p.yrs||0)>=2,yes:tx((p.yrs||0)+"+ years of experience",(p.yrs||0)+"年以上の経験"),no:tx("Under 2 years of experience","経験2年未満"),fix:tx("Gain 6 months of experience (part-time or internship)","6か月の経験を積む（バイト・インターン）"),kind:"months",eff:5}];
- F.forEach(f=>{f.gain=Math.round(f.w*.9);});
- const got=F.reduce((a,f)=>a+(f.ok?f.w:0),0),pct=clampP((cv.length>40?15:8)+got*.9+(sc.resume||0)*.06,10,95),warn=F.filter(f=>!f.ok);
- return {pct,F,good:F.filter(f=>f.ok),warn,blockers:warn.slice().sort((a,b)=>b.w-a.w).slice(0,3),fast:warn.slice().sort((a,b)=>b.gain/b.eff-a.gain/a.eff)};
-}
-function renderHiring(){
- if(!STATE.profile)return "";
- const h=hiringModel(),nx=h.fast[0],col=h.pct>=75?"var(--ok)":h.pct>=55?"var(--ac)":"var(--er)";
- const pro=isPro()?`<div class="section-title">${tx("Biggest blockers","最大の障害")}</div><ul class="list-check">${h.blockers.map(f=>`<li class="miss">⛔ ${esc(f.no)}</li>`).join("")||`<li class="ok">✅ ${tx("None","なし")}</li>`}</ul><div class="section-title">${tx("Fastest improvements","最短の改善策")}</div><ul class="list-check">${h.fast.slice(0,3).map(f=>`<li class="ok">⚡ ${esc(f.fix)} <b>+${f.gain}%</b></li>`).join("")}</ul>`:lockCard(tx("Biggest blockers & fastest improvements","最大の障害と最短の改善策"));
- return `<div class="card hp"><div class="hp-top"><div class="hp-num" style="color:${col}">${h.pct}%</div><div><div class="step-text">${tx("Current Hiring Probability","現在の採用確率")}</div><div class="sub" style="margin:0">${tx("Why this score: your CV compared with what Japanese employers look for.","このスコアの理由：CVと日本の採用基準の比較")}</div></div></div><ul class="list-check">${h.good.map(f=>`<li class="ok">✅ ${esc(f.yes)}</li>`).join("")}${h.warn.map(f=>`<li class="miss">⚠ ${esc(f.no)}</li>`).join("")}</ul>${pro}${nx?`<div class="coach"><div class="tap" style="font-size:26px;margin:6px 0 2px">👇</div><b>${tx("Next Best Action","次にやること")}</b><div style="margin:4px 0 10px">${esc(nx.fix)} — ${tx(`raises your hiring probability from ${h.pct}% to ${Math.min(97,h.pct+nx.gain)}%.`,`採用確率が ${h.pct}% → ${Math.min(97,h.pct+nx.gain)}% に上がります。`)}</div><button class="btn btn-lg" data-coach="${nx.kind}">${tx("Do this now","今すぐ実行")}</button></div>`:""}</div>`;
-}
-const ENTRY_ROLES=[["Customer Support","customer"],["Hotel Front Desk","hospitality"],["Travel Consultant","travel"],["Retail Staff",null],["Marketing Manager","marketing"]];
-function realisticJobs(){
- const h=hiringModel(),p=STATE.profile||{},ind=STATE.matches?.industries||[],pctOf=id=>(ind.find(i=>i.id===id)||{}).pct||35,g=STATE.journey?.goal,pool=[];
- (STATE.matches?.titles||[]).forEach(x=>{const th=TITLE_HINTS.find(t=>t.t===x.title);pool.push([x.title,th?th.ind:null]);});
- ENTRY_ROLES.forEach(e=>{if(!pool.some(x=>x[0]===e[0]))pool.push(e);});
- return pool.map(([t,i0])=>{let s=(i0?pctOf(i0):40)*.45+h.pct*.5;
-  if(/manager|head|director|senior|lead/i.test(t))s-=(p.yrs||0)>=6?5:(p.yrs||0)>=3?20:35;
-  if(/support|front desk|staff|assistant|consultant|coordinator/i.test(t))s+=8;
-  if(g==="fast"||g==="part")s+=/support|front desk|staff|assistant/i.test(t)?8:-6;
-  return {t,pct:clampP(s,8,96)};}).sort((a,b)=>b.pct-a.pct).slice(0,6);
-}
-function renderRealJobs(){
- if(!STATE.profile)return "";
- return `<div class="card"><h3>🎯 ${tx("Jobs You Can Realistically Get This Week","今週、現実的に取れる仕事")}</h3>${realisticJobs().map(r=>meter(esc(r.t),r.pct)).join("")}<p class="sub" style="margin-top:8px">${tx("Estimates from your CV, Japanese level and goal.","CV・日本語レベル・目標からの推定です。")}</p></div>`;
-}
-function renderSim(){
- if(!STATE.profile)return "";
- if(!isPro())return lockCard(tx("Career Simulator","キャリアシミュレーター"));
- const h=hiringModel(),sum=k=>h.warn.filter(f=>k.includes(f.kind)).reduce((a,f)=>a+f.gain,0),s0=h.pct,s1=Math.min(97,s0+sum(["cv"])),s2=Math.min(97,s1+sum(["jlpt"])),s3=Math.min(97,s2+sum(["exp","months"]));
- return `<div class="card"><h3>🔮 ${tx("Career Simulator","キャリアシミュレーター")}</h3>${meter(tx("Today","現在"),s0)}${meter(tx("+ CV fixes","＋CV改善"),s1)}${meter(tx("+ JLPT N3","＋JLPT N3"),s2)}${meter(tx("+ 6 mo. exp.","＋6か月経験"),s3)}<p class="sub" style="margin-top:8px">${tx("Each step adds to the one before it.","各ステップは前の結果に加算されます。")}</p></div>`;
-}
-function renderDaily(){
- if(!STATE.profile)return "";
- if(!isPro())return lockCard(tx("Daily Hiring Dashboard","デイリー就活ダッシュボード"));
- const d=today();if(!STATE.daily||STATE.daily.date!==d)STATE.daily={date:d,done:{}};
- const dn=STATE.daily.done,h=hiringModel(),n5=(STATE.applications.applied||[]).filter(x=>x.moved===d).length;
- const T=[["cv",tx("Update CV","CVを更新"),cvText().length>40,0],["ach",tx("Add achievements","成果を追加"),!!h.F.find(f=>f.id==="ach").ok,0],["iv",tx("Complete interview practice","面接練習を完了"),!!dn.iv,1],["app",tx(`Apply to 5 jobs (${Math.min(n5,5)}/5)`,`5件応募（${Math.min(n5,5)}/5）`),n5>=5,0],["jp",tx("Improve Japanese","日本語を勉強"),!!dn.jp,1]];
- return `<div class="card"><h3>📅 ${tx("Daily Hiring Dashboard","デイリー就活ダッシュボード")}</h3>${meter(tx("Readiness","準備度"),h.pct)}<p class="sub">${tx("Current","現在")}: ${h.pct}% → ${tx("Target","目標")}: 80%</p>${T.map(t=>t[3]?`<button type="button" class="plan" data-task="${t[0]}">${t[2]?"✅":"⬜"} <span>${t[1]}</span></button>`:`<div class="plan" style="cursor:default">${t[2]?"✅":"⬜"} <span>${t[1]}</span></div>`).join("")}</div>`;
-}
-function wireV32(){
- $$("[data-pro]").forEach(b=>b.onclick=()=>{STATE.plan="pro";persist();say(tx("Pro preview unlocked (free during beta)","Proプレビューを解除（ベータ中は無料）"),1);render();});
- $$("[data-coach]").forEach(b=>b.onclick=()=>{const f=b.dataset.coach==="cv"?"rewrite":(document.querySelector('[data-tool="roadmap"]')?"roadmap":"starter");STATE._focus=f;STATE._tool=f;setView("tools");});
- $$("[data-task]").forEach(b=>b.onclick=()=>{STATE.daily=STATE.daily||{date:today(),done:{}};STATE.daily.done[b.dataset.task]=!STATE.daily.done[b.dataset.task];persist();render();});
-}
-NEW_TOOLS.recruiters=p=>{const pr=STATE.profile||{},roles=selectedRoles().slice(0,2).join(" / ")||"[target role]";
- const script=`Subject: ${pr.yrs||0}+ yrs ${roles} — available to interview in Japan\n\nHello,\n\nI'm ${pr.name||"[name]"}, targeting ${roles} in Japan. Japanese: ${pr.jlpt||"[level]"}. Visa: ${pr.visaStatus||"[status]"}. My CV is attached; I'm happy to share a 15-minute intro call.\n\nBest regards,\n${pr.name||"[name]"}`;
- const act=s=>s>=80?tx("Send introduction today.","今日、紹介メッセージを送りましょう。"):s>=60?tx("Send introduction this week.","今週中に紹介メッセージを送りましょう。"):tx("Improve your CV first, then contact them.","先にCVを改善してから連絡しましょう。");
- p.innerHTML=`<div class="card" style="margin-top:12px"><h3>🤝 ${tx("Recruiter Matches","エージェント推薦")}</h3>${recMatch().map(a=>`<div class="role-item on" style="display:block"><strong>${esc(a.n)} · ${a.s}%</strong><div class="sub" style="margin:6px 0 2px">${tx("Why matched","マッチ理由")}:</div><ul class="list-check">${a.why.map(w=>`<li class="ok">• ${esc(w)}</li>`).join("")}</ul>${isPro()?`<div class="sub" style="margin:4px 0"><b>${tx("Recommended action","推奨アクション")}:</b> ${act(a.s)}</div>`:`<div class="sub" style="margin:4px 0">🔒 ${tx("Pro: recommended action","Pro：推奨アクション")}</div>`}<a class="btn secondary" href="${a.u}" target="_blank" rel="noopener" style="margin-top:8px;min-height:40px;font-size:13px;text-decoration:none">${tx("Open","開く")} ↗</a></div>`).join("")}${isPro()?"":lockCard(tx("Premium Recruiter Intelligence","プレミアム・エージェント分析"))}<div class="section-title">${tx("Intro message","紹介メッセージ")}</div><div class="letter-box" id="rcS">${esc(script)}</div><div class="action-row"><button class="btn" id="rcCopy">${tx("Copy","コピー")}</button></div></div>`;
- $("rcCopy").onclick=()=>navigator.clipboard.writeText(script).then(()=>say(tx("Copied","コピーしました"),1));
- wireV32();};
-NEW_TOOLS.premium=p=>{const L=[["Free","無料",["CV analysis","Job search","Tracker","Recruiter matching"],["CV分析","求人検索","トラッカー","エージェント推薦"]],["Pro","Pro",["Hiring Probability details","Career Simulator","Daily Hiring Dashboard","Unlimited ATS scoring","Advanced Interview Coach","Smart follow-up reminders","Premium Recruiter Intelligence"],["採用確率の詳細","キャリアシミュレーター","デイリーダッシュボード","ATS無制限","高度な面接コーチ","スマート・リマインダー","プレミアム・エージェント分析"]]];
- p.innerHTML=`<div class="card" style="margin-top:12px"><h3>💎 ${tx("Free & Pro","無料とPro")}</h3>${L.map(x=>`<div class="roadmap-step"><strong>${tx(x[0],x[1])}</strong><span>${(LANG==="jp"?x[3]:x[2]).join(" · ")}</span></div>`).join("")}${isPro()?`<p class="sub">✅ ${tx("Pro preview is on (free during beta).","Proプレビュー有効（ベータ中は無料）。")}</p>`:lockCard(tx("Pro features","Pro機能"))}</div>`;wireV32();};
-
 function setView(v){
   STATE.view = v;
   persist();
@@ -1968,7 +1848,8 @@ function renderLanding(){
         : "AI analyzes it and tells you exactly one next action. No confusion."}
     </p>
     <button class="btn btn-lg" id="btnUpload" style="font-size:18px">📄 ${t("upload")}</button>
-    <div style="text-align:center;margin-top:10px"><button class="btn ghost" id="btnPaste" style="width:auto;min-height:44px;font-size:14px">📋 ${t("paste")}</button></div>
+    <div class="or">${t("or")}</div>
+    <button class="btn secondary" id="btnPaste" style="min-height:52px">📋 ${t("paste")}</button>
   </div>
 
   <div class="card" style="margin-top:12px">
@@ -1987,8 +1868,6 @@ function renderLanding(){
     </div>
   </div>
 
-  <div style="text-align:center;margin:10px 0 4px"><button class="linklike" id="btnSkip">${tx("Just browsing? See jobs without a CV →","見るだけ？CVなしで求人を見る →")}</button></div>
-
   <div class="card" style="margin-top:10px;border-color:var(--ac)">
     <div style="font-size:13px;font-weight:700;color:var(--ac);margin-bottom:8px">⚡ ${LANG==="jp"?"急いで仕事が必要な人へ":"Need a job fast?"}</div>
     <p style="font-size:13px;color:var(--mu);margin:0 0 12px">
@@ -2001,10 +1880,13 @@ function renderLanding(){
     </button>
   </div>
 
+  <div style="text-align:center;margin:16px 0 8px">
+    <button class="btn ghost" id="btnSkip" style="max-width:300px;min-height:48px;font-size:15px">${t("skip")}</button>
+  </div>
   `}
 
   <p style="margin-top:14px;font-size:12px;color:var(--mu);text-align:center">${t("free_private") || (LANG==="jp"?"無料 · プライベート · 登録不要 · 端末内のみ":"Free · Private · No signup · On this device only")}</p>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.2.0 Guided</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.1.0 Guided</div>
 
   <div style="text-align:center;margin-top:6px"><button class="btn ghost" id="btnRestore" style="max-width:300px;min-height:44px;font-size:14px">⬆ ${t("restore")}</button></div>
   <input type="file" id="restoreFile" accept="application/json,.json" class="hidden">
@@ -2033,10 +1915,6 @@ function renderDashboard(){
       <div class="step-sub">${LANG==="jp"?"スコアを確認したら、下の大きなボタンを押してください":"Review scores, then tap the big button below"}</div>
     </div>
   </div>
-  ${renderHiring()}
-  ${renderRealJobs()}
-  ${renderSim()}
-  ${renderDaily()}
   ${renderCopilot()}
   <h2 style="margin:0 0 4px;font-size:20px;font-weight:800">${LANG==="jp"?"あなたの現状":"Your Hiring Snapshot"}</h2>
   <p style="color:var(--mu);margin:0 0 12px;font-size:14px">${esc(p.name||"Your profile")} · ${LANG==="jp"?"端末内のみ":"Local only"} ${fast?'· ⚡ Fast mode':''}</p>
@@ -2092,7 +1970,7 @@ function renderDashboard(){
     <button class="btn secondary" data-go="tracker">${t("tracker")}</button>
     <button class="btn secondary" data-go="directory">🌐 ${t("sites")}</button>
   </div>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.2.0 Guided</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.1.0 Guided</div>
   `;
 }
 
@@ -2103,7 +1981,6 @@ function renderJobs(){
   if(prefs.visaOnly) jobs = jobs.filter(j => j.visa);
   if(prefs.englishOnly) jobs = jobs.filter(j => j.eng !== false);
   if(prefs.remoteOnly) jobs = jobs.filter(j => j.remote);
-  if(STATE.journey?.fastMode) jobs = fastRank(jobs);
   const hasLive = jobs.length > 0;
   const titles = (STATE.matches?.titles || []).map(x => x.title || x).filter(Boolean);
 
@@ -2117,7 +1994,6 @@ function renderJobs(){
   </div>
 
   <h2 style="margin:0 0 10px;font-size:20px;font-weight:800">${t("nav_jobs")}</h2>
-  ${STATE.journey?.fastMode ? `<div class="verdict" style="font-size:14px">⚡ ${tx("Fast mode: visa, entry-level, part-time and hourly jobs first","スピードモード：ビザ支援・未経験・アルバイト・時給の求人を優先")}</div>` : ""}
 
   ${(STATE.matches?.titles||[]).length ? `<div class="section-title" style="margin-top:0">${t("best_matches")}</div>${renderRoleSelector()}` : ""}
 
@@ -2208,7 +2084,7 @@ function renderJobs(){
     </div>`;
   }).join("")}
 
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.2.0 Guided</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.1.0 Guided</div>
   `;
 }
 
@@ -2252,7 +2128,7 @@ function renderTracker(){
         ${(STATE.applications[c]||[]).map(item=>`
           <div class="kanban-item" draggable="true" data-id="${esc(item.id)}">
             <strong style="color:var(--tx)">${esc(item.title)}</strong>
-            <div style="font-size:12px;color:var(--mu);margin-top:2px">${esc(item.company||"")}${item.score?` · ${item.score}%`:""}</div>${(c==="applied"||c==="saved")&&item.moved&&dSince(item.moved)>=7?`<div class="chip bad">⏰ follow up</div>`:""}
+            <div style="font-size:12px;color:var(--mu);margin-top:2px">${esc(item.company||"")}${item.score?` · ${item.score}%`:""}</div>${c==="applied"&&item.moved&&(Date.now()-new Date(item.moved))/864e5>=7?`<div class="chip bad">⏰ follow up</div>`:""}
           </div>`).join("")}
       </div>`).join("")}
   </div>
@@ -2296,7 +2172,7 @@ function renderDirectory(){
       </div>
     </div>`;
   }).join("")}
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.2.0 Guided</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.1.0 Guided</div>
   `;
 }
 
@@ -2414,7 +2290,7 @@ function render(){
     wireCommon();
     wireRoles();
   }
-  wireV3(); wireV32();
+  wireV3();
   $$("#bottomNav button").forEach(b => {
     const dv = b.dataset.view;
     let active = dv === v;
@@ -2478,7 +2354,7 @@ function wireLanding(){
     STATE.matches = computeMatches({ indScores:{travel:60,hospitality:55,customer:70}, recs:[{t:"Customer Support",ind:"customer"}] });
     STATE.selectedRoles = allRoles();
     STATE.jobs = [];
-    STATE.view = "jobs";
+    STATE.view = "dashboard";
     persist();
     render();
   });
@@ -2489,14 +2365,13 @@ function wireLanding(){
     say("Reading CV…",1);
     try {
       let text = "";
-      const isPdf = f.type === "application/pdf" || /\.pdf$/i.test(f.name);
-      if(isPdf){
-        try { text = await extractPdfText(f); } catch(pe){ console.error(pe); showPdfFail(); return; }
+      if(f.type === "application/pdf" || f.name.endsWith(".pdf")){
+        text = await extractPdfText(f);
       } else {
         text = await f.text();
       }
       if(text.trim().length < 40){
-        if(isPdf) showPdfFail(); else say("Could not extract enough text. Try paste or another file.",0);
+        say("Could not extract enough text. Try paste or another file.",0);
         return;
       }
       runAnalysis(text);
@@ -2551,6 +2426,22 @@ function runAnalysis(text){
   persist();
   say("Analysis complete", 1);
   render();
+}
+
+async function extractPdfText(file){
+  // Minimal fallback — if pdf.js is loaded use it, else read as text (works for some)
+  if(window.pdfjsLib){
+    const buf = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({data:buf}).promise;
+    let text = "";
+    for(let i=1;i<=Math.min(pdf.numPages,8);i++){
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      text += content.items.map(it=>it.str).join(" ") + "\n";
+    }
+    return text;
+  }
+  return file.text();
 }
 
 function wireTools(){
@@ -2667,8 +2558,11 @@ $("btnBackup")?.addEventListener("click", () => {
 $("logoHome")?.addEventListener("click", () => { setView("landing"); window.scrollTo(0,0); });
 $("logoHome")?.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); setView("landing"); } });
 
-// Warm-up PDF.js (robust loader: ensurePdfJs)
-ensurePdfJs().catch(()=>{});
+// Load pdf.js for better extraction
+const s = document.createElement("script");
+s.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+s.onload = () => { if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"; };
+document.head.appendChild(s);
 
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("./sw.js").catch(()=>{});
