@@ -57,3 +57,12 @@ V3.1.0 Guided — builds on V3.0.0 engines (ATS, Interview Coach, Rewriter, Appl
 - Header back arrow (←) appears on every screen after the CV is loaded; it follows the real screen history.
 - 🔄 Restart button in the header clears the profile, goal and job results (tracker is kept) after a confirmation.
 - 👇 finger now taps up and down; the main button has a soft gold pulse. Both stop when the device asks for reduced motion.
+
+## V4.0.0 Career DNA Engine
+See V4_CAREER_DNA_PLAN.md for architecture, data model and plan. Summary:
+- Resume understanding: 16 experience domains (management, leadership, operations, marketing, product ownership, technology knowledge, hands-on coding, travel, business development, sales, customer care, analytics, teaching, creative, finance, HR). Job titles outweigh bare keywords. "Hands-on coding" needs real engineering evidence, so a Technical Project Manager is not labelled a Software Engineer.
+- Preference Profile: likes, dislikes, work style, direction, free note. Guessed from the CV (shown with ✨) and editable by tapping.
+- Outputs: Career Archetype, Candidate Type, Best Industries, Best Roles, Avoid Roles, Fast-Hire Roles, Long-Term Roles.
+- Job match score = 40% experience + 25% interest + 20% skill + 10% language + 5% visa/location. Every job shows why it matches, why it may not, missing requirements and interview chance.
+- Search: one or two real search phrases per selected role, results kept per role so each selected role changes the list. Changing roles clears old results and re-searches.
+- Native share button (navigator.share) for the app, your Career DNA and each job, with copy-to-clipboard fallback.
