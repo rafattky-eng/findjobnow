@@ -1143,7 +1143,7 @@ details.mwhy>summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--a
 <script>
 
 // ===== FindJob Now V5.0.0 — Career DNA for Japan =====
-const APP_VERSION = "5.0.0";
+const APP_VERSION = "5.0.1";
 const $ = id => document.getElementById(id);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 const L = (k,d) => { try { const v = localStorage.getItem(k); return v!=null ? JSON.parse(v) : d; } catch { return d; } };
@@ -1274,8 +1274,8 @@ const I18N = {
     sites: "Sites",
     tools: "Tools",
     install_title: "Install FindJob Now",
-    install_1: "Tap the Share button",
-    install_2: "Tap Add to Home Screen",
+    install_1: "Tap Safari’s Share icon (square with ↑)",
+    install_2: "Tap “Add to Home Screen”",
     install_3: "Open it like an app",
     got_it: "Got It",
     free_private: "Smart (rule-based) matching — no cloud AI, no sign-up. Your data stays on this device.",
@@ -1374,8 +1374,8 @@ const I18N = {
     sites: "サイト",
     tools: "ツール",
     install_title: "FindJob Nowをインストール",
-    install_1: "共有ボタンをタップ",
-    install_2: "ホーム画面に追加をタップ",
+    install_1: "Safariの共有アイコン（↑付き四角）をタップ",
+    install_2: "「ホーム画面に追加」をタップ",
     install_3: "アプリのように開く",
     got_it: "了解",
     free_private: "無料 · プライベート · 登録不要 · すべてこの端末に保存",
@@ -2566,7 +2566,7 @@ function renderLanding(){
   </details>
 
   <p style="margin-top:14px;font-size:12px;color:var(--mu);text-align:center">${t("free_private") || (LANG==="jp"?"無料 · プライベート · 登録不要 · 端末内のみ":"Free · Private · No signup · On this device only")}</p>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V5.0.0</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V5.0.1</div>
 
   <details class="more" style="margin-top:8px"><summary>${LANG==="jp"?"バックアップから復元":"Restore a backup"}</summary><div style="text-align:center;margin-top:6px"><button class="btn ghost" id="btnRestore" style="max-width:300px;min-height:44px;font-size:14px">⬆ ${t("restore")}</button></div></details>
   <input type="file" id="restoreFile" accept="application/json,.json" class="hidden">

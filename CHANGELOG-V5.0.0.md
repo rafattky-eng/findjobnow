@@ -1,4 +1,4 @@
-# FindJob Now V5.0.0 / V5.1 CHANGELOG
+# FindJob Now V5.0.1 / V5.1 CHANGELOG
 
 ## Files
 - `index.html` — main app (~3700 lines)
@@ -7,7 +7,7 @@
 
 ## Version
 - `APP_VERSION = "5.0.0"`
-- Footer: `© 2026 Rafat Kotaki. All rights reserved.` / `FindJobNow · V5.0.0`
+- Footer: `© 2026 Rafat Kotaki. All rights reserved.` / `FindJobNow · V5.0.1`
 - Service worker: `const V = "fj-v5.0.0"` (old fj-v4.* deleted on activate)
 
 ## Hard requirements completed
@@ -57,3 +57,9 @@ You now answer 10 short questions (resume optional). Selected options are clearl
 - Removed Share button from header and bottom nav
 - Added expandable “How to share & install” section on Landing + Dashboard (iOS Safari + Android Chrome steps)
 - Job cards and Career DNA still have 📤 share (contextual only)
+
+## V5.0.1
+- Removed header Share (📤) button completely — header is now: EN/JP · Restart · Backup only (better balance on iPhone)
+- Removed bottom-nav Share tab
+- Install banner text updated to use Safari’s system Share icon (not the old in-app button)
+- How-to-share expandable sections remain on Landing + Dashboard
