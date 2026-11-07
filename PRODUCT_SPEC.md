@@ -44,3 +44,11 @@ V3.1.0 Guided — builds on V3.0.0 engines (ATS, Interview Coach, Rewriter, Appl
 - Saved applications retain the save date (`moved` and `createdAt`) for follow-up timing.
 - Application Score displays scam-check reasons and pre-application fixes as separate bullet lists.
 - Landing page keeps Upload CV as the primary action and makes browsing without a CV a small secondary text link.
+
+## V3.3.0 Simplification Release
+- Landing: plainer English hero, 3-line "how it works" (was a 10-line list), step counter unified to "of 5", backup-restore hidden behind a small link.
+- Dashboard: readiness score and ONE next action are now first; full analysis, strengths, industries and secondary links are collapsed under "See full analysis". Duplicate "Find Jobs" buttons removed.
+- Jobs: honest note that live results are overseas/remote roles, with a prominent "Open Japan job sites" button.
+- Score renamed "CV Readiness Score" with plain wording (it is a heuristic, not a hiring probability).
+- Accessibility: pinch-zoom re-enabled, visible keyboard focus, reduced-motion support.
+- Footer repeated only once. Service-worker cache bumped to fj-v3.3.0.

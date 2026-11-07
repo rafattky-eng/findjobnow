@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1044,6 +1044,17 @@ body{background:radial-gradient(1000px 420px at 50% -8%,rgba(45,110,200,.35),tra
 .plan{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:rgba(255,255,255,.07);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-top:8px;color:var(--tx);cursor:pointer;min-height:48px}
 .verdict{font-size:18px;font-weight:800;margin:10px 0;padding:12px;border-radius:12px;background:rgba(255,255,255,.07)}
 .verdict.apply{color:var(--ok)}.verdict.skip{color:var(--er)}.verdict.tailor,.verdict.stretch{color:var(--ac)}
+/* ===== V3.3 simplification ===== */
+.how{padding:14px 16px}
+.how-row{display:flex;align-items:center;gap:12px;padding:6px 0;font-size:15px}
+.how-row b{width:28px;height:28px;border-radius:50%;background:var(--ac);color:#000;display:grid;place-items:center;font-size:14px;flex-shrink:0}
+details.more{margin:14px 0}
+details.more>summary{cursor:pointer;list-style:none;min-height:48px;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--mu);font-weight:700;font-size:14px;border:1px dashed var(--bd);border-radius:var(--radius);padding:10px 14px}
+details.more>summary::-webkit-details-marker{display:none}
+details.more[open]>summary{margin-bottom:14px}
+.more-links{display:grid;gap:10px;margin-top:16px}
+:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
 </head>
@@ -1125,8 +1136,8 @@ function say(msg, ok){
 // ---------- i18n (minimal core) ----------
 const I18N = {
   en: {
-    hero_title: "Get hired in Japan — one clear step at a time",
-    hero_sub: "Guided AI Copilot for foreigners. Upload once → AI tells you exactly what to do next. No confusion. No decision fatigue.",
+    hero_title: "Find a job in Japan — one step at a time",
+    hero_sub: "Upload your CV. We tell you what to do next. Free. No sign-up.",
     upload: "Upload CV",
     paste: "Paste Resume",
     skip: "Continue without CV",
@@ -1209,7 +1220,7 @@ const I18N = {
   },
   jp: {
     hero_title: "日本で内定を — 次にやることは1つだけ",
-    hero_sub: "外国人のためのガイド付きAIコパイロット。一度アップロード → AIが次にやることを明確に示します。迷わない。",
+    hero_sub: "履歴書をアップロードすると、次にやることがわかります。無料・登録不要。",
     upload: "履歴書をアップロード",
     paste: "履歴書を貼り付け",
     skip: "履歴書なしで続ける",
@@ -1846,7 +1857,7 @@ function renderLanding(){
 
   <!-- GUIDED STEP 1 -->
   <div class="start-card" style="border-width:2px">
-    <div class="start-label">STEP 1 OF 10</div>
+    <div class="start-label">STEP 1 OF 5</div>
     <div class="step-guide" style="justify-content:center;margin:8px 0 12px">
       <span class="hand">👇</span>
       <div class="step-text" style="font-size:16px">${LANG==="jp"?"まず履歴書をアップロードしてください":"First: Upload your CV"}</div>
@@ -1862,31 +1873,21 @@ function renderLanding(){
     <button class="btn secondary" id="btnPaste" style="min-height:52px">📋 ${t("paste")}</button>
   </div>
 
-  <div class="card" style="margin-top:12px">
-    <div style="font-size:13px;font-weight:700;color:var(--ac);margin-bottom:10px">${LANG==="jp"?"この後の流れ（ガイド付き）":"Your guided path (10 steps)"}</div>
-    <div style="font-size:13px;color:var(--tx);line-height:1.75">
-      <div>① Upload CV</div>
-      <div>② AI Analysis + scores</div>
-      <div>③ Choose goal (Fast job / Career / Part-time)</div>
-      <div>④ Find realistic jobs</div>
-      <div>⑤ Score each job</div>
-      <div>⑥ Generate application</div>
-      <div>⑦ Interview prep</div>
-      <div>⑧ Tracker</div>
-      <div>⑨ Follow-up</div>
-      <div>⑩ Offer preparation</div>
-    </div>
+  <div class="card how" style="margin-top:12px">
+    <div class="how-row"><b>1</b><span>${LANG==="jp"?"履歴書をアップロード":"Upload your CV"}</span></div>
+    <div class="how-row"><b>2</b><span>${LANG==="jp"?"あなたに合う求人を見る":"See jobs that fit you"}</span></div>
+    <div class="how-row"><b>3</b><span>${LANG==="jp"?"応募して、進み具合を管理":"Apply and track every step"}</span></div>
   </div>
 
   <div style="text-align:center;margin:10px 0 4px">
-    <button type="button" id="btnSkip" style="background:none;border:0;color:var(--mu);font-size:13px;text-decoration:underline;padding:8px 10px;min-height:40px;cursor:pointer">Just browsing? See jobs without a CV →</button>
+    <button type="button" id="btnSkip" style="background:none;border:0;color:var(--mu);font-size:13px;text-decoration:underline;padding:8px 10px;min-height:40px;cursor:pointer">${LANG==="jp"?"履歴書なしで求人を見る →":"No CV? See jobs first →"}</button>
   </div>
   `}
 
   <p style="margin-top:14px;font-size:12px;color:var(--mu);text-align:center">${t("free_private") || (LANG==="jp"?"無料 · プライベート · 登録不要 · 端末内のみ":"Free · Private · No signup · On this device only")}</p>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.2.0 Hiring Copilot</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.3.0 Hiring Copilot</div>
 
-  <div style="text-align:center;margin-top:6px"><button class="btn ghost" id="btnRestore" style="max-width:300px;min-height:44px;font-size:14px">⬆ ${t("restore")}</button></div>
+  <details class="more" style="margin-top:8px"><summary>${LANG==="jp"?"バックアップから復元":"Restore a backup"}</summary><div style="text-align:center;margin-top:6px"><button class="btn ghost" id="btnRestore" style="max-width:300px;min-height:44px;font-size:14px">⬆ ${t("restore")}</button></div></details>
   <input type="file" id="restoreFile" accept="application/json,.json" class="hidden">
   <input type="file" id="cvFile" accept=".pdf,.doc,.docx,.txt,application/pdf" class="hidden">
   <div class="hidden" id="pasteModal">
@@ -1929,8 +1930,8 @@ function calculateHiringProbability(profile,scores,cv){
 function renderHiringProbability(){
   const h=calculateHiringProbability(STATE.profile,STATE.scores,STATE.cvText),target=Math.min(95,Math.max(80,h.value+12));
   return `<section class="card" style="border:1px solid var(--ac);margin:14px 0">
-    <div style="font-size:13px;font-weight:800;color:var(--ac);text-transform:uppercase">📈 Hiring Readiness Estimate</div>
-    <div style="display:flex;align-items:center;gap:14px;margin:10px 0"><div style="font-size:38px;font-weight:900;color:var(--ac)">${h.value}%</div><div style="font-size:13px;color:var(--mu)">CV-based readiness indicator<br><small>Heuristic estimate — not a measured hiring probability or guarantee.</small></div></div>
+    <div style="font-size:13px;font-weight:800;color:var(--ac);text-transform:uppercase">📈 CV Readiness Score</div>
+    <div style="display:flex;align-items:center;gap:14px;margin:10px 0"><div style="font-size:38px;font-weight:900;color:var(--ac)">${h.value}%</div><div style="font-size:13px;color:var(--mu)">How ready your CV looks<br><small>A simple check of your CV. Not a promise of a job.</small></div></div>
     <div class="progress-bar"><i style="width:${h.value}%"></i></div>
     <h3>Why this score exists</h3><ul class="list-check">${h.reasons.map(x=>`<li class="ok">✓ ${esc(x)}</li>`).join("")||"<li>Limited evidence found in the CV</li>"}</ul>
     <h3>Biggest blockers</h3><ul class="list-check">${h.blockers.map(x=>`<li class="miss">⚠ ${esc(x)}</li>`).join("")||"<li>No major CV blockers detected by this basic check</li>"}</ul>
@@ -1950,15 +1951,6 @@ function renderDashboard(){
       <div class="step-text">${LANG==="jp"?"STEP 2 — AI分析結果":"STEP 2 — AI Analysis"}</div>
       <div class="step-sub">${LANG==="jp"?"スコアを確認したら、下の大きなボタンを押してください":"Review scores, then tap the big button below"}</div>
     </div>
-  </div>
-  ${renderCopilot()}
-  <h2 style="margin:0 0 4px;font-size:20px;font-weight:800">${LANG==="jp"?"あなたの現状":"Your Hiring Snapshot"}</h2>
-  <p style="color:var(--mu);margin:0 0 12px;font-size:14px">${esc(p.name||"Your profile")} · ${LANG==="jp"?"端末内のみ":"Local only"} ${fast?'· ⚡ Fast mode':''}</p>
-  <div class="score-grid">
-    <div class="score-card"><div class="num">${s.resume||0}</div><div class="lbl">${t("resume_score")}</div></div>
-    <div class="score-card"><div class="num">${s.japan||0}</div><div class="lbl">${t("japan_score")}</div></div>
-    <div class="score-card"><div class="num">${s.language||0}</div><div class="lbl">Language</div></div>
-    <div class="score-card"><div class="num">${s.visa||0}</div><div class="lbl">Visa</div></div>
   </div>
   ${renderHiringProbability()}
 
@@ -1983,6 +1975,18 @@ function renderDashboard(){
     `}
   </div>
 
+  <details class="more">
+    <summary>${LANG==="jp"?"詳しい分析を見る":"See full analysis"}</summary>
+  ${renderCopilot()}
+  <h2 style="margin:0 0 4px;font-size:20px;font-weight:800">${LANG==="jp"?"あなたの現状":"Your Hiring Snapshot"}</h2>
+  <p style="color:var(--mu);margin:0 0 12px;font-size:14px">${esc(p.name||"Your profile")} · ${LANG==="jp"?"端末内のみ":"Local only"} ${fast?'· ⚡ Fast mode':''}</p>
+  <div class="score-grid">
+    <div class="score-card"><div class="num">${s.resume||0}</div><div class="lbl">${t("resume_score")}</div></div>
+    <div class="score-card"><div class="num">${s.japan||0}</div><div class="lbl">${t("japan_score")}</div></div>
+    <div class="score-card"><div class="num">${s.language||0}</div><div class="lbl">Language</div></div>
+    <div class="score-card"><div class="num">${s.visa||0}</div><div class="lbl">Visa</div></div>
+  </div>
+
   ${p.strengths?.length ? `<div class="card"><h3>${LANG==="jp"?"強み":"Strengths"}</h3><ul class="list-check">${p.strengths.map(x=>`<li class="ok">✓ ${esc(x)}</li>`).join("")}</ul>
   ${p.missing?.length?`<h3 style="margin-top:12px">${LANG==="jp"?"改善点":"Missing"}</h3><ul class="list-check">${p.missing.map(x=>`<li class="miss">✗ ${esc(x)}</li>`).join("")}</ul>`:""}</div>`:""}
   <div class="section-title">Best Industries</div>
@@ -1993,21 +1997,12 @@ function renderDashboard(){
   </div>
   <div class="section-title">${t("best_matches")}</div>
   ${renderRoleSelector()}
-  <div class="step-guide" style="margin-top:20px">
-    <span class="hand">👇</span>
-    <div>
-      <div class="step-text">${t("find_jobs")}</div>
-      <div class="step-sub">${t("step3_sub")}</div>
+    <div class="more-links">
+      <button class="btn secondary" data-go="tools">🧰 ${t("improve_cv")}</button>
+      <button class="btn secondary" data-go="tracker">🗂 ${t("tracker")}</button>
+      <button class="btn secondary" data-go="directory">🌐 ${t("sites")}</button>
     </div>
-  </div>
-  <button class="btn btn-lg" data-go="jobs" style="margin-bottom:12px">💼 ${t("find_jobs")}</button>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-    <button class="btn secondary" data-go="tools">${t("improve_cv")}</button>
-    <button class="btn secondary" data-go="tools">${t("visa_help")}</button>
-    <button class="btn secondary" data-go="tracker">${t("tracker")}</button>
-    <button class="btn secondary" data-go="directory">🌐 ${t("sites")}</button>
-  </div>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.2.0 Hiring Copilot</div>
+  </details>
   `;
 }
 
@@ -2038,8 +2033,10 @@ function renderJobs(){
     🔍 ${LANG==="jp"?"ライブ求人を検索":"Search Live Jobs"}
   </button>
   <p style="margin:0 0 12px;font-size:12px;color:var(--mu);text-align:center">
-    ${LANG==="jp"?"Remotive / Jobicy から英語リモート求人を取得します":"Fetches English remote roles from Remotive & Jobicy"}
+    ${LANG==="jp"?"ここに出るのは海外・リモートの英語求人です。日本国内の求人は下のボタンから。":"These are overseas / remote English jobs. For jobs located in Japan, use the button below."}
   </p>
+
+  <button class="btn secondary" data-go="directory" style="margin-bottom:12px;min-height:52px">🇯🇵 ${LANG==="jp"?"日本の求人サイトを開く":"Open Japan job sites (jobs in Japan)"}</button>
 
   <div class="filters">
     <label><input type="checkbox" id="fVisa" ${prefs.visaOnly?"checked":""}> 🛂 ${t("visa_support")}</label>
@@ -2121,7 +2118,6 @@ function renderJobs(){
     </div>`;
   }).join("")}
 
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.2.0 Hiring Copilot</div>
   `;
 }
 
@@ -2209,7 +2205,6 @@ function renderDirectory(){
       </div>
     </div>`;
   }).join("")}
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.2.0 Hiring Copilot</div>
   `;
 }
 
