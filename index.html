@@ -8,7 +8,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="FindJob Now">
 <meta name="theme-color" content="#0C2340">
-<meta name="description" content="Guided AI Job Search Copilot for foreigners in Japan. One clear next step at a time: upload CV → AI analysis → choose goal → find realistic jobs → apply → interview → get hired. Free, private, no signup.">
+<meta name="description" content="Find a job in Japan — one step at a time. Upload your CV (or skip). Answer 10 short questions. Smart (rule-based) matching — no cloud AI, no sign-up. Free and private.">
 <meta name="application-name" content="FindJob Now">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; worker-src 'self' blob: https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.google.com https://www.gstatic.com https://icons.duckduckgo.com; font-src 'self' data:; connect-src 'self' https://boards-api.greenhouse.io https://api.lever.co https://api.ashbyhq.com https://remotive.com https://jobicy.com; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; upgrade-insecure-requests">
 <link rel="manifest" href="./manifest.webmanifest">
@@ -1071,6 +1071,41 @@ details.more[open]>summary{margin-bottom:14px}
 .more-links{display:grid;gap:10px;margin-top:16px}
 :focus-visible{outline:3px solid var(--ac);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* ===== V4 Career DNA ===== */
+.dna{border:1px solid var(--ac);margin:14px 0}
+.dna-k{font-size:12px;font-weight:800;color:var(--ac);text-transform:uppercase;letter-spacing:.04em}
+.dna-name{font-size:24px;font-weight:900;margin:6px 0 2px;line-height:1.2}
+.dna-name small{font-size:14px;font-weight:600;color:var(--mu)}
+.dna-b{margin:0 0 8px;font-size:14px;color:var(--mu)}
+.dna-type{display:inline-block;font-size:12px;font-weight:700;border:1px solid var(--bd);border-radius:999px;padding:4px 10px;margin-bottom:10px}
+.dna-row{display:grid;gap:6px;margin:8px 0;font-size:13px}
+.dna-row .chip{display:inline-block;margin:2px 4px 2px 0}
+.dna-share{margin-top:10px;min-height:46px;font-size:14px}
+.pnote{font-size:12px;color:var(--mu);margin:4px 0 10px}
+.plabel{font-size:13px;font-weight:800;margin:12px 0 6px}
+.pchips{display:flex;flex-wrap:wrap;gap:8px}
+.pchip{min-height:40px;padding:8px 14px;border-radius:999px;border:1px solid var(--bd);background:transparent;color:var(--tx);font-size:13px;font-weight:600;cursor:pointer}
+.pchip.on{background:var(--ac);color:#000;border-color:var(--ac)}
+.sel { outline: 2px solid var(--ac); background: rgba(244,180,0,.18); color: var(--ac); font-weight: 800; }
+.seg button.on, .pchip.on, .role-item.on { outline: 2px solid var(--ac); }
+.pchip.inf{border-style:dashed;border-color:var(--ac)}
+details.more textarea{width:100%;background:transparent;color:var(--tx);border:1px solid var(--bd);border-radius:12px;padding:10px;font:inherit;font-size:14px;box-sizing:border-box}
+.dna-role{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:14px}
+.dna-role:last-child{border-bottom:0}
+.dna-role small{grid-column:1/3;color:var(--mu);font-size:12px}
+.dna-role.bad b{color:#ff8a80}
+.fitpct{font-size:12px;color:var(--ac);font-weight:800}
+.tagb{font-size:12px}
+details.mwhy{margin-top:10px;border-top:1px dashed var(--bd);padding-top:8px}
+details.mwhy>summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--ac);min-height:36px;display:flex;align-items:center}
+.mrow{display:grid;grid-template-columns:118px 1fr 34px;gap:8px;align-items:center;font-size:12px;margin:5px 0}
+.mrow small{color:var(--mu)}
+.mlist{margin-top:8px;font-size:13px}
+.mlist ul{margin:4px 0 0;padding-left:18px}
+.mlist.ok b{color:#6ee7a0}.mlist.no b{color:#ff8a80}.mlist.miss b{color:var(--ac)}
+.mrow .bar{height:8px;background:rgba(255,255,255,.14);border-radius:8px;overflow:hidden}
+.mrow .bar i{display:block;height:100%;background:var(--ac);border-radius:8px}
+.mrow .pct{text-align:right}
 </style>
 
 </head>
@@ -1084,6 +1119,7 @@ details.more[open]>summary{margin-bottom:14px}
       <button type="button" id="btnEn" class="active">EN</button>
       <button type="button" id="btnJp">JP</button>
     </div>
+    <button class="icon-btn" id="btnShare" type="button" aria-label="Share" title="Share">📤</button>
     <button class="icon-btn" id="btnRestart" type="button" aria-label="Start from the beginning" title="Start from the beginning">🔄</button>
     <button class="icon-btn" id="btnBackup" title="Backup">💾</button>
   </div>
@@ -1101,14 +1137,15 @@ details.more[open]>summary{margin-bottom:14px}
   <button data-view="dashboard" class="active"><span>🧭</span><span class="nav-label" data-i18n="nav_home">Home</span></button>
   <button data-view="jobs"><span>💼</span><span class="nav-label" data-i18n="nav_jobs">Jobs</span></button>
   <button data-view="tools"><span>🧰</span><span class="nav-label" data-i18n="nav_tools">Toolkit</span></button>
-  <button data-view="tools" data-tool-focus="interview"><span>🎤</span><span class="nav-label" data-i18n="nav_interview">Interview</span></button>
   <button data-view="tracker"><span>🗂</span><span class="nav-label" data-i18n="nav_tracker">Tracker</span></button>
+  <button data-view="share" id="navShare"><span>📤</span><span class="nav-label" data-i18n="nav_share">Share</span></button>
 </nav>
 </div>
 <div class="toast" id="toast"></div>
 <script>
 
-// ===== FindJob Now v2 — AI Career Copilot for Japan =====
+// ===== FindJob Now V5.0.0 — Career DNA for Japan =====
+const APP_VERSION = "5.0.0";
 const $ = id => document.getElementById(id);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 const L = (k,d) => { try { const v = localStorage.getItem(k); return v!=null ? JSON.parse(v) : d; } catch { return d; } };
@@ -1116,31 +1153,6 @@ const W = (k,v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {
 const esc = s => String(s??"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 const safeHttpsUrl = u => { try { const x = new URL(String(u||""), location.href); if(x.protocol==="https:"||x.protocol==="http:") return x.href; } catch{} return ""; };
 const today = () => new Date().toISOString().slice(0,10);
-
-/** Native iOS / Web Share (navigator.share) with clipboard fallback */
-async function shareNative({title, text, url}){
-  const payload = { title: title||"FindJob Now", text: text||"", url: url||"" };
-  try {
-    if(navigator.share && (!navigator.canShare || navigator.canShare(payload))){
-      await navigator.share(payload);
-      say(LANG==="jp"?"共有しました":"Shared", 1);
-      return true;
-    }
-  } catch(e){
-    if(e && e.name === "AbortError") return false;
-  }
-  // Fallback: copy text + url
-  const clip = [payload.title, payload.text, payload.url].filter(Boolean).join("\n");
-  try {
-    await navigator.clipboard.writeText(clip);
-    say(LANG==="jp"?"クリップボードにコピーしました":"Copied to clipboard", 1);
-    return true;
-  } catch {
-    say(LANG==="jp"?"共有できませんでした":"Share not available", 0);
-    return false;
-  }
-}
-
 
 function purgeDemoJobs(st){
   if(!st) return st;
@@ -1153,21 +1165,40 @@ let STATE = purgeDemoJobs(L("fj2_state", null)) || {
   profile: null,
   scores: null,
   matches: null,
-  careerDNA: null,
   jobs: [],
   applications: { saved:[], applied:[], interview:[], offer:[], rejected:[] },
-  preferences: {
-    visaOnly:false, workType:"any", jlptMin:"", englishOnly:false, remoteOnly:false, experienceLevel:null,
-    likes: [], dislikes: [], workStyle: "", careerPath: "", interests: []
-  },
+  preferences: { visaOnly:false, workType:"any", jlptMin:"", englishOnly:false, remoteOnly:false, experienceLevel:null },
   settings: { lang: "en", theme: "dark" },
   view: "landing",
   journey: { step: 1, mode: null, goal: null, fastMode: false }
 };
-if(!STATE.preferences) STATE.preferences = { visaOnly:false, workType:"any", jlptMin:"", englishOnly:false, remoteOnly:false, experienceLevel:null, likes:[], dislikes:[], workStyle:"", careerPath:"", interests:[] };
-if(!STATE.preferences.likes) { STATE.preferences.likes=[]; STATE.preferences.dislikes=[]; STATE.preferences.workStyle=""; STATE.preferences.careerPath=""; STATE.preferences.interests=[]; }
-if(!STATE.careerDNA) STATE.careerDNA = null;
 if(!STATE.journey) STATE.journey = { step: 1, mode: null, goal: null, fastMode: false };
+const DEFAULT_PREFS = () => ({ likes:[], dislikes:[], style:{ remote:"any" }, path:"", note:"" });
+if(!STATE.prefProfile) STATE.prefProfile = DEFAULT_PREFS();
+if(typeof STATE.prefProfile.note !== "string") STATE.prefProfile.note = "";
+const DEFAULT_ONBOARDING = () => ({
+  step: 1,
+  hasResume: false,
+  experience: null,          // "experienced" | "entry"
+  workTypes: [],             // ["full","part","remote","hybrid"]
+  english: 0,                // 1..5
+  japanese: 0,               // 1..5
+  otherLang: false,
+  otherLangText: "",
+  location: null,            // "tokyo"|"japan"|"overseas"|"both"
+  visaNeeded: true,
+  visaDetail: "",
+  nationality: "non_japanese"
+});
+if(!STATE.onboarding){
+  STATE.onboarding = DEFAULT_ONBOARDING();
+  // Migration: if profile already exists, assume resume done → start at step 2
+  if(STATE.profile || STATE.cvText){ STATE.onboarding.step = 2; STATE.onboarding.hasResume = !!(STATE.cvText); }
+}
+if(STATE.onboarding.step < 1) STATE.onboarding.step = 1;
+if(!STATE.onboarding.nationality) STATE.onboarding.nationality = "non_japanese";
+if(typeof STATE.onboarding.visaNeeded !== "boolean") STATE.onboarding.visaNeeded = true;
+const UIOPEN = {};
 
 let LANG = STATE.settings.lang || "en";
 let THEME = STATE.settings.theme || "dark";
@@ -1187,11 +1218,11 @@ function say(msg, ok){
 const I18N = {
   en: {
     hero_title: "Find a job in Japan — one step at a time",
-    hero_sub: "Upload your CV. We tell you what to do next. Free. No sign-up.",
+    hero_sub: "Upload your CV (or skip). Answer 10 short questions. We match jobs and tell you the next step. Free. No sign-up.",
     upload: "Upload CV",
     paste: "Paste Resume",
     skip: "Continue without CV",
-    dash: "Your AI Dashboard",
+    dash: "Your Dashboard",
     resume_score: "Resume Strength",
     japan_score: "Japan Readiness",
     best_matches: "Best Jobs For You",
@@ -1212,11 +1243,28 @@ const I18N = {
     nav_jobs: "Jobs",
     nav_apply: "Apply",
     nav_tracker: "Tracker",
-    step_upload: "Upload CV",
-    step_analysis: "Career Analysis",
+    nav_share: "Share",
+    step_upload: "Resume",
+    step_analysis: "Experience",
     step_jobs: "Find Jobs",
     step_apply: "Apply",
     step_track: "Track",
+    step_exp: "Experience",
+    step_work: "Work type",
+    step_en: "English",
+    step_ja: "Japanese",
+    step_ol: "Other languages",
+    step_loc: "Location",
+    step_visa: "Visa",
+    step_nat: "Nationality",
+    step_like: "What I like",
+    next: "Next →",
+    back: "Back",
+    find_jobs: "Find jobs",
+    skip_now: "Skip for now",
+    continue_no_cv: "Continue without CV",
+    sel_helper: "Tap to select — selected items are highlighted.",
+    honesty: "Rule-based matching · No cloud AI · Your data stays on this device.",
     start_here: "START HERE",
     upload_your_cv: "Upload your CV",
     or: "or",
@@ -1232,10 +1280,10 @@ const I18N = {
     install_2: "Tap Add to Home Screen",
     install_3: "Open it like an app",
     got_it: "Got It",
-    free_private: "Free · Private · No signup · Everything stays on this device",
+    free_private: "Smart (rule-based) matching — no cloud AI, no sign-up. Your data stays on this device.",
     step1_title: "Step 1 — Upload your CV",
     step1_sub: "PDF, Word, or paste text. Analysis stays on this device.",
-    step2_title: "Step 2 — Review your AI Profile",
+    step2_title: "Step 2 — Review your Profile",
     step2_sub: "Scores, strengths, and best-fit roles",
     step3_title: "Step 3 — View Matched Jobs",
     step3_sub: "Filter by visa, English, remote, and more",
@@ -1270,11 +1318,11 @@ const I18N = {
   },
   jp: {
     hero_title: "日本で内定を — 次にやることは1つだけ",
-    hero_sub: "履歴書をアップロードすると、次にやることがわかります。無料・登録不要。",
+    hero_sub: "履歴書をアップロード（またはスキップ）。10の短い質問に答える。ルールベースでマッチ。無料・登録不要。",
     upload: "履歴書をアップロード",
     paste: "履歴書を貼り付け",
     skip: "履歴書なしで続ける",
-    dash: "AIダッシュボード",
+    dash: "ダッシュボード",
     resume_score: "履歴書スコア",
     japan_score: "日本準備度",
     best_matches: "あなたに最適な仕事",
@@ -1295,11 +1343,28 @@ const I18N = {
     nav_jobs: "求人",
     nav_apply: "応募",
     nav_tracker: "管理",
+    nav_share: "シェア",
     step_upload: "履歴書",
-    step_analysis: "キャリア分析",
+    step_analysis: "経験",
     step_jobs: "求人検索",
     step_apply: "応募",
     step_track: "管理",
+    step_exp: "経験",
+    step_work: "働き方",
+    step_en: "英語",
+    step_ja: "日本語",
+    step_ol: "他言語",
+    step_loc: "勤務地",
+    step_visa: "ビザ",
+    step_nat: "国籍",
+    step_like: "好きなこと・苦手なこと",
+    next: "次へ →",
+    back: "戻る",
+    find_jobs: "求人を探す",
+    skip_now: "今はスキップ",
+    continue_no_cv: "CVなしで続ける",
+    sel_helper: "タップで選択（選択中は強調表示）。",
+    honesty: "ルールベースのマッチング・クラウドAIなし・データは端末内のみ。",
     start_here: "ここから始める",
     upload_your_cv: "履歴書をアップロード",
     or: "または",
@@ -1356,61 +1421,34 @@ const t = k => (I18N[LANG] && I18N[LANG][k]) || I18N.en[k] || k;
 
 // ---------- Skill & industry packs ----------
 const SKILL_PACKS = {
-  travel: ["travel","tour","tourism","hospitality","hotel","guest","reservation","airline","guide","itinerary","booking","destination","dmc"],
-  hospitality: ["hospitality","hotel","restaurant","front desk","concierge","guest relations","fnb","service","rooms division"],
-  customer: ["customer service","customer success","support","client","crm","client success"],
-  sales: ["sales","account","business development","b2b","negotiation","pipeline"],
-  marketing: ["marketing","content","social media","seo","campaign","brand","growth"],
-  product: ["product manager","product owner","roadmap","backlog","prioritisation","mvp","user stories","discovery"],
-  management: ["managed","led","team of","supervised","directed","head of","people manager","stakeholder","okr","p&l","budget","hiring"],
-  operations: ["operations","process improvement","sop","logistics","supply chain","vendor","ops manager","workflow"],
+  travel: ["travel","tour","tourism","hospitality","hotel","guest","reservation","airline","guide","itinerary","booking"],
+  hospitality: ["hospitality","hotel","restaurant","front desk","concierge","guest relations","fnb","service"],
+  customer: ["customer service","customer success","support","client","call center","crm"],
+  sales: ["sales","account","business development","b2b","negotiation"],
+  marketing: ["marketing","content","social media","seo","campaign","brand"],
   eng: ["english","native english","bilingual"],
   jp: ["japanese","jlpt","nihongo"],
-  tech: ["software","developer","python","javascript","java","react","sql","aws","cloud","data","engineer","api"]
+  tech: ["software","developer","python","javascript","java","react","sql","aws","cloud","data","engineer"]
 };
 
-// Priority: management / product / travel first — pure SE last
 const TITLE_HINTS = [
-  {t:"Travel Product Manager", k:/travel product|tourism product|product.*travel|product.*tour/i, ind:"travel", priority:10},
-  {t:"Tourism Product Owner", k:/product owner|destination product|tour product/i, ind:"travel", priority:9},
-  {t:"Product Manager", k:/product manager|product owner|roadmap|backlog/i, ind:"product", priority:9},
-  {t:"Technical Project Manager", k:/technical project|project manager|tpm|program manager/i, ind:"management", priority:8},
-  {t:"Operations Manager", k:/operations manager|ops manager|process improvement/i, ind:"operations", priority:8},
-  {t:"Business Development Manager", k:/business development|bd manager|partnerships/i, ind:"sales", priority:7},
-  {t:"Travel Consultant", k:/travel consultant|tour consultant|travel advisor/i, ind:"travel", priority:6},
-  {t:"Tour Coordinator", k:/tour coordinator|itinerary|tour operator/i, ind:"travel", priority:6},
-  {t:"Hotel Guest Relations", k:/guest relations|front desk|concierge/i, ind:"hospitality", priority:5},
-  {t:"Reservation Specialist", k:/reservation|booking specialist|airline/i, ind:"travel", priority:5},
-  {t:"Customer Success Manager", k:/customer success|client success/i, ind:"customer", priority:5},
-  {t:"Marketing Manager", k:/marketing manager|growth marketing|brand manager/i, ind:"marketing", priority:5},
-  {t:"Marketing Coordinator", k:/marketing|content|social media/i, ind:"marketing", priority:4},
-  {t:"Sales Manager", k:/sales manager|account executive/i, ind:"sales", priority:4},
-  {t:"Customer Support", k:/customer service|support agent|help desk/i, ind:"customer", priority:3},
-  {t:"English Teacher", k:/teacher|instructor|efl|esl|tefl/i, ind:"education", priority:3},
-  {t:"Data Analyst", k:/data analy|sql|tableau|power bi/i, ind:"tech", priority:2},
-  {t:"Software Engineer", k:/software engineer|software developer|full.?stack|backend|frontend/i, ind:"tech", priority:1},
-  {t:"Recruiter", k:/recruit|talent acquisition|hr business/i, ind:"hr", priority:2}
+  {t:"Travel Consultant", k:/travel|tour|tourism/i, ind:"travel"},
+  {t:"Tour Coordinator", k:/tour|coordinator|itinerary/i, ind:"travel"},
+  {t:"Hotel Guest Relations", k:/hotel|guest|front desk|concierge/i, ind:"hospitality"},
+  {t:"Reservation Specialist", k:/reservation|booking|airline/i, ind:"travel"},
+  {t:"Customer Success", k:/customer success|client success/i, ind:"customer"},
+  {t:"Customer Support", k:/customer service|support|help desk/i, ind:"customer"},
+  {t:"Sales Associate", k:/sales|retail/i, ind:"sales"},
+  {t:"Marketing Coordinator", k:/marketing|content|social/i, ind:"marketing"},
+  {t:"English Teacher", k:/teacher|instructor|efl|esl|tefl/i, ind:"education"},
+  {t:"Software Engineer", k:/software|developer|python|javascript|react|java\b/i, ind:"tech"},
+  {t:"Data Analyst", k:/data analy|sql|tableau|power bi/i, ind:"tech"},
+  {t:"Recruiter", k:/recruit|hr|talent/i, ind:"hr"}
 ];
 
 const INDUSTRY_LABELS = {
   travel: "Travel Industry", hospitality: "Hospitality", customer: "Customer Service",
-  tech: "Technology", sales: "Sales", marketing: "Marketing", education: "Education",
-  hr: "HR / Recruiting", product: "Product", management: "Management", operations: "Operations"
-};
-
-const LIKE_PRESETS = ["Product creation","Management","Business development","Travel","Marketing","Client-facing work","Strategy","People leadership","Operations","Creative work"];
-const DISLIKE_PRESETS = ["Pure coding","Repetitive work","Call center work","Night shifts","Heavy sales quotas","Solo deep-tech","Factory floor"];
-const WORK_STYLES = ["collaborative","independent","hybrid","client-facing","fast-paced","structured"];
-const ARCHETYPES = {
-  travel_product: "Travel Product Builder",
-  hospitality_ops: "Hospitality Operator",
-  cx_leader: "Customer Experience Leader",
-  bd_hunter: "Business Development Hunter",
-  tech_pm: "Technical Project Leader",
-  product_mgr: "Product-Oriented Manager",
-  career_starter: "Career Starter",
-  bilingual_pro: "Hybrid Bilingual Professional",
-  ops_leader: "Operations Leader"
+  tech: "Technology", sales: "Sales", marketing: "Marketing", education: "Education", hr: "HR / Recruiting"
 };
 
 
@@ -1475,42 +1513,56 @@ function scoreLiveJob(j, titles, skills){
 }
 
 async function searchLiveJobs(){
-  const titles = selectedRoles();
+  const sel = selectedRoles();
+  const dna = STATE.dna;
   const skills = STATE.profile?.skills || [];
-  if(STATE.matches && !titles.length){ say(t("pick_one"), 0); return; }
-  const queries = (titles.length ? titles : [skills[0] || "customer service"]).slice(0,4);
-  if(STATE.journey?.fastMode) ["part-time hourly","entry level no experience","visa sponsorship","アルバイト 未経験 時給"].forEach(q=>{if(queries.length<8)queries.push(q);});
+  if(STATE.matches && !sel.length){ say(t("pick_one"), 0); return; }
+  const catalog = Object.fromEntries(ROLE_CATALOG.map(r => [r.t, r]));
+  // one or two real search phrases per selected role, so different roles give different jobs
+  const plan = [];
+  (sel.length ? sel : [skills[0] || "customer service"]).forEach(title => {
+    const r = catalog[title], qs = r ? r.q.slice(0,2) : [title];
+    qs.forEach((q,i) => plan.push({ q, role: title, pri: i }));
+  });
+  if(STATE.journey?.fastMode){
+    if(dna) dna.fast.slice(0,2).forEach(r => plan.push({ q: r.queries[0], role: r.title, pri: 2 }));
+    ["entry level no experience","visa sponsorship"].forEach(q => plan.push({ q, role: "Fast hire", pri: 3 }));
+  }
+  const queries = plan.sort((a,b) => a.pri - b.pri).slice(0, 10);
   say(LANG==="jp" ? "求人を検索中…" : "Searching jobs…", 1);
   try {
-    const feeds = await Promise.all(queries.flatMap(q => [
-      jget(DIRECT.remotive({q}), 9000).then(d => MAP("remotive", d)).catch(() => []),
-      jget(DIRECT.jobicy({q}), 9000).then(d => MAP("jobicy", d)).catch(() => [])
-    ]));
+    const feeds = await Promise.all(queries.flatMap(p => [
+      jget(DIRECT.remotive({q:p.q}), 9000).then(d => MAP("remotive", d)).catch(() => []),
+      jget(DIRECT.jobicy({q:p.q}), 9000).then(d => MAP("jobicy", d)).catch(() => [])
+    ].map(pr => pr.then(arr => (arr||[]).map(j => ({...j, _role:p.role}))))));
     let jobs = feeds.flat().filter(Boolean);
-    if(jobs.length < 8){
-      const extra = await jget(DIRECT.remotive({q: "hospitality"}), 8000).then(d => MAP("remotive", d)).catch(() => []);
-      jobs = jobs.concat(extra||[]);
-    }
-    // score + dedupe
     const seen = new Set();
-    jobs = jobs.map(j => ({...j,matchScore:scoreLiveJob(j,titles,skills)}));
-    if(STATE.journey?.fastMode){
-      const fastCount=jobs.filter(isFastHireJob).length;
-      jobs.sort((a,b)=>{
-        if(isFastHireJob(a)!==isFastHireJob(b)) return isFastHireJob(a)?-1:1;
-        return (b.matchScore||0)-(a.matchScore||0);
-      });
-      if(fastCount<3) jobs=jobs; // Keep every result; fast-hire matches are simply floated to the top.
-    } else jobs.sort((a,b)=>(b.matchScore||0)-(a.matchScore||0));
-    jobs = jobs.filter(j => {
-      const k = (j.url||j.title+j.company).toLowerCase();
-      if(seen.has(k)) return false;
-      seen.add(k);
-      return true;
-    }).slice(0, 40);
-    STATE.jobs = jobs;
+    jobs = jobs.filter(j => { const k = (j.url || j.title + j.company).toLowerCase(); if(seen.has(k)) return false; seen.add(k); return true; });
+    jobs = jobs.map(j => {
+      const m = dna ? matchJob(j, dna) : null;
+      return { ...j, matchScore: m ? m.total : scoreLiveJob(j, sel, skills), _avoid: !!(m && m.avoid), fastHire: isFastHireJob(j) };
+    });
+    if(dna){
+      const kept = jobs.filter(j => !j._avoid);
+      if(kept.length >= 5) jobs = kept;
+      const strong = jobs.filter(j => j.matchScore >= 30);
+      if(strong.length >= 8) jobs = strong;
+    }
+    // keep every selected role represented, then fill by best score
+    const byRole = {};
+    jobs.sort((a,b) => (b.matchScore||0) - (a.matchScore||0)).forEach(j => (byRole[j._role] = byRole[j._role] || []).push(j));
+    const roles = Object.keys(byRole), quota = Math.max(3, Math.ceil(40 / Math.max(1, roles.length)));
+    const picked = new Set(), out = [];
+    roles.forEach(r => byRole[r].slice(0, quota).forEach(j => { picked.add(j); out.push(j); }));
+    jobs.forEach(j => { if(out.length < 40 && !picked.has(j)){ picked.add(j); out.push(j); } });
+    out.sort((a,b) => {
+      if(STATE.journey?.fastMode && a.fastHire !== b.fastHire) return a.fastHire ? -1 : 1;
+      return (b.matchScore||0) - (a.matchScore||0);
+    });
+    STATE.jobs = out.slice(0, 40);
     persist();
-    say(jobs.length ? (LANG==="jp" ? `${jobs.length}件の求人` : `${jobs.length} jobs found`) : (LANG==="jp" ? "求人が見つかりませんでした" : "No jobs found — try Directory"), jobs.length?1:0);
+    const n = STATE.jobs.length;
+    say(n ? (LANG==="jp" ? `${n}件の求人` : `${n} jobs found`) : (LANG==="jp" ? "求人が見つかりませんでした" : "No jobs found — try Directory"), n?1:0);
     render();
   } catch(e){
     console.error(e);
@@ -1560,7 +1612,393 @@ const ROADMAPS = {
   default: ["Entry Role","Specialist","Senior Specialist","Manager","Director"]
 };
 
-// ---------- CV Analysis + Career DNA Engine (V3.4) ----------
+// ---------- CV Analysis (enhanced heuristics) ----------
+// ===== CAREER DNA ENGINE (V4.0) =====
+const DNA_VERSION = 4;
+const _rx = (a, f) => new RegExp(a, f || "gi");
+const DOMAINS = {
+  management: { en: "Management", jp: "マネジメント", re: _rx("\\b(managed|managing|manager|head of|supervis\\w+|oversaw|oversee\\w*|team of \\d+|direct reports?|headcount|people management|budget (?:of|owner)|responsible for (?:a )?team)\\b|マネージャー|管理職|部長|課長|統括|責任者") },
+  leadership: { en: "Leadership", jp: "リーダーシップ", re: _rx("\\b(led|leading|leader|mentor\\w*|coach\\w*|spearhead\\w*|directed|founded|co-?founded|stakeholders?|cross[- ]functional|championed|drove|built (?:a )?team)\\b|リーダー|主導|立ち上げ") },
+  operations: { en: "Operations", jp: "オペレーション", re: _rx("\\b(operations?|logistics|process improvement|workflow|scheduling|coordinat\\w+|procurement|vendors?|supply chain|sops?|kpis?|quality control|efficiency|streamlin\\w+|compliance|inventory|back[- ]office|project plan\\w*|timeline|delivery)\\b|運営|業務改善|進行管理") },
+  marketing: { en: "Marketing", jp: "マーケティング", re: _rx("\\b(marketing|seo|sem|campaigns?|brand\\w*|social media|content strategy|newsletter|advertis\\w+|growth|promotion\\w*|ppc|google analytics|market research)\\b|マーケティング|広告|販促") },
+  product: { en: "Product ownership", jp: "プロダクト開発", re: _rx("\\b(product (?:owner|manager|management|roadmap|strategy|development|launch\\w*|design)|roadmaps?|requirements?|user stories|backlog|mvp|go[- ]to[- ]market|gtm|prototype\\w*|ux|user research|a/b test\\w*|new products?|created (?:a )?(?:new )?(?:product|service|tour|package)s?|developed (?:a )?(?:new )?(?:product|service|tour|package)s?|packages? design|launched)\\b|商品企画|企画|新商品|サービス開発") },
+  techKnow: { en: "Technology knowledge", jp: "テクノロジー知識", re: _rx("\\b(api|apis|cloud|aws|azure|gcp|database|sql|system design|architecture|agile|scrum|jira|confluence|sdlc|devops|saas|integration|software|technical|technology|it project|erp|crm|automation|python|javascript|java|react|html|css|data pipeline|machine learning)\\b|システム|IT|エンジニア") },
+  coding: { en: "Hands-on coding", jp: "コーディング", re: _rx("\\b(wrote code|writing code|coding|programming|programmer|developed (?:software|applications?|apps?|web|websites?|backend|frontend|apis?)|implemented (?:features?|code|algorithms?|apis?)|full[- ]?stack|back[- ]?end|front[- ]?end|github|unit tests?|code reviews?|refactor\\w*|software (?:engineer|developer)|web developer|debugg\\w+|deployed code|pull requests?)\\b|プログラミング|開発者|実装") },
+  travel: { en: "Travel industry", jp: "旅行業界", re: _rx("\\b(travel|tour\\w*|hotel\\w*|airlines?|booking\\w*|itinerar\\w+|ota|gds|destinations?|inbound|outbound|reservations?|hospitality|ryokan|dmc|resort|cruise|guest\\w*|concierge|sightseeing|amadeus|sabre)\\b|旅行|観光|ホテル|宿泊|航空") },
+  bizdev: { en: "Business development", jp: "事業開発", re: _rx("\\b(business development|partnerships?|alliances?|b2b|new accounts?|lead generation|negotiat\\w+|revenue growth|market expansion|client acquisition|deals?|channel (?:sales|partners?)|strategic partners?)\\b|事業開発|提携|新規開拓") },
+  sales: { en: "Sales", jp: "営業", re: _rx("\\b(sales|selling|quota|retail|account executive|upsell\\w*|closing|cross[- ]sell\\w*|revenue target)\\b|営業|販売") },
+  customer: { en: "Customer care", jp: "カスタマーケア", re: _rx("\\b(customer service|customer success|customer support|help ?desk|call cent(?:er|re)|client relations?|complaints?|customer satisfaction|csat|inbound calls?|tickets?|zendesk)\\b|接客|カスタマー|問い合わせ|コールセンター") },
+  analytics: { en: "Analytics", jp: "データ分析", re: _rx("\\b(data analy\\w+|sql|tableau|power bi|excel|dashboards?|reporting|statistic\\w*|insights?|metrics|forecast\\w*|kpi analysis|looker)\\b|データ分析|集計") },
+  education: { en: "Teaching", jp: "教育", re: _rx("\\b(teach\\w*|instructor|tutor\\w*|lessons?|curriculum|eikaiwa|esl|efl|tefl|alt\\b|training sessions?|trainer)\\b|教師|講師|英会話|研修") },
+  creative: { en: "Creative", jp: "クリエイティブ", re: _rx("\\b(design\\w*|copywrit\\w+|video|storytelling|photograph\\w*|editor|writer|illustrat\\w+|figma|photoshop|content creation)\\b|デザイン|ライター|制作") },
+  finance: { en: "Finance", jp: "財務", re: _rx("\\b(finance|accounting|audit\\w*|bookkeeping|invoic\\w+|tax|accounts (?:payable|receivable)|financial (?:analysis|reporting))\\b|経理|財務|会計") },
+  hr: { en: "HR / Recruiting", jp: "人事", re: _rx("\\b(recruit\\w*|talent acquisition|hr|human resources|onboarding|hiring|interview(?:ing)? candidates)\\b|採用|人事") }
+};
+const TOOL_TERMS = ["jira","confluence","salesforce","hubspot","excel","sql","python","javascript","typescript","java","react","aws","azure","tableau","power bi","figma","google analytics","seo","crm","sap","notion","slack","scrum","agile","kanban","zendesk","shopify","wordpress","photoshop","amadeus","sabre","gds","ota","quickbooks","xero","git","docker","rest api","api","budgeting","negotiation","presentation","stakeholder management","project management","roadmap","a/b testing"];
+
+const PREF_LIKES = [
+  { id: "creating", en: "Creating products", jp: "商品・サービスづくり" },
+  { id: "managing", en: "Management", jp: "マネジメント" },
+  { id: "bizdev", en: "Business development", jp: "事業開発" },
+  { id: "travel", en: "Travel", jp: "旅行・観光" },
+  { id: "marketing", en: "Marketing", jp: "マーケティング" },
+  { id: "tech", en: "Technology", jp: "テクノロジー" },
+  { id: "people", en: "Working with people", jp: "人と関わる仕事" },
+  { id: "analysis", en: "Data & analysis", jp: "データ分析" },
+  { id: "ops", en: "Organizing operations", jp: "運営・段取り" },
+  { id: "creative", en: "Creative work", jp: "クリエイティブ" },
+  { id: "teaching", en: "Teaching", jp: "教える仕事" },
+  { id: "sales", en: "Sales", jp: "営業" }
+];
+const PREF_DISLIKES = [
+  { id: "coding", en: "Pure coding", jp: "純粋なコーディング" },
+  { id: "repetitive", en: "Repetitive work", jp: "単純作業の繰り返し" },
+  { id: "callcenter", en: "Call center work", jp: "コールセンター" },
+  { id: "sales", en: "Quota / pressure sales", jp: "ノルマ営業" },
+  { id: "teaching", en: "Teaching", jp: "教える仕事" },
+  { id: "analysis", en: "Heavy data work", jp: "データ作業中心" }
+];
+const DOMAIN_TAG = { management:"managing", leadership:"managing", product:"creating", marketing:"marketing", bizdev:"bizdev", travel:"travel", techKnow:"tech", analytics:"analysis", education:"teaching", creative:"creative", operations:"ops", sales:"sales", customer:"people" };
+
+// id, EN title, JP title, level(0 entry..3 lead), minYears, profile weights, tags, industries, fast, long, jpNeed(0-5), titleRegex, search queries
+const ROLE_CATALOG = [
+  { id:"tpm", t:"Technical Project Manager", j:"テクニカルプロジェクトマネージャー", lv:2, my:4, p:{management:.22,leadership:.18,techKnow:.25,operations:.2,product:.15}, tags:["managing","tech","ops"], ind:["tech","operations"], long:1, jp:2, re:/technical (project|program)|it project|project manager|program manager|delivery manager/i, q:["technical project manager","it project manager","program manager"] },
+  { id:"pm", t:"Product Manager", j:"プロダクトマネージャー", lv:2, my:3, p:{product:.35,leadership:.15,techKnow:.15,analytics:.1,marketing:.1,bizdev:.15}, tags:["creating","managing","tech"], ind:["tech","marketing"], long:1, jp:2, re:/product (manager|owner|lead)|associate product|head of product/i, q:["product manager","product owner","associate product manager"] },
+  { id:"tpdm", t:"Travel Product Manager", j:"トラベルプロダクトマネージャー", lv:2, my:3, p:{travel:.35,product:.3,bizdev:.1,marketing:.1,operations:.15}, tags:["travel","creating","managing"], ind:["travel"], long:1, jp:2, re:/travel (product|experience)|tour(ism)? product|destination (product|manager)|product.{0,12}(travel|tour)/i, q:["travel product manager","tourism product manager","travel experience product"] },
+  { id:"opsm", t:"Operations Manager", j:"オペレーションマネージャー", lv:2, my:4, p:{operations:.35,management:.3,leadership:.15,customer:.1,analytics:.1}, tags:["managing","ops"], ind:["operations","customer"], long:1, jp:2, re:/operations? (manager|lead|director|head)|business operations|head of operations/i, q:["operations manager","business operations manager","operations lead"] },
+  { id:"bdm", t:"Business Development Manager", j:"事業開発マネージャー", lv:2, my:3, p:{bizdev:.35,sales:.15,management:.1,leadership:.1,marketing:.15,travel:.15}, tags:["bizdev","managing","sales"], ind:["sales","travel"], long:1, jp:2, re:/business development|partnerships? (manager|lead)|alliances?/i, q:["business development manager","partnerships manager","business development"] },
+  { id:"mktm", t:"Marketing Manager", j:"マーケティングマネージャー", lv:2, my:4, p:{marketing:.45,management:.15,creative:.15,analytics:.15,leadership:.1}, tags:["marketing","managing","creative"], ind:["marketing"], long:1, jp:2, re:/marketing (manager|lead|director|head)|head of marketing|brand manager/i, q:["marketing manager","brand manager","head of marketing"] },
+  { id:"mkts", t:"Digital Marketing Specialist", j:"デジタルマーケティング担当", lv:1, my:1, p:{marketing:.5,analytics:.2,creative:.2,techKnow:.1}, tags:["marketing","creative","analysis"], ind:["marketing"], fast:1, jp:1, re:/marketing (specialist|coordinator|executive|associate)|digital marketing|growth marketer|seo specialist|social media/i, q:["digital marketing specialist","marketing coordinator","growth marketing"] },
+  { id:"content", t:"Content / Community Marketer", j:"コンテンツ・コミュニティ担当", lv:1, my:1, p:{marketing:.35,creative:.4,customer:.1,travel:.15}, tags:["creative","marketing"], ind:["marketing"], fast:1, jp:1, re:/content (marketer|manager|writer|creator)|community (manager|specialist)|copywriter/i, q:["content marketing","community manager","copywriter"] },
+  { id:"swe", t:"Software Engineer", j:"ソフトウェアエンジニア", lv:1, my:1, p:{coding:.6,techKnow:.3,analytics:.1}, tags:["coding","tech"], ind:["tech"], long:1, jp:1, re:/software (engineer|developer)|developer|programmer|full[- ]?stack|back[- ]?end|front[- ]?end|engineer/i, q:["software engineer","full stack developer","backend developer"] },
+  { id:"da", t:"Data Analyst", j:"データアナリスト", lv:1, my:1, p:{analytics:.5,techKnow:.2,operations:.15,product:.1,coding:.05}, tags:["analysis","tech"], ind:["tech"], jp:1, re:/data analyst|business intelligence|bi analyst|analytics/i, q:["data analyst","business intelligence analyst","analytics"] },
+  { id:"ba", t:"Business Analyst", j:"ビジネスアナリスト", lv:1, my:2, p:{analytics:.3,operations:.25,product:.2,techKnow:.15,management:.1}, tags:["analysis","ops","tech"], ind:["tech","operations"], long:1, jp:2, re:/business analyst|systems analyst|requirements analyst/i, q:["business analyst","systems analyst"] },
+  { id:"scrum", t:"Scrum Master / Delivery Lead", j:"スクラムマスター", lv:2, my:3, p:{management:.2,leadership:.25,techKnow:.3,operations:.25}, tags:["managing","tech","ops"], ind:["tech"], long:1, jp:2, re:/scrum master|agile coach|delivery lead/i, q:["scrum master","agile delivery lead"] },
+  { id:"csm", t:"Customer Success Manager", j:"カスタマーサクセス", lv:1, my:2, p:{customer:.35,bizdev:.15,leadership:.1,techKnow:.15,operations:.1,sales:.15}, tags:["people","tech","bizdev"], ind:["customer","tech"], long:1, jp:2, re:/customer success|client success|account manager|client manager/i, q:["customer success manager","client success","account manager"] },
+  { id:"sup", t:"Customer Support Specialist", j:"カスタマーサポート", lv:0, my:0, p:{customer:.7,techKnow:.15,operations:.15}, tags:["people","repetitive"], ind:["customer"], fast:1, jp:2, re:/customer (support|service)|support (specialist|agent|representative)|help ?desk/i, q:["customer support specialist","customer service","support agent"] },
+  { id:"cc", t:"Call Center Operator", j:"コールセンター", lv:0, my:0, p:{customer:.8,sales:.1,operations:.1}, tags:["callcenter","repetitive","people"], ind:["customer"], fast:1, jp:3, re:/call cent(er|re)|telemarket|inbound (agent|calls)|outbound calls|contact cent(er|re)/i, q:["call center","contact center agent"] },
+  { id:"tc", t:"Travel Consultant / Tour Coordinator", j:"旅行コンサルタント", lv:0, my:0, p:{travel:.5,customer:.2,sales:.15,operations:.15}, tags:["travel","people"], ind:["travel"], fast:1, jp:2, re:/travel (consultant|agent|advisor)|tour (coordinator|operator|guide)|reservation|itinerary/i, q:["travel consultant","tour coordinator","travel agent"] },
+  { id:"tops", t:"Tour / Travel Operations Manager", j:"ツアーオペレーション", lv:2, my:3, p:{travel:.3,operations:.35,management:.2,customer:.15}, tags:["travel","managing","ops"], ind:["travel","operations"], long:1, jp:2, re:/(tour|travel).{0,12}operations|destination (operations|manager)|dmc/i, q:["travel operations manager","tour operations"] },
+  { id:"hotel", t:"Hotel Guest Relations", j:"ホテルゲストリレーション", lv:0, my:0, p:{travel:.4,customer:.5,operations:.1}, tags:["travel","people"], ind:["travel"], fast:1, jp:3, re:/hotel|guest relations|front desk|concierge/i, q:["guest relations","front desk hotel"] },
+  { id:"sales", t:"Sales Associate", j:"販売・営業スタッフ", lv:0, my:0, p:{sales:.55,customer:.3,marketing:.15}, tags:["sales","people"], ind:["sales"], fast:1, jp:2, re:/sales (associate|representative|executive)|retail|inside sales/i, q:["sales associate","inside sales representative"] },
+  { id:"ae", t:"Account Executive", j:"アカウントエグゼクティブ", lv:1, my:2, p:{sales:.4,bizdev:.3,customer:.15,techKnow:.15}, tags:["sales","bizdev"], ind:["sales","tech"], long:1, jp:2, re:/account executive|sales (manager|lead)|enterprise sales/i, q:["account executive","sales manager"] },
+  { id:"se", t:"Solutions Consultant", j:"ソリューションコンサルタント", lv:1, my:2, p:{techKnow:.35,sales:.2,customer:.2,bizdev:.15,product:.1}, tags:["tech","people","bizdev"], ind:["tech"], long:1, jp:2, re:/solutions? (consultant|engineer|architect)|sales engineer|pre-?sales/i, q:["solutions consultant","sales engineer"] },
+  { id:"teach", t:"English Teacher", j:"英語講師", lv:0, my:0, p:{education:.7,customer:.15,creative:.15}, tags:["teaching","people"], ind:["education"], fast:1, jp:0, re:/teacher|instructor|tutor|esl|efl|tefl|alt\b/i, q:["english teacher","online english tutor"] },
+  { id:"rec", t:"Recruiter", j:"リクルーター", lv:1, my:1, p:{hr:.6,sales:.15,customer:.15,bizdev:.1}, tags:["people","sales"], ind:["hr"], jp:2, re:/recruit|talent acquisition|sourcer/i, q:["recruiter","talent acquisition"] },
+  { id:"pc", t:"Project Coordinator", j:"プロジェクトコーディネーター", lv:0, my:0, p:{operations:.45,customer:.15,leadership:.1,techKnow:.1,management:.2}, tags:["ops","people"], ind:["operations"], fast:1, jp:2, re:/project coordinator|operations coordinator|program coordinator|coordinator/i, q:["project coordinator","operations coordinator"] }
+];
+const ARCHETYPES = [
+  { id:"tpl", en:"Technical Product Leader", jp:"テクニカル・プロダクトリーダー", blurb_en:"You turn technology into products and lead people to ship them — not a pure coder.", blurb_jp:"技術を商品に変えて、人を率いて形にする人。コーダーではありません。", f:s=>s.product*.35+s.techKnow*.2+(s.management+s.leadership)/2*.3+s.bizdev*.15 },
+  { id:"tjl", en:"Technical Project Leader", jp:"テクニカル・プロジェクトリーダー", blurb_en:"You understand technology and keep complex projects, people and deadlines on track.", blurb_jp:"技術を理解し、複雑なプロジェクトを期限通りに進める人。", f:s=>s.techKnow*.3+s.operations*.25+(s.management+s.leadership)/2*.35+s.product*.1 },
+  { id:"tpb", en:"Travel Product Builder", jp:"トラベルプロダクトビルダー", blurb_en:"You know travel deeply and create products, tours or services around it.", blurb_jp:"旅行に精通し、商品やツアーを企画する人。", f:s=>s.travel*.45+s.product*.3+s.bizdev*.1+s.marketing*.15 },
+  { id:"oo", en:"Operations Organizer", jp:"オペレーション・オーガナイザー", blurb_en:"You make things run smoothly: processes, vendors, teams and quality.", blurb_jp:"プロセス、取引先、チーム、品質を整えて回す人。", f:s=>s.operations*.45+(s.management+s.leadership)/2*.4+s.customer*.15 },
+  { id:"gbb", en:"Growth & Business Builder", jp:"グロース＆ビジネスビルダー", blurb_en:"You win partners and customers and grow revenue.", blurb_jp:"パートナーと顧客を開拓し、売上を伸ばす人。", f:s=>s.bizdev*.4+s.marketing*.25+s.sales*.2+s.leadership*.15 },
+  { id:"bcs", en:"Brand & Content Storyteller", jp:"ブランド＆コンテンツ・ストーリーテラー", blurb_en:"You shape how people see a brand through content and campaigns.", blurb_jp:"コンテンツとキャンペーンでブランドの見え方をつくる人。", f:s=>s.marketing*.5+s.creative*.4+s.analytics*.1 },
+  { id:"ces", en:"Customer Experience Specialist", jp:"カスタマーエクスペリエンス担当", blurb_en:"You are warm, reliable and great with guests and customers.", blurb_jp:"お客様に寄り添い、信頼される接客のプロ。", f:s=>s.customer*.5+s.travel*.25+s.sales*.1+s.operations*.15 },
+  { id:"eng", en:"Hands-on Engineer", jp:"ハンズオン・エンジニア", blurb_en:"You build software yourself and are strongest close to the code.", blurb_jp:"自分でソフトを作る、コードに近い場所で強い人。", f:s=>s.coding*.7+s.techKnow*.3-(s.management+s.product)*.1 },
+  { id:"dps", en:"Data Problem-Solver", jp:"データ・プロブレムソルバー", blurb_en:"You find answers in numbers and explain them clearly.", blurb_jp:"数字から答えを見つけ、わかりやすく伝える人。", f:s=>s.analytics*.6+s.techKnow*.25+s.operations*.15 },
+  { id:"edu", en:"Educator & Communicator", jp:"教育・コミュニケーター", blurb_en:"You explain, coach and help others learn.", blurb_jp:"教え、導き、学びを支える人。", f:s=>s.education*.8+s.creative*.1+s.customer*.1 },
+  { id:"ptp", en:"People & Talent Partner", jp:"ピープル＆タレントパートナー", blurb_en:"You connect people with the right opportunities.", blurb_jp:"人と機会をつなぐ人。", f:s=>s.hr*.8+s.sales*.1+s.customer*.1 }
+];
+
+function _count(re, text){ const m = text.match(re); return m ? m.length : 0; }
+function estimateYears(text){
+  const t = String(text||"");
+  let explicit = 0;
+  for(const m of t.matchAll(/(\d{1,2})\s*\+?\s*(?:years?|yrs?|年)(?:\s+of)?(?:\s+(?:professional|work|relevant|industry))?/gi)){
+    const ctx = t.slice(Math.max(0, m.index-30), m.index+60);
+    if(/experience|経験|working|worked|industry|professional|career/i.test(ctx)) explicit = Math.max(explicit, Math.min(40, +m[1]));
+  }
+  const nowY = new Date().getFullYear();
+  const spans = [];
+  for(const m of t.matchAll(/\b((?:19|20)\d{2})\s*(?:[-–—]|to)\s*((?:19|20)\d{2}|present|current|now|today)\b/gi)){
+    const a = +m[1], b = /^\d/.test(m[2]) ? +m[2] : nowY;
+    if(b >= a && b - a <= 40 && a >= 1970) spans.push([a, b]);
+  }
+  spans.sort((x,y)=>x[0]-y[0]);
+  let total = 0, cur = null;
+  for(const s of spans){ if(!cur) cur = s.slice(); else if(s[0] <= cur[1]) cur[1] = Math.max(cur[1], s[1]); else { total += cur[1]-cur[0]; cur = s.slice(); } }
+  if(cur) total += cur[1]-cur[0];
+  return Math.min(40, Math.max(explicit, total));
+}
+function extractTitles(text){
+  const re = /\b((?:senior|junior|lead|chief|head of|associate|assistant|principal|deputy)?\s*(?:[A-Za-z&\/]+\s){0,2}(?:manager|director|engineer|developer|consultant|coordinator|specialist|analyst|executive|owner|officer|designer|teacher|recruiter|founder|producer|planner|agent|representative))\b/gi;
+  const out = new Set();
+  for(const m of String(text||"").matchAll(re)){ const v = m[1].trim().replace(/\s+/g," "); if(v.length <= 46 && !/^(stack|end|web|the|and|a|an)\s/i.test(v)) out.add(v); }
+  return [...out].slice(0, 12);
+}
+function extractSignals(text){
+  const raw = String(text||"");
+  const signals = {}, evidence = {};
+  const titles = extractTitles(raw);
+  for(const [k, d] of Object.entries(DOMAINS)){
+    const re = new RegExp(d.re.source, d.re.flags);
+    const n = _count(re, raw);
+    let score = Math.round(100 * (1 - Math.exp(-n / 4)));
+    evidence[k] = [];
+    const re2 = new RegExp(d.re.source, "i");
+    const m = raw.match(re2);
+    if(m){ const i = m.index; evidence[k].push(raw.slice(Math.max(0, i-30), i+m[0].length+40).replace(/\s+/g," ").trim()); }
+    signals[k] = score;
+  }
+  // job-title evidence outweighs bare keywords
+  const tj = titles.join(" | ").toLowerCase();
+  const bump = (k, v) => { signals[k] = Math.min(100, Math.max(signals[k], v)); };
+  if(/manager|director|head of/.test(tj)) bump("management", 65);
+  if(/lead|head of|director|founder|chief|principal/.test(tj)) bump("leadership", 60);
+  if(/product (manager|owner)/.test(tj)) bump("product", 80);
+  if(/project manager|program manager|operations|coordinator|producer|planner/.test(tj)) bump("operations", 55);
+  if(/marketing/.test(tj)) bump("marketing", 65);
+  if(/(software|backend|frontend|full[- ]?stack|web) (engineer|developer)|programmer/.test(tj)) bump("coding", 75);
+  if(/business development|partnership/.test(tj)) bump("bizdev", 65);
+  if(/recruiter/.test(tj)) bump("hr", 65);
+  if(/teacher|instructor/.test(tj)) bump("education", 65);
+  // keyword listing alone is not hands-on coding: require verbs or an engineering title
+  const handsOn = /(software|backend|frontend|full[- ]?stack|web) (engineer|developer)|programmer|wrote code|developed (software|applications?|apps?|websites?)|implemented (features?|code)/i.test(raw);
+  if(!handsOn) signals.coding = Math.min(signals.coding, 30);
+  // Legacy / low-level systems keywords (printer drivers, SDK, DDK, NT Traffic) → soft-cap coding unless true SE title
+  if(/printer\s*drivers?|windows\s*printer|\bSDK\b|\bDDK\b|NT\s*Traffic|device\s*driver/i.test(raw) && !/(software|backend|frontend|full[- ]?stack) (engineer|developer)/i.test(raw)){
+    signals.coding = Math.min(signals.coding, 40);
+  }
+  // "don't like coding / programming" already handled in note; boost management/product/leadership bias downstream
+  return { signals, evidence, titles };
+}
+function inferLevel(yrs, titles, signals){
+  const t = (titles||[]).join(" ").toLowerCase();
+  let lv = yrs < 2 ? 0 : yrs < 5 ? 1 : yrs < 9 ? 2 : 3;
+  if(/manager|director|head of|lead|principal/.test(t) && yrs >= 3) lv = Math.max(lv, 2);
+  if(/director|head of|chief|vp\b/.test(t) && yrs >= 8) lv = 3;
+  if((signals.management||0) >= 60 && yrs >= 4) lv = Math.max(lv, 2);
+  return lv;
+}
+const LV_LABEL = { en:["Early-career","Mid-level","Experienced","Senior"], jp:["若手","中堅","経験豊富","シニア"] };
+const JLN_V = { N1:5, N2:4, N3:3, N4:2, N5:1 };
+function jaLevel(jlpt, text){ return JLN_V[jlpt] || (/japanese|日本語|nihongo/i.test(text||"") ? 2 : 0); }
+
+function inferPrefs(signals, text, explicit){
+  const likes = [], dislikes = [];
+  for(const [d, tag] of Object.entries(DOMAIN_TAG)){ if((signals[d]||0) >= 45 && !likes.includes(tag)) likes.push(tag); }
+  const inferredD = [];
+  const m = String(text||"").match(/(?:not interested in|don'?t (?:enjoy|like)|do not (?:enjoy|like)|dislike|avoid|prefer not to|no longer want to)\s+([^.\n;]{3,50})/i);
+  if(m){
+    const c = m[1].toLowerCase();
+    if(/cod|program/.test(c)) inferredD.push("coding");
+    if(/repetit|routine|data entry/.test(c)) inferredD.push("repetitive");
+    if(/call cent|telemarket/.test(c)) inferredD.push("callcenter");
+    if(/sales|quota/.test(c)) inferredD.push("sales");
+  }
+  // soft hint: leaders/product people with only light coding are unlikely to want pure coding
+  const lead = ((signals.management||0)+(signals.product||0)+(signals.leadership||0))/3;
+  if(lead >= 45 && (signals.coding||0) < 50 && !inferredD.includes("coding")) inferredD.push("coding");
+  return { likesInferred: likes.filter(x => !(explicit.likes||[]).includes(x)), dislikesInferred: inferredD.filter(x => !(explicit.dislikes||[]).includes(x)) };
+}
+
+function seniorityOf(title){
+  const t = String(title||"").toLowerCase();
+  if(/\b(director|vp|vice president|head of|chief|principal|staff)\b/.test(t)) return 3;
+  if(/\b(senior|sr\.?|lead|manager|architect)\b/.test(t)) return 2;
+  if(/\b(junior|jr\.?|intern|trainee|graduate|entry|assistant|associate)\b/.test(t)) return 0;
+  return 1;
+}
+function expFitForRole(c, role){
+  let sum = 0, wsum = 0;
+  for(const [d, w] of Object.entries(role.p)){ sum += w * Math.min(1, (c.signals[d]||0)/60); wsum += w; }
+  let fit = wsum ? sum / wsum : 0;
+  if(c.yrs < role.my) fit *= 0.6 + 0.4 * (c.yrs / Math.max(1, role.my));
+  if(role.lv <= 0 && c.level >= 3) fit *= 0.8;
+  if(role.id === "swe"){
+    const s = c.signals, lead = (s.management + s.product + s.leadership) / 3;
+    if(s.coding < 40) fit *= 0.35;
+    if(lead > s.coding * 0.9) fit *= 0.5;
+  }
+  return Math.round(Math.min(1, fit) * 100);
+}
+function interestFit(c, tags, extra){
+  const L = new Set(c.prefs.likes||[]), Li = new Set(c.likesInferred||[]), D = new Set(c.prefs.dislikes||[]), Di = new Set(c.dislikesInferred||[]);
+  let hits = 0, hardDis = false, softDis = false;
+  for(const t of tags){ if(L.has(t)) hits += 1; else if(Li.has(t)) hits += .6; if(D.has(t)) hardDis = true; if(Di.has(t)) softDis = true; }
+  let v = (L.size || Li.size) ? 40 + 60 * Math.min(1, hits / Math.max(1, Math.min(2, tags.length))) : 50;
+  if(softDis) v = Math.min(v, 30);
+  if(hardDis) v = 5;
+  if(extra) v = Math.max(0, Math.min(100, v + extra));
+  return { v: Math.round(v), hardDis, softDis, hits };
+}
+function scoreRole(c, role){
+  const exp = expFitForRole(c, role);
+  const it = interestFit(c, role.tags, 0);
+  const top = Object.entries(role.p).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const skill = Math.round(100 * top.reduce((a,[d])=>a+Math.min(1,(c.signals[d]||0)/55),0)/top.length);
+  const need = role.jp, have = c.ja;
+  const lang = need <= have ? 100 : Math.max(10, 100 - 25 * (need - have));
+  const visa = c.visaStrong ? 95 : /student/i.test(c.visaStatus||"") ? 55 : 70;
+  const total = Math.round(.40*exp + .25*it.v + .20*skill + .10*lang + .05*visa);
+  return { total: it.hardDis ? Math.min(total, 30) : total, parts:{exp, interest:it.v, skill, lang, visa}, hardDis: it.hardDis, softDis: it.softDis };
+}
+function explainRole(c, role, sc){
+  const top = Object.entries(role.p).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([d])=>d).filter(d=>(c.signals[d]||0)>=35);
+  const names = top.map(d=>DOMAINS[d].en.toLowerCase());
+  const nm = top.map(d=>DOMAINS[d][LANGX()]).join(" / ");
+  if(sc.hardDis) return LANGX()==="jp" ? "あなたが避けたい仕事に当たります。" : "This matches something you said you want to avoid.";
+  if(names.length) return LANGX()==="jp" ? `${nm}の経験が活かせます。` : `Your ${names.join(" and ")} experience fits this role.`;
+  return LANGX()==="jp" ? "経験の一部が活かせます。" : "Partly fits your background.";
+}
+let LANGX = () => (typeof LANG !== "undefined" && LANG === "jp") ? "jp" : "en";
+
+function computeDNA(text, prefsIn, ctx){
+  const raw = String(text||"");
+  const ex = extractSignals(raw);
+  const yrs = estimateYears(raw);
+  const level = inferLevel(yrs, ex.titles, ex.signals);
+  const prefs = { likes:(prefsIn&&prefsIn.likes)||[], dislikes:(prefsIn&&prefsIn.dislikes)||[], style:(prefsIn&&prefsIn.style)||{}, path:(prefsIn&&prefsIn.path)||"", note:(prefsIn&&prefsIn.note)||"" };
+  // free-text note can add dislikes and bias
+  const note = prefs.note.toLowerCase();
+  const dl = prefs.dislikes.slice();
+  if(/call cent|telemarket/.test(note) && !dl.includes("callcenter")) dl.push("callcenter");
+  if(/repetit|routine|data entry/.test(note) && !dl.includes("repetitive")) dl.push("repetitive");
+  if(/don'?t like coding|do not like coding|hate coding|no coding|pure cod|only cod|programming all day|don'?t like programming/i.test(note) && !dl.includes("coding")) dl.push("coding");
+  prefs.dislikes = dl;
+  // Bias: if user dislikes coding, lift management/product/leadership
+  if(dl.includes("coding") || /don'?t like coding|manage projects/i.test(note)){
+    ex.signals.management = Math.min(100, (ex.signals.management||0) + 15);
+    ex.signals.product = Math.min(100, (ex.signals.product||0) + 15);
+    ex.signals.leadership = Math.min(100, (ex.signals.leadership||0) + 15);
+    if(!/(software|backend|frontend) (engineer|developer)/i.test(raw)) ex.signals.coding = Math.min(ex.signals.coding||0, 25);
+  }
+  // Travel keywords → tags
+  if(/inbound|outbound|tour packages?|van with driver|OTA|Tripadvisor|Viator|Expedia|travel apps?|reels|Google ads/i.test(note + " " + raw)){
+    if(!prefs.likes.includes("travel")) prefs.likes.push("travel");
+    if(!prefs.likes.includes("creating")) prefs.likes.push("creating");
+    if(/OTA|Tripadvisor|Viator|Expedia|SNS|reels|Google ads|marketing/i.test(note+raw) && !prefs.likes.includes("marketing")) prefs.likes.push("marketing");
+    if(/travel apps? development|app (dev|development)/i.test(note+raw)){
+      if(!prefs.likes.includes("tech")) prefs.likes.push("tech");
+    }
+  }
+  if(/manage projects|project manage/i.test(note) && !prefs.likes.includes("managing")) prefs.likes.push("managing");
+  if(/develop.*creative|new app design|improve.*design|create.*ideas/i.test(note) && !prefs.likes.includes("creating")) prefs.likes.push("creating");
+  const inf = inferPrefs(ex.signals, raw, prefs);
+  const jlpt = (ctx && ctx.jlpt) || "";
+  const visaStatus = (ctx && ctx.visaStatus) || "";
+  let ja = jaLevel(jlpt, raw);
+  // Onboarding Japanese 1-5 overrides if higher / present
+  if(STATE.onboarding && STATE.onboarding.japanese >= 1){
+    ja = Math.max(ja, STATE.onboarding.japanese);
+  }
+  if(STATE.onboarding && STATE.onboarding.experience === "entry"){
+    // cap level at 1 for entry
+    // (applied later via level)
+  }
+  const c = { signals: ex.signals, yrs, level: (STATE.onboarding && STATE.onboarding.experience === "entry") ? Math.min(level, 1) : level, prefs, likesInferred: inf.likesInferred, dislikesInferred: inf.dislikesInferred, ja, jlpt, visaStatus, visaStrong: /permanent|spouse|engineer|humanities|specified/i.test(visaStatus) || (STATE.onboarding && STATE.onboarding.visaDetail && /permanent|spouse|work_visa/i.test(STATE.onboarding.visaDetail)) };
+  const roles = ROLE_CATALOG.map(r => { const sc = scoreRole(c, r); return { id:r.id, title:r.t, titleJp:r.j, fit:sc.total, parts:sc.parts, tags:r.tags, ind:r.ind, fast:!!r.fast, long:!!r.long, lv:r.lv, avoid:sc.hardDis, soft:sc.softDis, why:explainRole(c, r, sc), queries:r.q }; }).sort((a,b)=>b.fit-a.fit);
+  const usable = roles.filter(r => !r.avoid);
+  const best = usable.slice(0, 6);
+  const avoid = roles.filter(r => r.avoid || (r.fit < 38 && r.lv >= 2) || (r.soft && r.fit < 50)).slice(-4).reverse();
+  const avoidFinal = [...new Set([...roles.filter(r=>r.avoid), ...roles.filter(r=>r.soft && r.fit < 55), ...roles.filter(r=>!r.avoid && r.fit < 35 && r.lv >= 1).slice(-3)])].slice(0,5);
+  const fast = usable.filter(r => r.fast && r.fit >= 40 && r.lv <= Math.max(1, level)).sort((a,b)=>b.fit-a.fit).slice(0,4);
+  const long = usable.filter(r => r.long && r.fit >= 45).sort((a,b)=>b.fit-a.fit).slice(0,4);
+  const arch = ARCHETYPES.map(a => ({ a, v: a.f(ex.signals) })).sort((x,y)=>y.v-x.v);
+  const archetype = arch[0].v >= 12 ? arch[0].a : { id:"gen", en:"Versatile Generalist", jp:"マルチプレイヤー", blurb_en:"You have a broad background. Choose a direction below and we will sharpen it.", blurb_jp:"幅広い経験があります。方向を選べば、さらに精度が上がります。" };
+  const secondary = arch[1] && arch[1].v >= 20 ? arch[1].a : null;
+  const langs = []; if(/english|英語/i.test(raw)) langs.push("English"); if(c.ja) langs.push(jlpt ? "Japanese ("+jlpt+")" : "Japanese");
+  const candidateType = {
+    en: `${LV_LABEL.en[level]} ${level >= 2 && (ex.signals.management >= 45 || ex.signals.leadership >= 45) ? "manager-track" : "professional"} · ${langs.length>1 ? "bilingual (EN + JA)" : (langs[0]||"language not stated")}${yrs ? " · ~"+yrs+" yrs" : ""}`,
+    jp: `${LV_LABEL.jp[level]}・${langs.length>1 ? "バイリンガル" : (langs[0]||"言語未記載")}${yrs ? "・約"+yrs+"年" : ""}`
+  };
+  const S = ex.signals;
+  const indMap = {
+    travel: ["Travel & Tourism","旅行・観光", Math.max(S.travel, 0)],
+    tech: ["Technology","テクノロジー", Math.round((S.techKnow*.5 + S.product*.3 + S.coding*.2))],
+    marketing: ["Marketing","マーケティング", Math.round(S.marketing*.7 + S.creative*.3)],
+    sales: ["Sales & Biz Dev","営業・事業開発", Math.round(S.bizdev*.6 + S.sales*.4)],
+    operations: ["Operations","オペレーション", Math.round(S.operations*.6 + S.management*.4)],
+    customer: ["Customer Service","カスタマーサービス", S.customer],
+    education: ["Education","教育", S.education],
+    hr: ["HR / Recruiting","人事", S.hr]
+  };
+  const industries = Object.entries(indMap).map(([id,[en,jp,v]]) => {
+    const tag = { travel:"travel", tech:"tech", marketing:"marketing", sales:"bizdev", operations:"ops", customer:"people", education:"teaching", hr:"people" }[id];
+    let pct = v; if(prefs.likes.includes(tag)) pct += 10; if(prefs.dislikes.includes(tag)) pct -= 30;
+    return { id, label: LANGX()==="jp" ? jp : en, en, jp, pct: Math.max(0, Math.min(98, Math.round(pct))) };
+  }).sort((a,b)=>b.pct-a.pct);
+  const expertise = [ ["management","Management experience"], ["leadership","Leadership"], ["operations","Operations"], ["marketing","Marketing"], ["product","Product ownership"], ["techKnow","Technology knowledge"], ["travel","Travel industry expertise"] ].map(([k,label]) => ({ key:k, label, jp: DOMAINS[k].jp, score: S[k], level: S[k]>=60 ? "strong" : S[k]>=30 ? "some" : "none", evidence: (ex.evidence[k]||[])[0]||"" }));
+  return { version: DNA_VERSION, yrs, level, titles: ex.titles, signals: S, evidence: ex.evidence, prefs, likesInferred: inf.likesInferred, dislikesInferred: inf.dislikesInferred, archetype, secondary, candidateType, industries, expertise, roles, best, avoid: avoidFinal, fast, long, ja: c.ja, jlpt, visaStatus, visaStrong: c.visaStrong, skillTerms: TOOL_TERMS.filter(t => new RegExp("(^|[^a-z])" + t.replace(/[.*+?^${}()|[\]\\\/]/g,"\\$&") + "([^a-z]|$)","i").test(raw)) };
+}
+
+// ---------- Job matching: 40 experience / 25 interest / 20 skill / 10 language / 5 visa ----------
+function matchJob(job, dna){
+  const text = ((job.title||"")+" "+(job.description||"")+" "+(job.full||"")).replace(/\s+/g," ");
+  const low = text.toLowerCase();
+  const title = job.title || "";
+  const js = extractSignals(text).signals;
+  const c = { signals: dna.signals, yrs: dna.yrs, level: dna.level, prefs: dna.prefs, likesInferred: dna.likesInferred, dislikesInferred: dna.dislikesInferred, ja: dna.ja };
+  const why = [], whyNot = [], missing = [];
+  // role family via title
+  let role = ROLE_CATALOG.filter(r => r.re.test(title)).sort((a,b)=>b.lv-a.lv)[0] || null;
+  if(role && role.id === "swe" && !/engineer|developer|programmer/i.test(title)) role = null;
+  // experience fit: role-family fit blended with domain overlap
+  let dot = 0, jn = 0;
+  for(const d of Object.keys(DOMAINS)){ if((js[d]||0) >= 25){ jn += js[d]; dot += js[d] * Math.min(1, (dna.signals[d]||0)/60); } }
+  const overlap = jn ? Math.round(100 * dot / jn) : 40;
+  let exp = role ? Math.round(expFitForRole(c, role) * .6 + overlap * .4) : overlap;
+  const jl = seniorityOf(title), gap = jl - dna.level;
+  if(gap >= 2){ exp = Math.round(exp * .55); whyNot.push(LANGX()==="jp" ? "あなたの現在のレベルより上のポジションです。" : "This role is above your current level."); }
+  else if(gap === 1){ exp = Math.round(exp * .88); }
+  else if(gap <= -2){ exp = Math.round(exp * .8); whyNot.push(LANGX()==="jp" ? "経験に対して簡単すぎる可能性があります。" : "May be below your experience level."); }
+  const ym = low.match(/(\d{1,2})\s*\+?\s*(?:years?|yrs?)[^.]{0,30}(?:experience|in )/);
+  let reqYrs = ym ? +ym[1] : 0, penalties = 0;
+  if(reqYrs && dna.yrs < reqYrs){ exp = Math.round(exp * (.6 + .4 * dna.yrs / reqYrs)); missing.push(LANGX()==="jp" ? `${reqYrs}年以上の経験` : `${reqYrs}+ years of experience`); penalties += 8; }
+  // interest fit
+  const tags = new Set(role ? role.tags : []);
+  for(const [d, tag] of Object.entries(DOMAIN_TAG)){ if((js[d]||0) >= 50) tags.add(tag); }
+  if(/call cent(er|re)|inbound calls|outbound calls|telemarket|cold call/i.test(low)){ tags.add("callcenter"); tags.add("repetitive"); }
+  if(/data entry|repetitive|routine tasks|manual input/i.test(low)) tags.add("repetitive");
+  if((js.coding||0) >= 50 && /engineer|developer|programmer/i.test(title)) tags.add("coding");
+  let extra = 0; const ws = dna.prefs.style || {};
+  if(ws.remote === "remote") extra += job.remote ? 8 : -8; else if(ws.remote === "office") extra += job.remote ? -8 : 4;
+  const it = interestFit(c, [...tags], extra);
+  // skill fit: named tools/skills required in the ad vs CV
+  const req = TOOL_TERMS.filter(t => new RegExp("(^|[^a-z])" + t.replace(/[.*+?^${}()|[\]\\\/]/g,"\\$&") + "([^a-z]|$)","i").test(low));
+  const have = new Set(dna.skillTerms || []);
+  const matched = req.filter(t => have.has(t));
+  const lack = req.filter(t => !have.has(t));
+  const topJ = Object.entries(js).filter(([d,v]) => v >= 25).sort((a,b)=>b[1]-a[1]).slice(0,2);
+  const domFit = topJ.length ? Math.round(100 * topJ.reduce((a,[d])=>a+Math.min(1,(dna.signals[d]||0)/55),0)/topJ.length) : 50;
+  const skill = req.length ? Math.round(.6 * (100 * matched.length / req.length) + .4 * domFit) : domFit;
+  lack.slice(0,4).forEach(t => missing.push(t));
+  // language fit
+  let needJa = 0;
+  const jm = low.match(/japanese[^.]{0,25}(?:n([1-5])|fluent|native|business[- ]level|proficien\w+)|(?:n([1-5]))[^.]{0,15}japanese|jlpt\s*n([1-5])|日本語[^。]{0,8}(ビジネス|ネイティブ|流暢|n[1-5])/i);
+  if(jm){ const n = jm[1]||jm[2]||jm[3]; needJa = n ? ({1:5,2:4,3:3,4:2,5:1})[n] : 4; }
+  else if(/japanese (?:language|speaking|skills?)|日本語/i.test(low)) needJa = 2;
+  const lang = needJa ? (dna.ja >= needJa ? 100 : Math.max(10, 100 - 25*(needJa - dna.ja))) : (dna.ja ? 100 : 88);
+  if(needJa && dna.ja < needJa){ missing.push(LANGX()==="jp" ? `日本語 N${6-needJa}` : `Japanese N${6-needJa}`); penalties += 8; whyNot.push(LANGX()==="jp" ? "日本語レベルが要件に届いていません。" : "Your Japanese is below the stated requirement."); }
+  // visa / location eligibility
+  const loc = (job.location||"");
+  const jpOk = /worldwide|anywhere|global|asia|apac|japan|tokyo|osaka|international/i.test(loc) || !loc || /^remote$/i.test(loc.trim());
+  const restricted = !jpOk && /\b(usa?|united states|u\.s\.|canada|uk|united kingdom|europe|eu|emea|latam|latin america|australia|germany|france|north america|brazil|india)\b/i.test(loc);
+  const authOnly = /(must|need to|required to) (be )?(legally |currently )?(authori[sz]ed|eligible|allowed) to work in (the )?(us|u\.s\.|united states|uk|canada|eu)/i.test(low);
+  let visa = (restricted || authOnly) ? 10 : job.visa ? 100 : dna.visaStrong ? 95 : /student/i.test(dna.visaStatus||"") ? 55 : 70;
+  if(restricted || authOnly){ whyNot.push(LANGX()==="jp" ? `勤務地の制限: ${loc||"US/EU"}（日本から応募できない可能性）` : `Location-restricted${loc ? " ("+loc+")" : ""} — may not accept applicants in Japan.`); penalties += 30; }
+  let total = Math.round(.40*exp + .25*it.v + .20*skill + .10*lang + .05*visa);
+  if(restricted || authOnly) total = Math.min(total, 45);
+  if(it.hardDis){ total = Math.min(total, 30); whyNot.push(LANGX()==="jp" ? "避けたい仕事の特徴があります。" : "Has traits you said you want to avoid (e.g. call-center or pure-coding work)."); }
+  else if(it.softDis){ whyNot.push(LANGX()==="jp" ? "あなたの志向と合わない可能性があります。" : "May not fit what you enjoy."); }
+  // positive reasons
+  const topC = Object.entries(dna.signals).filter(([d,v]) => v >= 45 && (js[d]||0) >= 25).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([d])=>d);
+  if(topC.length) why.push(LANGX()==="jp" ? `${topC.map(d=>DOMAINS[d].jp).join("・")}の経験が求人内容と一致しています。` : `Your ${topC.map(d=>DOMAINS[d].en.toLowerCase()).join(" and ")} experience matches what this job needs.`);
+  if(role && expFitForRole(c, role) >= 60) why.push(LANGX()==="jp" ? `「${role.j}」タイプの職種で、経歴に合っています。` : `Fits your profile as a ${role.t}.`);
+  if(it.hits >= 1 && !it.hardDis) why.push(LANGX()==="jp" ? "あなたの興味に合っています。" : "Lines up with what you said you like.");
+  if(matched.length) why.push(LANGX()==="jp" ? `一致するスキル: ${matched.slice(0,4).join(", ")}` : `Skills you already have: ${matched.slice(0,4).join(", ")}.`);
+  if(needJa && dna.ja >= needJa) why.push(LANGX()==="jp" ? "日本語要件を満たしています。" : "You meet the Japanese requirement.");
+  if(!needJa) why.push(LANGX()==="jp" ? "日本語は必須ではありません。" : "No Japanese requirement stated.");
+  if(job.visa) why.push(LANGX()==="jp" ? "ビザ支援の記載があります。" : "Mentions visa support.");
+  if(!why.length) why.push(LANGX()==="jp" ? "一部の条件が一致しています。" : "Some requirements overlap with your background.");
+  let pct = Math.round(total * .88 - penalties);
+  pct = Math.max(3, Math.min(92, pct));
+  const label = pct >= 62 ? "high" : pct >= 38 ? "medium" : "low";
+  return { total: Math.max(0, Math.min(99, total)), parts:{ exp, interest: it.v, skill, lang, visa }, why: why.slice(0,5), whyNot: [...new Set(whyNot)].slice(0,4), missing: [...new Set(missing)].slice(0,6), interview: { pct, label }, role: role ? role.id : null, avoid: it.hardDis, restricted: !!(restricted||authOnly), fast: false };
+}
+
+
 function analyse(text){
   const t = String(text||"");
   const low = t.toLowerCase();
@@ -1583,72 +2021,30 @@ function analyse(text){
   if(/永住者|permanent resident/i.test(t)) visaStatus = "Permanent resident";
   else if(/日本人の配偶者|spouse visa/i.test(t)) visaStatus = "Spouse visa";
   else if(/技術・人文知識・国際業務|engineer.?humanities/i.test(t)) visaStatus = "Engineer/Humanities";
-  else if(/特定技能|specified skilled/i.test(t)) visaStatus = "Specified Skilled";
+  else if(/特定技能|specified skills/i.test(t)) visaStatus = "Specified Skills";
   else if(/留学|student visa/i.test(t)) visaStatus = "Student";
-  else if(/working holiday|ワーキングホリデー/i.test(t)) visaStatus = "Working Holiday";
 
+  const dna = computeDNA(t, STATE.prefProfile, {jlpt, visaStatus});
+  if(dna.yrs) yrs = dna.yrs;
   const langs = [];
   if(/english|英語/i.test(t)) langs.push("English");
-  if(jlpt || /japanese|日本語/i.test(t)) langs.push("Japanese");
-  if(/chinese|中文|中国語/i.test(t)) langs.push("Chinese");
-  if(/korean|韓国語/i.test(t)) langs.push("Korean");
-
-  // Capability signals (not just keywords)
-  const signals = {
-    management: (low.match(/\b(managed|led|supervised|directed|head of|people manager|team of|hiring|p&l|budget ownership|stakeholder)\b/g)||[]).length,
-    leadership: (low.match(/\b(led|leadership|mentor|coached|built the team|grew the team)\b/g)||[]).length,
-    product: (low.match(/\b(product manager|product owner|roadmap|backlog|prioritisation|mvp|user stories|product strategy|discovery)\b/g)||[]).length,
-    operations: (low.match(/\b(operations|process improvement|sop|logistics|vendor management|workflow|ops)\b/g)||[]).length,
-    marketing: (low.match(/\b(marketing|campaign|seo|brand|content strategy|growth)\b/g)||[]).length,
-    travel: (low.match(/\b(travel|tour|tourism|itinerary|reservation|hospitality|hotel|guest|destination|airline)\b/g)||[]).length,
-    pureCode: (low.match(/\b(software engineer|backend|frontend|full.?stack|algorithm|leetcode|git commit|unit test|ci\/cd)\b/g)||[]).length,
-    bd: (low.match(/\b(business development|partnerships|pipeline|account executive|hunter)\b/g)||[]).length
-  };
+  if(/japanese|日本語|jlpt|nihongo/i.test(t)) langs.push(jlpt ? "Japanese ("+jlpt+")" : "Japanese");
 
   const skills = new Set();
   Object.values(SKILL_PACKS).flat().forEach(kw => {
     const re = new RegExp("\\b" + kw.replace(/[.*+?^${}()|[\]\\]/g,"\\$&") + "\\b","i");
-    if(re.test(t)) skills.add(kw);
+    if(re.test(low)) skills.add(kw.replace(/\b\w/g, c => c.toUpperCase()));
   });
-  // Always surface high-value capability labels
-  if(signals.management >= 2) skills.add("management");
-  if(signals.leadership >= 1) skills.add("leadership");
-  if(signals.product >= 1) skills.add("product ownership");
-  if(signals.operations >= 1) skills.add("operations");
-  if(signals.travel >= 3) skills.add("travel industry");
 
-  // Recommendations with priority (avoid pure SE when management/product is stronger)
-  const recs = [];
-  const addRec = (title, ind, why) => {
-    if(recs.some(r => r.t === title)) return;
-    recs.push({t: title, ind, why});
-  };
-  if(signals.travel >= 2 && signals.product >= 1) addRec("Travel Product Manager","travel","Travel domain + product signals");
-  if(signals.product >= 2) addRec("Product Manager","product","Strong product ownership language");
-  if(signals.management >= 2 && signals.pureCode >= 1) addRec("Technical Project Manager","management","Tech keywords + management language");
-  if(signals.operations >= 2) addRec("Operations Manager","operations","Operations / process signals");
-  if(signals.bd >= 2) addRec("Business Development Manager","sales","Business development signals");
-  if(signals.travel >= 3 && signals.product < 1) addRec("Travel Consultant","travel","Deep travel industry keywords");
-  if(signals.marketing >= 2) addRec("Marketing Manager","marketing","Marketing ownership signals");
-  if(signals.management >= 1 && signals.travel >= 1) addRec("Tourism Operations Lead","travel","Travel + management");
-  // Only recommend SE when pure code dominates and management/product is weak
-  if(signals.pureCode >= 3 && signals.management < 2 && signals.product < 1)
-    addRec("Software Engineer","tech","Dominant pure engineering language");
-  if(yrs < 2 && !recs.length) addRec("Customer Support","customer","Entry-friendly starting point");
+  dna.skillTerms.forEach(x => skills.add(x.replace(/\b\w/g, c => c.toUpperCase())));
+  const recs = dna.best.slice(0,3).map(r => ({t:r.title, ind:(r.ind||[])[0]||"customer"}));
 
-  // Industry scores (boosted by signals)
+  // Industry scores
   const indScores = {};
   Object.keys(SKILL_PACKS).forEach(ind => {
     let hits = 0;
     SKILL_PACKS[ind].forEach(kw => { if(low.includes(kw)) hits++; });
-    let base = Math.min(98, Math.round(35 + hits * 11 + (yrs>2?8:0)));
-    if(ind === "product" && signals.product) base = Math.min(98, base + signals.product * 12);
-    if(ind === "management" && signals.management) base = Math.min(98, base + signals.management * 8);
-    if(ind === "operations" && signals.operations) base = Math.min(98, base + signals.operations * 10);
-    if(ind === "travel" && signals.travel) base = Math.min(98, base + Math.min(25, signals.travel * 4));
-    if(ind === "tech" && signals.pureCode && signals.management < 2) base = Math.min(98, base + signals.pureCode * 6);
-    if(ind === "tech" && signals.management >= 2) base = Math.max(20, base - 25); // down-rank pure tech when manager
-    indScores[ind] = base;
+    indScores[ind] = Math.min(98, Math.round(40 + hits * 12 + (yrs>2?10:0)));
   });
 
   // Resume score
@@ -1662,7 +2058,6 @@ function analyse(text){
   if(/summary|objective|profile/i.test(t)) resume += 6;
   if(/\d+%|\d+\+|increased|improved|led |managed /i.test(t)) resume += 10;
   if(jlpt) resume += 5;
-  if(signals.management || signals.product) resume += 6;
   resume = Math.min(98, resume);
 
   const strengths = [];
@@ -1670,14 +2065,14 @@ function analyse(text){
   if(yrs >= 2) strengths.push("Solid experience");
   if(langs.length >= 1) strengths.push("Language skills");
   if(indScores.travel > 70 || indScores.hospitality > 70) strengths.push("Tourism / Hospitality background");
-  if(signals.management >= 2) strengths.push("Management / leadership evidence");
-  if(signals.product >= 1) strengths.push("Product ownership signals");
   if(skills.size >= 4) strengths.push("Diverse skill set");
+  dna.expertise.filter(e => e.level === "strong").slice(0,3).forEach(e => strengths.push(e.label));
   if(!/summary|objective|profile/i.test(t)) missing.push("Professional summary");
   if(!/\d+%|\d+\+|increased|improved|achieved/i.test(t)) missing.push("Measurable achievements");
   if(skills.size < 3) missing.push("Clear skills section");
   if(!jlpt && !/japanese|日本語/i.test(t)) missing.push("Japanese level stated");
 
+  // Japan readiness
   const langScore = jlpt === "N1" ? 95 : jlpt === "N2" ? 85 : jlpt === "N3" ? 70 : jlpt === "N4" ? 55 : jlpt === "N5" ? 40 : (/japanese/i.test(t) ? 45 : 25);
   const expScore = Math.min(95, 40 + yrs * 12);
   const resumeReady = resume;
@@ -1686,258 +2081,38 @@ function analyse(text){
 
   return {
     name, phone, em, yrs, jlpt, visaStatus, langs, skills: [...skills],
-    recs, indScores, resume, strengths, missing, signals,
+    recs, indScores, resume, strengths, missing, dna,
     scores: { resume, japan, language: langScore, experience: expScore, resumeReady, visa: visaScore }
   };
 }
 
-function buildCareerDNA(ana, prefs){
-  prefs = prefs || STATE.preferences || {};
-  const likes = new Set([...(prefs.likes||[]), ...(prefs.interests||[])]);
-  const dislikes = new Set(prefs.dislikes||[]);
-  const signals = ana.signals || {};
-  const yrs = ana.yrs || 0;
-  const topInd = Object.entries(ana.indScores||{}).sort((a,b)=>b[1]-a[1]).map(x=>x[0]);
-
-  // Candidate Type
-  let candidateType = "Professional";
-  if(yrs < 2) candidateType = "Career Starter";
-  else if(signals.management >= 2 || signals.leadership >= 2) candidateType = "People / Project Leader";
-  else if(signals.product >= 2) candidateType = "Product Builder";
-  else if(signals.travel >= 3) candidateType = "Travel Industry Specialist";
-  else if(signals.bd >= 2) candidateType = "Business Development Professional";
-  else if(signals.operations >= 2) candidateType = "Operations Professional";
-
-  // Archetype
-  let archetypeKey = "bilingual_pro";
-  if(yrs < 2) archetypeKey = "career_starter";
-  else if(signals.travel >= 2 && signals.product >= 1) archetypeKey = "travel_product";
-  else if(signals.product >= 2) archetypeKey = "product_mgr";
-  else if(signals.management >= 2 && signals.pureCode >= 1) archetypeKey = "tech_pm";
-  else if(signals.operations >= 2) archetypeKey = "ops_leader";
-  else if(signals.travel >= 3 || topInd[0]==="hospitality") archetypeKey = "hospitality_ops";
-  else if(signals.bd >= 2) archetypeKey = "bd_hunter";
-  else if(topInd[0]==="customer") archetypeKey = "cx_leader";
-  const archetype = ARCHETYPES[archetypeKey] || ARCHETYPES.bilingual_pro;
-
-  // Best industries (top 4, preference-boosted)
-  const bestIndustries = topInd
-    .filter(id => !["eng","jp"].includes(id))
-    .slice(0,6)
-    .map(id => {
-      let pct = ana.indScores[id]||50;
-      if(likes.has("Travel") && id==="travel") pct = Math.min(99, pct+12);
-      if(likes.has("Marketing") && id==="marketing") pct = Math.min(99, pct+10);
-      if(likes.has("Management") && (id==="management"||id==="operations")) pct = Math.min(99, pct+10);
-      if(likes.has("Product creation") && id==="product") pct = Math.min(99, pct+15);
-      if(dislikes.has("Pure coding") && id==="tech") pct = Math.max(10, pct-30);
-      return {id, label: INDUSTRY_LABELS[id]||id, pct};
-    })
+function dnaMatches(d){
+  return {
+    industries: d.industries.slice(0,6).map(i => ({id:i.id, label:i.label, pct:i.pct})),
+    titles: d.best.map(r => ({ title:r.title, titleJp:r.titleJp, why:r.why, fit:r.fit, id:r.id, fast:r.fast, long:r.long })),
+    avoid: d.avoid.map(r => r.title)
+  };
+}
+function computeMatches(ana){
+  if(ana && ana.dna) return dnaMatches(ana.dna);
+  const industries = Object.entries(ana.indScores || {})
+    .map(([k,v]) => ({id:k, label: INDUSTRY_LABELS[k]||k, pct:v}))
     .sort((a,b)=>b.pct-a.pct)
-    .slice(0,4);
-
-  // Roles from analysis + DNA
-  const bestRoles = [];
+    .slice(0,6);
   const seen = new Set();
-  const pushRole = (title, why, kind) => {
+  const titles = [];
+  const addT = (title, ind) => {
     if(!title || seen.has(title)) return;
     seen.add(title);
-    bestRoles.push({title, why, kind});
+    titles.push({ title, why: `Matches your ${ind} experience and keywords found in your CV.` });
   };
-  (ana.recs||[]).forEach(r => pushRole(r.t, r.why||("Matches "+r.ind), "best"));
-  // Preference-driven roles
-  if(likes.has("Product creation") || likes.has("Management")) {
-    if(signals.travel >= 1) pushRole("Travel Product Manager","Interest in product + travel domain","best");
-    else pushRole("Product Manager","Interest in product creation","best");
-  }
-  if(likes.has("Business development")) pushRole("Business Development Manager","Stated interest in BD","best");
-  if(likes.has("Travel") && !seen.has("Travel Consultant")) pushRole("Travel Consultant","Strong travel interest","best");
-  if(likes.has("Marketing")) pushRole("Marketing Coordinator","Marketing interest","best");
-
-  // Avoid roles
-  const avoidRoles = [];
-  if(dislikes.has("Pure coding") || (signals.management >= 2 && signals.pureCode < 2))
-    avoidRoles.push({title:"Software Engineer", why:"Dislike pure coding / stronger management profile"});
-  if(dislikes.has("Call center work") || dislikes.has("Repetitive work"))
-    avoidRoles.push({title:"Call Center Agent", why:"Stated dislike of call-center / repetitive work"});
-  if(dislikes.has("Night shifts"))
-    avoidRoles.push({title:"Night Shift Operations", why:"Dislike night shifts"});
-  // Classic mismatches
-  ["Japanese Lawyer","Quantitative Researcher","Senior Backend Engineer"].forEach(t => {
-    if(!avoidRoles.some(a=>a.title===t)) avoidRoles.push({title:t, why:"Outside your experience and preference profile"});
-  });
-
-  // Fast-hire vs long-term
-  const fastHireRoles = [];
-  const longTermRoles = [];
-  bestRoles.forEach(r => {
-    if(/consultant|coordinator|specialist|support|associate|guest|reservation/i.test(r.title))
-      fastHireRoles.push(r);
-    else
-      longTermRoles.push(r);
-  });
-  if(yrs < 3) {
-    ["Customer Support","Reservation Specialist","Hotel Guest Relations"].forEach(t => {
-      if(!fastHireRoles.some(x=>x.title===t))
-        fastHireRoles.push({title:t, why:"Realistic near-term entry / transfer role", kind:"fast"});
-    });
-  }
-  if(signals.management >= 1 || likes.has("Management")) {
-    ["Operations Manager","Product Manager","Business Development Manager"].forEach(t => {
-      if(!longTermRoles.some(x=>x.title===t))
-        longTermRoles.push({title:t, why:"Longer-term career path matching your profile", kind:"long"});
-    });
-  }
-
-  return {
-    candidateType,
-    archetype,
-    archetypeKey,
-    bestIndustries,
-    bestRoles: bestRoles.slice(0,8),
-    avoidRoles: avoidRoles.slice(0,6),
-    fastHireRoles: fastHireRoles.slice(0,5),
-    longTermRoles: longTermRoles.slice(0,5),
-    preferences: {
-      likes: [...likes],
-      dislikes: [...dislikes],
-      workStyle: prefs.workStyle || "",
-      careerPath: prefs.careerPath || archetype
-    },
-    signals
-  };
-}
-
-function computeMatches(ana){
-  const dna = buildCareerDNA(ana, STATE.preferences);
-  STATE.careerDNA = dna;
-  const industries = dna.bestIndustries.length
-    ? dna.bestIndustries
-    : Object.entries(ana.indScores || {})
-        .map(([k,v]) => ({id:k, label: INDUSTRY_LABELS[k]||k, pct:v}))
-        .sort((a,b)=>b.pct-a.pct)
-        .slice(0,6);
-
-  const titles = (dna.bestRoles||[]).map(r => ({
-    title: r.title,
-    why: r.why || "Aligned with your Career DNA"
-  }));
-  // Ensure at least a few titles
-  if(titles.length < 3) {
-    (ana.recs||[]).forEach(r => {
-      if(titles.length < 6 && !titles.some(x=>x.title===r.t))
-        titles.push({title:r.t, why:r.why||("Matches "+r.ind)});
-    });
-  }
-  const avoid = (dna.avoidRoles||[]).map(a => a.title);
-  return {
-    industries,
-    titles,
-    avoid,
-    dna // full DNA attached
-  };
-}
-
-// Weighted job match: 40% experience · 25% interest · 20% skill · 10% language · 5% visa
-function scoreJobMatch(job, profile, dna, prefs){
-  profile = profile || STATE.profile || {};
-  dna = dna || STATE.careerDNA || {};
-  prefs = prefs || STATE.preferences || {};
-  const text = ((job.title||"")+" "+(job.description||"")+" "+(job.company||"")+" "+(job.full||"")).toLowerCase();
-  const titleLow = (job.title||"").toLowerCase();
-  const whyMatch = [], whyNot = [], missing = [];
-
-  // Experience fit (40%)
-  let expFit = 45;
-  const yrs = profile.yrs || 0;
-  const bestTitles = (dna.bestRoles||[]).map(r=>r.title.toLowerCase());
-  const avoidTitles = (dna.avoidRoles||[]).map(r=>r.title.toLowerCase());
-  if(bestTitles.some(t => titleLow.includes(t.split(" ")[0]) || text.includes(t))) {
-    expFit = 88; whyMatch.push("Title aligns with your Career DNA best roles");
-  } else if((dna.fastHireRoles||[]).some(r => titleLow.includes(r.title.toLowerCase().split(" ")[0]))) {
-    expFit = 72; whyMatch.push("Matches a realistic near-term / fast-hire role");
-  }
-  if(avoidTitles.some(t => titleLow.includes(t.split(" ")[0]))) {
-    expFit = Math.min(expFit, 25); whyNot.push("Title is on your avoid list");
-  }
-  if(yrs >= 5 && /senior|lead|manager|head|director/i.test(titleLow)) { expFit = Math.min(98, expFit+8); }
-  if(yrs < 2 && /senior|lead|principal|director/i.test(titleLow)) { expFit = Math.max(15, expFit-30); whyNot.push("Role seniority is higher than your experience"); missing.push("More years of experience"); }
-
-  // Interest fit (25%)
-  let interestFit = 50;
-  const likes = new Set([...(prefs.likes||[]), ...((dna.preferences||{}).likes||[])]);
-  const dislikes = new Set([...(prefs.dislikes||[]), ...((dna.preferences||{}).dislikes||[])]);
-  if(likes.has("Travel") && /travel|tour|tourism|hospitality|hotel/i.test(text)) { interestFit += 25; whyMatch.push("Matches your interest in Travel"); }
-  if(likes.has("Product creation") && /product manager|product owner|roadmap/i.test(text)) { interestFit += 28; whyMatch.push("Matches interest in product creation"); }
-  if(likes.has("Management") && /manager|lead|head of|people/i.test(text)) { interestFit += 20; whyMatch.push("Matches interest in management"); }
-  if(likes.has("Business development") && /business development|partnerships|bd /i.test(text)) { interestFit += 22; whyMatch.push("Matches BD interest"); }
-  if(likes.has("Marketing") && /marketing|growth|brand/i.test(text)) { interestFit += 18; whyMatch.push("Matches marketing interest"); }
-  if(dislikes.has("Pure coding") && /software engineer|backend|frontend|full.?stack|coding/i.test(text)) { interestFit = Math.max(10, interestFit-40); whyNot.push("Conflicts with dislike of pure coding"); }
-  if(dislikes.has("Call center work") && /call center|contact center|inbound/i.test(text)) { interestFit = Math.max(5, interestFit-45); whyNot.push("Conflicts with dislike of call-center work"); }
-  if(dislikes.has("Repetitive work") && /data entry|repetitive|routine/i.test(text)) { interestFit = Math.max(15, interestFit-25); whyNot.push("May involve repetitive work"); }
-  interestFit = Math.max(5, Math.min(98, interestFit));
-
-  // Skill fit (20%)
-  let skillFit = 40;
-  const skills = profile.skills || [];
-  let skillHits = 0;
-  skills.forEach(sk => { if(text.includes(String(sk).toLowerCase())) skillHits++; });
-  skillFit = Math.min(95, 35 + skillHits * 12);
-  if(skillHits >= 2) whyMatch.push(`Skills overlap (${skillHits} matches)`);
-  else if(skillHits === 0) { whyNot.push("Few of your listed skills appear in the ad"); missing.push("Relevant skill keywords in CV"); }
-
-  // Language fit (10%)
-  let langFit = 50;
-  const jlpt = (profile.jlpt||"").toUpperCase();
-  if(jlpt === "N1" || jlpt === "N2") { langFit = 90; whyMatch.push("Japanese level is competitive"); }
-  else if(jlpt === "N3") { langFit = 70; }
-  else if(jlpt) { langFit = 55; }
-  else { langFit = 40; if(/japanese required|jlpt|日本語必須/i.test(text)) { langFit = 25; whyNot.push("Japanese required; level not stated on CV"); missing.push("JLPT level on CV"); } }
-  if((profile.langs||[]).some(l=>/english/i.test(l)) && /english|英語/i.test(text)) { langFit = Math.min(95, langFit+10); }
-
-  // Visa fit (5%)
-  let visaFit = 55;
-  if(job.visa) { visaFit = 90; whyMatch.push("Role mentions visa support"); }
-  else if(/visa sponsor|sponsorship|visa support/i.test(text)) { visaFit = 88; whyMatch.push("Visa sponsorship language found"); }
-  else if(/must have.*visa|already have.*visa|no sponsorship/i.test(text)) { visaFit = 20; whyNot.push("No sponsorship indicated"); missing.push("Visa sponsorship"); }
-  const vs = (profile.visaStatus||"").toLowerCase();
-  if(/permanent|spouse/.test(vs)) { visaFit = Math.max(visaFit, 92); whyMatch.push("Strong visa status"); }
-
-  const overall = Math.round(
-    expFit * 0.40 +
-    interestFit * 0.25 +
-    skillFit * 0.20 +
-    langFit * 0.10 +
-    visaFit * 0.05
-  );
-
-  // Interview likelihood heuristic
-  let interviewLikelihood = overall;
-  if(visaFit < 40) interviewLikelihood = Math.max(10, interviewLikelihood - 15);
-  if(langFit < 40) interviewLikelihood = Math.max(10, interviewLikelihood - 10);
-  if(expFit > 80 && interestFit > 70) interviewLikelihood = Math.min(95, interviewLikelihood + 8);
-  interviewLikelihood = Math.round(Math.max(5, Math.min(95, interviewLikelihood)));
-
-  return {
-    overall: Math.max(5, Math.min(99, overall)),
-    components: { experience: expFit, interest: interestFit, skill: skillFit, language: langFit, visa: visaFit },
-    whyMatch: whyMatch.slice(0,4),
-    whyNot: whyNot.slice(0,3),
-    missing: missing.slice(0,3),
-    interviewLikelihood
-  };
-}
-
-function isFastHireJob(job){
-  const hay=[job.title,job.company,job.description,job.full,job.type,job.salary,job.visa].join(" ").toLowerCase();
-  return /visa sponsor|visa sponsorship|sponsor visa|part[- ]time|hourly|entry[- ]level|no experience|未経験|アルバイト|パート|時給|ビザ.{0,8}(支援|サポート)/i.test(hay);
-}
-
-function scoreLiveJob(j, titles, skills){
-  // Backward-compatible wrapper → full Career DNA scorer
-  const m = scoreJobMatch(j, STATE.profile, STATE.careerDNA, STATE.preferences);
-  j._matchDetail = m;
-  return m.overall;
+  (ana.recs||[]).forEach(r => addT(r.t, r.ind));
+  // fill up to 6 suggestions from the strongest industries so the list is never tiny
+  const ranked = Object.entries(ana.indScores||{}).sort((a,b)=>b[1]-a[1]).map(x=>x[0]);
+  ranked.forEach(ind => TITLE_HINTS.filter(h=>h.ind===ind).forEach(h => { if(titles.length < 6) addT(h.t, h.ind); }));
+  const avoid = ["Senior Software Engineer","Japanese Lawyer","Financial Analyst","Quantitative Researcher"]
+    .filter(t => !(ana.skills||[]).some(s => t.toLowerCase().includes(s.toLowerCase())));
+  return { industries, titles, avoid };
 }
 
 // ---------- Role selection (Best Jobs For You) ----------
@@ -1963,15 +2138,20 @@ function renderRoleSelector(){
     ${titles.map(ti => `
       <label class="role-item ${sel.has(ti.title)?"on":""}">
         <input type="checkbox" data-role="${esc(ti.title)}" ${sel.has(ti.title)?"checked":""}>
-        <div><strong>${esc(ti.title)}</strong><span class="why">${esc(ti.why)}</span></div>
+        <div><strong>${esc(LANG==="jp"&&ti.titleJp?ti.titleJp:ti.title)}${ti.fit?` <span class="fitpct">${ti.fit}%</span>`:""}${ti.fast?` <span class="tagb">⚡</span>`:""}${ti.long?` <span class="tagb">🌱</span>`:""}</strong><span class="why">${esc(ti.why)}</span></div>
         ${ti.custom ? `<button type="button" class="rm" data-role-del="${esc(ti.title)}" aria-label="Remove">✕</button>` : ""}
       </label>`).join("") || "<p style='color:var(--mu);font-size:13px'>No titles yet</p>"}
     <div class="role-add">
       <input type="text" id="roleNew" maxlength="50" placeholder="${t("add_role")}">
       <button type="button" class="btn" id="roleAddBtn">${t("add")}</button>
     </div>
-    ${(STATE.matches?.avoid||[]).length ? `<div style="margin-top:14px;font-size:12px;color:var(--mu)">Avoid for now: ${STATE.matches.avoid.map(a=>`<span class="chip bad">${esc(a)}</span>`).join(" ")}</div>` : ""}
+    ${(STATE.matches?.avoid||[]).length ? `<div style="margin-top:14px;font-size:12px;color:var(--mu)">${tx("Avoid for now","今は避ける")}: ${STATE.matches.avoid.map(a=>`<span class="chip bad">${esc(a)}</span>`).join(" ")}</div>` : ""}
   </div>`;
+}
+let _reTimer = null;
+function rolesChanged(){
+  STATE.jobs = []; persist();
+  if(STATE.view === "jobs"){ clearTimeout(_reTimer); _reTimer = setTimeout(() => { if(selectedRoles().length) searchLiveJobs(); else render(); }, 900); }
 }
 function wireRoles(){
   const refresh = () => {
@@ -1983,10 +2163,10 @@ function wireRoles(){
     const sel = new Set(selectedRoles());
     cb.checked ? sel.add(cb.dataset.role) : sel.delete(cb.dataset.role);
     STATE.selectedRoles = allRoles().filter(r => sel.has(r));
-    persist(); refresh();
+    persist(); refresh(); rolesChanged();
   }));
-  $("roleAll")?.addEventListener("click", () => { STATE.selectedRoles = allRoles(); persist(); refresh(); });
-  $("roleNone")?.addEventListener("click", () => { STATE.selectedRoles = []; persist(); refresh(); });
+  $("roleAll")?.addEventListener("click", () => { STATE.selectedRoles = allRoles(); persist(); refresh(); rolesChanged(); });
+  $("roleNone")?.addEventListener("click", () => { STATE.selectedRoles = []; persist(); refresh(); rolesChanged(); });
   const add = () => {
     const inp = $("roleNew"); const v = (inp?.value||"").trim();
     if(!v) return;
@@ -2010,9 +2190,9 @@ function wireRoles(){
 
 function startOver(){
   if(!confirm(t("confirm_over"))) return;
-  STATE.cvText = ""; STATE.profile = null; STATE.scores = null; STATE.matches = null; STATE.careerDNA = null;
+  STATE.cvText = ""; STATE.profile = null; STATE.scores = null; STATE.matches = null;
   STATE.selectedRoles = null; STATE.jobs = [];
-  STATE.journey = { step: 1, mode: null, goal: null, fastMode: false }; STATE.track = null; STATE._jd = ""; STATE._jt = null; NAVSTACK.length = 0;
+  STATE.journey = { step: 1, mode: null, goal: null, fastMode: false }; STATE.dna = null; STATE.prefProfile = DEFAULT_PREFS(); STATE.track = null; STATE._jd = ""; STATE._jt = null; NAVSTACK.length = 0;
   STATE.view = "landing";
   persist(); render(); window.scrollTo(0,0);
   say(t("cleared"), 1);
@@ -2115,7 +2295,7 @@ const meter=(l,v)=>`<div class="match-row"><span style="min-width:96px;font-size
 const checkList=a=>`<ul class="list-check">${a.map(c=>`<li class="${c[0]?"ok":"miss"}">${c[0]?"✓":"✗"} ${esc(c[1])}</li>`).join("")}</ul>`;
 const taBox=(id,ph,h)=>`<div class="field"><textarea id="${id}" placeholder="${ph}" style="min-height:${h||140}px"></textarea></div>`;
 const noCv=()=>{if(!cvText()){say(tx("Please upload or paste your CV first","先にCVをアップロードしてください"),0);return true}return false};
-const TOOLS3={ats:["🎯","ATS Optimizer","ATS最適化","Match your CV to any job ad","求人票とCVを照合"],score:["📊","Application Score","応募スコア","Fit, language, visa, scam risk — apply, tailor or skip","適合度・言語・ビザ・詐欺リスク"],rewrite:["✍️","AI Resume Rewriter","履歴書リライト","Turn weak bullets into measurable achievements","弱い文を成果ベースに"],interview:["🎤","Interview Coach","面接コーチ","Real questions for Japan + answer feedback","日本向け質問と回答フィードバック"],recruiters:["🤝","Recruiter Matches","エージェント推薦","Agencies that fit your level and Japanese","あなたに合うエージェント"],starter:["🌱","No-Experience Starter","未経験スタート","Turn study, part-time & volunteering into proof","学業・バイト等を実績に"],premium:["💎","Premium Roadmap","プレミアム計画","What is coming next","今後の機能"]};
+const TOOLS3={ats:["🎯","ATS Optimizer","ATS最適化","Match your CV to any job ad","求人票とCVを照合"],score:["📊","Application Score","応募スコア","Fit, language, visa, scam risk — apply, tailor or skip","適合度・言語・ビザ・詐欺リスク"],rewrite:["✍️","Resume Rewriter","履歴書リライト","Turn weak bullets into measurable achievements","弱い文を成果ベースに"],interview:["🎤","Interview Coach","面接コーチ","Real questions for Japan + answer feedback","日本向け質問と回答フィードバック"],recruiters:["🤝","Recruiter Matches","エージェント推薦","Agencies that fit your level and Japanese","あなたに合うエージェント"],starter:["🌱","No-Experience Starter","未経験スタート","Turn study, part-time & volunteering into proof","学業・バイト等を実績に"],premium:["💎","Premium Roadmap","プレミアム計画","What is coming next","今後の機能"]};
 const toolCard=k=>{const x=TOOLS3[k];return `<div class="card" data-tool="${k}" style="cursor:pointer"><h3>${x[0]} ${tx(x[1],x[2])}</h3><p style="font-size:13px;color:var(--mu);margin:0">${tx(x[3],x[4])}</p></div>`};
 const toolCards=()=>(STATE.track==="entry"?["starter"]:[]).concat(["ats","score","rewrite","interview","recruiters"],STATE.track==="entry"?[]:["starter"]).map(toolCard).join("");
 const segHTML=()=>`<div class="seg" id="trackSeg"><button type="button" data-track="pro" class="${STATE.track==="pro"?"on":""}">💼 ${tx("I have experience","経験者")}</button><button type="button" data-track="entry" class="${STATE.track==="entry"?"on":""}">🌱 ${tx("New / no experience","未経験・新卒")}</button></div>`;
@@ -2134,16 +2314,6 @@ function wireV3(){
  $$("[data-track]").forEach(b=>b.onclick=()=>{STATE.track=b.dataset.track;persist();if(STATE.view!=="landing"&&STATE.profile)render();else $$("[data-track]").forEach(x=>x.classList.toggle("on",x===b));});
  $$("[data-plan]").forEach(b=>b.onclick=()=>{const[k,v]=b.dataset.plan.split(":");if(k==="go")setView(v);else if(k==="tool"){STATE._focus=v;STATE._tool=v;setView("tools");}else $("trackSeg")?.scrollIntoView({behavior:"smooth"});});
  $$("[data-score-job]").forEach(b=>b.onclick=()=>{const j=(STATE.jobs||[]).find(x=>x.id===b.dataset.scoreJob);if(!j)return;STATE._jd=j.title+"\n"+(j.full||j.description||"");STATE._jt={title:j.title,company:j.company,url:j.url};STATE._focus="score";STATE._tool="score";setView("tools");});
-  $$("[data-share-job]").forEach(b=>b.onclick=()=>{
-    const title = b.dataset.jobTitle || "Job";
-    const company = b.dataset.jobCompany || "";
-    const url = b.dataset.jobUrl || location.href;
-    shareNative({
-      title: title + (company ? " @ " + company : ""),
-      text: (LANG==="jp"?"この求人をチェック: ":"Check this job: ") + title + (company?" at "+company:""),
-      url
-    });
-  });
 }
 const NEW_TOOLS={};
 NEW_TOOLS.ats=p=>{p.innerHTML=`<div class="card" style="margin-top:12px"><h3>🎯 ${tx("ATS Optimizer","ATS最適化")}</h3><p class="sub">${tx("Paste a job ad. We compare it with your CV and list the exact keywords and fixes.","求人票を貼り付けると、CVとの差分を表示します。")}</p>${taBox("atsJd",tx("Paste job description…","求人票を貼り付け…"))}<button class="btn" id="atsGo">${tx("Check ATS match","ATSチェック")}</button><div id="atsOut"></div></div>`;
@@ -2156,7 +2326,7 @@ NEW_TOOLS.score=p=>{const jt=STATE._jt||{};p.innerHTML=`<div class="card" style=
   const V={apply:tx("✅ Apply now","✅ 今すぐ応募"),tailor:tx("✍️ Tailor your CV first","✍️ CVを調整してから応募"),stretch:tx("⚠️ Stretch — apply with a referral or recruiter","⚠️ ストレッチ — 紹介経由で"),skip:tx("🚫 Skip — scam risk","🚫 見送り — 詐欺リスク")};
   $("scOut").innerHTML=`<div class="verdict ${r.verdict}">${V[r.verdict]} · ${r.overall}/100</div>${meter(tx("Skills","スキル"),r.kw)}${meter(tx("Language","言語"),r.lang)}${meter(tx("Experience","経験"),r.exp)}${meter(tx("Visa","ビザ"),r.visa)}<h3>${tx("Scam check details","詐欺チェックの詳細")} · ${esc(r.sc.risk.toUpperCase())}</h3><ul class="list-check">${r.sc.reasons.map(reason=>`<li class="miss">• ${esc(reason)}</li>`).join("")}</ul>${r.fix.length?`<h3>${tx("What to fix before applying","応募前に修正すること")}</h3><ul class="list-check">${r.fix.map(f=>`<li class="miss">• ${esc(f)}</li>`).join("")}</ul>`:`<p class="sub">${tx("No specific CV fixes were detected by this check.","このチェックでは具体的な修正点は見つかりませんでした。")}</p>`}<button class="btn secondary" id="scSave">${tx("Save to Tracker","トラッカーに保存")}</button>`;
   $("scSave").onclick=()=>{STATE.applications.saved.push({id:"jd-"+Date.now(),title:$("scT").value||"Job",company:$("scC").value||"",url:jt.url||"",score:r.overall,moved:today(),createdAt:today()});persist();say(tx("Saved to tracker","保存しました"),1);};};};
-NEW_TOOLS.rewrite=p=>{const S=summaries();p.innerHTML=`<div class="card" style="margin-top:12px"><h3>✍️ ${tx("AI Resume Rewriter","履歴書リライト")}</h3><p class="sub">${tx("Paste one weak bullet. Get measurable versions. Replace [brackets] with real facts only.","弱い箇条書きを貼ると成果ベースに変換。[ ]は事実のみで埋めてください。")}</p>${taBox("rwIn","Responsible for handling customer inquiries",80)}<button class="btn" id="rwGo">${tx("Rewrite","書き換え")}</button><div id="rwOut"></div><div class="section-title">${tx("Summary templates","職務要約テンプレート")}</div><div class="letter-box">${esc(S[0])}</div><div class="letter-box" style="margin-top:8px">${esc(S[1])}</div></div>`;
+NEW_TOOLS.rewrite=p=>{const S=summaries();p.innerHTML=`<div class="card" style="margin-top:12px"><h3>✍️ ${tx("Resume Rewriter","履歴書リライト")}</h3><p class="sub">${tx("Paste one weak bullet. Get measurable versions. Replace [brackets] with real facts only.","弱い箇条書きを貼ると成果ベースに変換。[ ]は事実のみで埋めてください。")}</p>${taBox("rwIn","Responsible for handling customer inquiries",80)}<button class="btn" id="rwGo">${tx("Rewrite","書き換え")}</button><div id="rwOut"></div><div class="section-title">${tx("Summary templates","職務要約テンプレート")}</div><div class="letter-box">${esc(S[0])}</div><div class="letter-box" style="margin-top:8px">${esc(S[1])}</div></div>`;
  $("rwGo").onclick=()=>{const v=$("rwIn").value;if(v.trim().length<8){say(tx("Please type a bullet first","先に文を入力してください"),0);return}$("rwOut").innerHTML=rewriteBullet(v).map(x=>`<div class="letter-box" style="margin-top:8px">${esc(x)}</div>`).join("");};};
 NEW_TOOLS.interview=p=>{const qs=IQ.core.concat(IQ[STATE.track==="entry"?"entry":"pro"]);let i=(STATE._qi||0)%qs.length;
  const draw=()=>{const q=qs[i];p.innerHTML=`<div class="card" style="margin-top:12px"><h3>🎤 ${tx("Interview Coach","面接コーチ")} · ${i+1}/${qs.length}</h3><div class="verdict" style="font-size:16px">${esc(q[0])}</div><p class="sub">💡 ${esc(q[1])}</p>${taBox("ivA",tx("Type your answer (70–170 words)…","回答を入力（70〜170語）…"),130)}<div class="action-row"><button class="btn" id="ivCoach">${tx("Coach my answer","回答を採点")}</button><button class="btn secondary" id="ivNext">${tx("Next question","次の質問")}</button></div><div id="ivOut"></div></div>`;
@@ -2190,6 +2360,129 @@ function setView(v){
   persist();
   render();
   
+}
+
+
+// ---------- V4: rebuild, share, preferences, DNA UI ----------
+function rebuildDNA(){
+  if(!STATE.cvText) return;
+  const customs = (STATE.matches?.titles||[]).filter(x => x.custom);
+  const ana = analyse(STATE.cvText);
+  STATE.dna = ana.dna;
+  STATE.matches = computeMatches(ana);
+  customs.forEach(c => { if(!STATE.matches.titles.some(x => x.title.toLowerCase() === c.title.toLowerCase())) STATE.matches.titles.push(c); });
+  STATE.selectedRoles = allRoles();
+  STATE.jobs = [];
+  persist();
+}
+function nativeShare(opts){
+  // Must call navigator.share synchronously inside the user gesture (no await before it)
+  const data = { title: opts.title || "FindJob Now", text: opts.text || "", url: opts.url || (location.origin + location.pathname) };
+  if(typeof navigator.share === "function"){
+    try{
+      const p = navigator.share(data);
+      if(p && typeof p.then === "function") p.catch(e => { if(e && e.name !== "AbortError") console.warn("share failed", e); });
+      return true;
+    }catch(e){
+      if(e && e.name === "AbortError") return false;
+      console.warn("share failed", e);
+    }
+  }
+  // Fallback: clipboard only if share unavailable; no toast unless copy succeeds
+  const payload = [data.text, data.url].filter(Boolean).join("\n");
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(payload).then(()=>{}).catch(()=>{ try{ window.prompt("Copy this:", payload); }catch(_){} });
+  } else {
+    try{ window.prompt("Copy this:", payload); }catch(_){}
+  }
+  return false;
+}
+function shareApp(){
+  return nativeShare({ title:"FindJob Now", text: tx("FindJob Now — free job search helper for foreigners in Japan. No sign-up. Smart (rule-based) matching.","FindJob Now — 日本で働く外国人のための無料求人サポート。登録不要。ルールベースのマッチング。") });
+}
+function shareDNA(){
+  const d = STATE.dna; if(!d) return shareApp();
+  const a = d.archetype, roles = d.best.slice(0,3).map(r => r.title).join(", ");
+  return nativeShare({ title: tx("My Career DNA","私のキャリアDNA"), text: tx(`🧬 My Career DNA: ${a.en}. Best-fit roles: ${roles}. Find yours free:`, `🧬 私のキャリアDNA: ${a.jp}。向いている職種: ${roles}。あなたも無料で診断:`) });
+}
+function shareJob(id){
+  const j = (STATE.jobs||[]).find(x => String(x.id) === String(id)); if(!j) return;
+  return nativeShare({ title: j.title, text: `${j.title}${j.company ? " — " + j.company : ""}`, url: safeHttpsUrl(j.url) || undefined });
+}
+const PCHIP = (kind, o, on, inferred) => `<button type="button" class="pchip ${on?"on":""} ${inferred&&!on?"inf":""}" data-pref="${kind}" data-id="${o.id}" aria-pressed="${on?"true":"false"}">${inferred&&!on?"✨ ":""}${esc(tx(o.en,o.jp))}</button>`;
+function renderPrefs(){
+  const d = STATE.dna, P = STATE.prefProfile || DEFAULT_PREFS(); if(!d) return "";
+  const lk = new Set(P.likes), dl = new Set(P.dislikes), li = new Set(d.likesInferred), di = new Set(d.dislikesInferred);
+  const n = lk.size + dl.size;
+  const seg = (kind, cur, opts) => `<div class="seg">${opts.map(([id,en,jp]) => `<button type="button" data-pref="${kind}" data-id="${id}" class="${cur===id?"on":""}">${esc(tx(en,jp))}</button>`).join("")}</div>`;
+  return `<details class="more" data-k="prefs" ${UIOPEN.prefs?"open":""}>
+    <summary>🎯 ${tx("Tune what you like & avoid","好き・避けたいことを調整")}${n?` · ${n}`:""}</summary>
+    <p class="pnote">${tx("✨ = guessed from your CV. Tap to confirm or change. This changes which jobs rank first.","✨はCVからの推測です。タップで確定・変更できます。求人の順位が変わります。")}</p>
+    <div class="plabel">👍 ${tx("I like","好きなこと")}</div>
+    <div class="pchips">${PREF_LIKES.map(o => PCHIP("like", o, lk.has(o.id), li.has(o.id))).join("")}</div>
+    <div class="plabel">👎 ${tx("I want to avoid","避けたいこと")}</div>
+    <div class="pchips">${PREF_DISLIKES.map(o => PCHIP("dislike", o, dl.has(o.id), di.has(o.id))).join("")}</div>
+    <div class="plabel">🏠 ${tx("Work style","働き方")}</div>
+    ${seg("remote", (P.style||{}).remote||"any", [["any","Any","どれでも"],["remote","Remote","リモート"],["office","On-site","出社"]])}
+    <div class="plabel">🧭 ${tx("Where do you want to go?","目指す方向")}</div>
+    ${seg("path", P.path||"", [["manager","Manager","マネージャー"],["expert","Expert","専門家"],["founder","Build my own","起業"],["unsure","Not sure","未定"]])}
+    <div class="plabel">✍️ ${tx("Anything else? (optional)","その他（任意）")}</div>
+    <textarea id="prefNote" maxlength="240" rows="2" placeholder="${esc(tx("e.g. I do not want call-center work or all-day coding","例: コールセンターや一日中のコーディングは避けたい"))}">${esc(P.note||"")}</textarea>
+  </details>`;
+}
+function renderDNACard(){
+  const d = STATE.dna; if(!d) return "";
+  const jp = LANG === "jp", a = d.archetype;
+  const chip = (r, bad) => `<span class="chip ${bad?"bad":"ok"}">${esc(jp && r.titleJp ? r.titleJp : r.title)}</span>`;
+  return `<section class="card dna">
+    <div class="dna-k">🧬 ${tx("Your Career DNA","あなたのキャリアDNA")}</div>
+    <div class="dna-name">${esc(jp?a.jp:a.en)}${d.secondary?` <small>+ ${esc(jp?d.secondary.jp:d.secondary.en)}</small>`:""}</div>
+    <p class="dna-b">${esc(jp?a.blurb_jp:a.blurb_en)}</p>
+    <div class="dna-type">${esc(jp?d.candidateType.jp:d.candidateType.en)}</div>
+    <div class="dna-row"><b>${tx("Best roles","向いている職種")}</b><div>${d.best.slice(0,3).map(r=>chip(r)).join(" ")}</div></div>
+    ${d.avoid.length?`<div class="dna-row"><b>${tx("Avoid","避けたい職種")}</b><div>${d.avoid.slice(0,2).map(r=>chip(r,true)).join(" ")}</div></div>`:""}
+    <button type="button" class="btn secondary dna-share" data-share-dna>📤 ${tx("Share my Career DNA","キャリアDNAをシェア")}</button>
+  </section>`;
+}
+function renderDNADetails(){
+  const d = STATE.dna; if(!d) return "";
+  const jp = LANG === "jp";
+  const roleList = (arr, bad) => arr.length ? arr.map(r => `<div class="dna-role ${bad?"bad":""}"><b>${esc(jp&&r.titleJp?r.titleJp:r.title)}</b><span>${r.fit}%</span><small>${esc(r.why)}</small></div>`).join("") : `<p class="pnote">${tx("Nothing to show yet.","まだありません。")}</p>`;
+  return `
+    <div class="section-title">${tx("What we found in your CV","CVから見つかったこと")}</div>
+    <div class="card">${d.expertise.map(e => `<div class="match-row"><span style="min-width:132px;font-size:13px">${e.level==="strong"?"✅":e.level==="some"?"🟡":"⬜"} ${esc(jp?e.jp:e.label)}</span><div class="bar"><i style="width:${e.score}%"></i></div><span class="pct">${e.score}</span></div>`).join("")}
+      <p class="pnote" style="margin-top:8px">${tx("Keywords alone do not decide your role: a technical manager is not labelled a software engineer.","キーワードだけで職種は決めません。技術に詳しいマネージャーをエンジニアとは判定しません。")}</p></div>
+    <div class="section-title">⚡ ${tx("Fast-hire roles","早く決まりやすい職種")}</div><div class="card">${roleList(d.fast)}</div>
+    <div class="section-title">🌱 ${tx("Long-term career roles","長期キャリアの職種")}</div><div class="card">${roleList(d.long)}</div>
+    <div class="section-title">🚫 ${tx("Roles to avoid","避けた方がよい職種")}</div><div class="card">${roleList(d.avoid, true)}</div>`;
+}
+function renderMatchBox(m){
+  const P = m.parts;
+  const row = (l, v, w) => `<div class="mrow"><span>${l} <small>${w}%</small></span><div class="bar"><i style="width:${v}%"></i></div><span class="pct">${v}</span></div>`;
+  const list = (cls, title, arr) => arr.length ? `<div class="mlist ${cls}"><b>${title}</b><ul>${arr.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : "";
+  return `<details class="mwhy"><summary>${tx("Why this score?","スコアの理由")}</summary>
+    ${row(tx("Experience","経験"),P.exp,40)}${row(tx("Interest","興味"),P.interest,25)}${row(tx("Skills","スキル"),P.skill,20)}${row(tx("Language","言語"),P.lang,10)}${row(tx("Visa / location","ビザ・勤務地"),P.visa,5)}
+    ${list("ok", tx("Why it matches","合う理由"), m.why)}
+    ${list("no", tx("Why it may not match","合わない理由"), m.whyNot)}
+    ${list("miss", tx("Missing requirements","足りない条件"), m.missing)}
+  </details>`;
+}
+function wirePrefs(){
+  $$("details[data-k]").forEach(d => d.addEventListener("toggle", () => { UIOPEN[d.dataset.k] = d.open; }));
+  $("btnShareDna") && 0;
+  $$("[data-share-dna]").forEach(b => b.addEventListener("click", () => shareDNA()));
+  $$("[data-share-job]").forEach(b => b.addEventListener("click", e => { e.preventDefault(); e.stopPropagation(); shareJob(b.dataset.shareJob); }));
+  const P = () => (STATE.prefProfile = STATE.prefProfile || DEFAULT_PREFS());
+  const toggle = (arr, id) => { const i = arr.indexOf(id); i >= 0 ? arr.splice(i,1) : arr.push(id); };
+  $$("[data-pref]").forEach(b => b.addEventListener("click", () => {
+    const k = b.dataset.pref, id = b.dataset.id, p = P();
+    if(k === "like"){ toggle(p.likes, id); if(p.dislikes.includes(id)) p.dislikes = p.dislikes.filter(x => x !== id); }
+    else if(k === "dislike"){ toggle(p.dislikes, id); if(p.likes.includes(id)) p.likes = p.likes.filter(x => x !== id); }
+    else if(k === "remote"){ p.style = p.style || {}; p.style.remote = id; }
+    else if(k === "path"){ p.path = p.path === id ? "" : id; }
+    UIOPEN.prefs = true; rebuildDNA(); render();
+  }));
+  $("prefNote")?.addEventListener("change", e => { P().note = e.target.value.slice(0,600); UIOPEN.prefs = true; rebuildDNA(); render(); });
 }
 
 function renderLanding(){
@@ -2238,7 +2531,7 @@ function renderLanding(){
     <p style="margin:0 0 18px;font-size:14px;color:var(--mu);font-weight:400;line-height:1.5">
       ${LANG==="jp"
         ? "AIが分析し、次にやることを1つだけ教えてくれます。迷いません。"
-        : "AI analyzes it and tells you exactly one next action. No confusion."}
+        : "We analyze it (rule-based) and tell you exactly one next action. No confusion."}
     </p>
     <button class="btn btn-lg" id="btnUpload" style="font-size:18px">📄 ${t("upload")}</button>
     <div class="or">${t("or")}</div>
@@ -2257,7 +2550,7 @@ function renderLanding(){
   `}
 
   <p style="margin-top:14px;font-size:12px;color:var(--mu);text-align:center">${t("free_private") || (LANG==="jp"?"無料 · プライベート · 登録不要 · 端末内のみ":"Free · Private · No signup · On this device only")}</p>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.3.1 Hiring Copilot</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V5.0.0</div>
 
   <details class="more" style="margin-top:8px"><summary>${LANG==="jp"?"バックアップから復元":"Restore a backup"}</summary><div style="text-align:center;margin-top:6px"><button class="btn ghost" id="btnRestore" style="max-width:300px;min-height:44px;font-size:14px">⬆ ${t("restore")}</button></div></details>
   <input type="file" id="restoreFile" accept="application/json,.json" class="hidden">
@@ -2310,66 +2603,6 @@ function renderHiringProbability(){
     <h3>Fastest improvement</h3><div class="step-guide" style="margin:8px 0"><span class="hand">👇</span><div><div class="step-text">${esc(h.improvements[0])}</div><div class="step-sub">Illustrative target guide: ${target}% after addressing key gaps — not a prediction.</div></div></div>
   </section>`;
 }
-
-function renderCareerDNA(){
-  const dna = STATE.careerDNA || STATE.matches?.dna || null;
-  if(!dna) return "";
-  const likes = (dna.preferences?.likes||STATE.preferences?.likes||[]).slice(0,6);
-  const dislikes = (dna.preferences?.dislikes||STATE.preferences?.dislikes||[]).slice(0,4);
-  const best = (dna.bestRoles||[]).slice(0,5);
-  const avoid = (dna.avoidRoles||[]).slice(0,3);
-  const fast = (dna.fastHireRoles||[]).slice(0,3);
-  const longR = (dna.longTermRoles||[]).slice(0,3);
-  const inds = (dna.bestIndustries||[]).slice(0,4);
-  return `
-  <div class="card" style="margin:14px 0;border:1.5px solid rgba(244,180,0,.35)">
-    <h3 style="margin:0 0 6px;font-size:17px">🧬 ${LANG==="jp"?"キャリアDNA":"Career DNA"}</h3>
-    <p style="margin:0 0 10px;font-size:13px;color:var(--mu)">${LANG==="jp"?"経験・志向・嫌いな仕事から生成されたプロフィール":"Generated from experience, interests and dislikes"}</p>
-    <div style="display:grid;gap:8px;font-size:14px">
-      <div><strong>${LANG==="jp"?"候補者タイプ":"Candidate Type"}:</strong> ${esc(dna.candidateType||"—")}</div>
-      <div><strong>${LANG==="jp"?"アーキタイプ":"Archetype"}:</strong> <span style="color:var(--ac)">${esc(dna.archetype||"—")}</span></div>
-      ${inds.length?`<div><strong>${LANG==="jp"?"向いている業界":"Best industries"}:</strong> ${inds.map(i=>esc(i.label||i.id)).join(" · ")}</div>`:""}
-      ${best.length?`<div><strong>${LANG==="jp"?"おすすめ職種":"Best roles"}:</strong><ul style="margin:4px 0 0 16px">${best.map(r=>`<li>${esc(r.title)} <span style="color:var(--mu);font-size:12px">— ${esc(r.why||"")}</span></li>`).join("")}</ul></div>`:""}
-      ${avoid.length?`<div><strong>${LANG==="jp"?"避けたい職種":"Avoid roles"}:</strong> ${avoid.map(r=>esc(r.title||r)).join(", ")}</div>`:""}
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
-        <div style="background:rgba(74,222,128,.08);padding:8px;border-radius:10px">
-          <div style="font-size:12px;color:var(--mu)">${LANG==="jp"?"すぐ応募しやすい":"Fast-hire roles"}</div>
-          <div>${fast.map(r=>esc(r.title)).join(", ")||"—"}</div>
-        </div>
-        <div style="background:rgba(244,180,0,.08);padding:8px;border-radius:10px">
-          <div style="font-size:12px;color:var(--mu)">${LANG==="jp"?"長期キャリア":"Long-term roles"}</div>
-          <div>${longR.map(r=>esc(r.title)).join(", ")||"—"}</div>
-        </div>
-      </div>
-      ${(likes.length||dislikes.length)?`
-      <div style="margin-top:6px;font-size:13px">
-        ${likes.length?`<span style="color:var(--ok,#4ade80)">👍 ${likes.map(esc).join(", ")}</span>`:""}
-        ${dislikes.length?`<span style="margin-left:8px;color:var(--er,#f87171)">👎 ${dislikes.map(esc).join(", ")}</span>`:""}
-      </div>`:""}
-    </div>
-    <details style="margin-top:10px">
-      <summary style="cursor:pointer;color:var(--ac);font-weight:600;font-size:13px">${LANG==="jp"?"好みを編集 (Likes / Dislikes)":"Edit preferences (Likes / Dislikes)"}</summary>
-      <div style="margin-top:8px" id="prefEditor">
-        <div style="font-size:12px;color:var(--mu);margin-bottom:4px">${LANG==="jp"?"好きなこと":"Likes"}</div>
-        <div class="pref-chips" id="likeChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
-          ${LIKE_PRESETS.map(p=>{
-            const on = (STATE.preferences.likes||[]).includes(p);
-            return `<button type="button" class="chip pref-like ${on?"on":""}" data-like="${esc(p)}" style="border:1px solid var(--bd);background:${on?"rgba(244,180,0,.2)":"transparent"};padding:6px 10px;border-radius:999px;cursor:pointer;font-size:12px">${esc(p)}</button>`;
-          }).join("")}
-        </div>
-        <div style="font-size:12px;color:var(--mu);margin-bottom:4px">${LANG==="jp"?"苦手・避けたいこと":"Dislikes"}</div>
-        <div class="pref-chips" id="dislikeChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
-          ${DISLIKE_PRESETS.map(p=>{
-            const on = (STATE.preferences.dislikes||[]).includes(p);
-            return `<button type="button" class="chip pref-dislike ${on?"on":""}" data-dislike="${esc(p)}" style="border:1px solid var(--bd);background:${on?"rgba(248,113,113,.15)":"transparent"};padding:6px 10px;border-radius:999px;cursor:pointer;font-size:12px">${esc(p)}</button>`;
-          }).join("")}
-        </div>
-        <button class="btn secondary" id="btnRebuildDNA" style="min-height:44px;width:100%">${LANG==="jp"?"DNAを再生成":"Rebuild Career DNA"}</button>
-      </div>
-    </details>
-  </div>`;
-}
-
 function renderDashboard(){
   const p = STATE.profile || {};
   const s = STATE.scores || {resume:0,japan:0,language:0,experience:0,visa:0};
@@ -2380,11 +2613,12 @@ function renderDashboard(){
   <div class="step-guide">
     <span class="hand">👇</span>
     <div>
-      <div class="step-text">${LANG==="jp"?"STEP 2 — AI分析結果":"STEP 2 — AI Analysis"}</div>
+      <div class="step-text">${LANG==="jp"?"STEP 2 — 分析結果":"STEP 2 — Analysis"}</div>
       <div class="step-sub">${LANG==="jp"?"スコアを確認したら、下の大きなボタンを押してください":"Review scores, then tap the big button below"}</div>
     </div>
   </div>
-  ${renderHiringProbability()}
+  ${renderDNACard()}
+  ${renderPrefs()}
 
   <!-- ONE PRIMARY ACTION -->
   <div class="card" style="border:2px solid var(--ac);margin:16px 0">
@@ -2407,9 +2641,11 @@ function renderDashboard(){
     `}
   </div>
 
-  <details class="more">
+  ${renderHiringProbability()}
+
+  <details class="more" data-k="full" ${UIOPEN.full?"open":""}>
     <summary>${LANG==="jp"?"詳しい分析を見る":"See full analysis"}</summary>
-  ${renderCareerDNA()}
+  ${renderDNADetails()}
   ${renderCopilot()}
   <h2 style="margin:0 0 4px;font-size:20px;font-weight:800">${LANG==="jp"?"あなたの現状":"Your Hiring Snapshot"}</h2>
   <p style="color:var(--mu);margin:0 0 12px;font-size:14px">${esc(p.name||"Your profile")} · ${LANG==="jp"?"端末内のみ":"Local only"} ${fast?'· ⚡ Fast mode':''}</p>
@@ -2469,7 +2705,18 @@ function renderJobs(){
     ${LANG==="jp"?"ここに出るのは海外・リモートの英語求人です。日本国内の求人は下のボタンから。":"These are overseas / remote English jobs. For jobs located in Japan, use the button below."}
   </p>
 
-  <button class="btn secondary" data-go="directory" style="margin-bottom:12px;min-height:52px">🇯🇵 ${LANG==="jp"?"日本の求人サイトを開く":"Open Japan job sites (jobs in Japan)"}</button>
+  <div class="card" style="margin-bottom:12px;padding:12px">
+    <div class="section-title" style="margin:0 0 8px">🇯🇵 ${tx("Japan job boards","日本の求人ボード")}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <a class="btn secondary" href="https://www.careercross.com/en/" target="_blank" rel="noopener" style="min-height:40px;font-size:13px;text-decoration:none">CareerCross</a>
+      <a class="btn secondary" href="https://www.daijob.com/en/" target="_blank" rel="noopener" style="min-height:40px;font-size:13px;text-decoration:none">Daijob</a>
+      <a class="btn secondary" href="https://jobs.gaijinpot.com/en/" target="_blank" rel="noopener" style="min-height:40px;font-size:13px;text-decoration:none">GaijinPot</a>
+      <a class="btn secondary" href="https://jp.indeed.com/jobs?q=&l=Japan" target="_blank" rel="noopener" style="min-height:40px;font-size:13px;text-decoration:none">Indeed JP</a>
+      <a class="btn secondary" href="https://www.linkedin.com/jobs/search/?location=Japan" target="_blank" rel="noopener" style="min-height:40px;font-size:13px;text-decoration:none">LinkedIn JP</a>
+    </div>
+    <p style="font-size:11px;color:var(--mu);margin:8px 0 0">${tx("Overseas / Remote (English) feeds appear below after you search.","下の検索では海外・リモート（英語）フィードが表示されます。")}</p>
+  </div>
+  <button class="btn secondary" data-go="directory" style="margin-bottom:12px;min-height:48px">🇯🇵 ${LANG==="jp"?"日本の求人サイト一覧":"All Japan job sites"}</button>
 
   <div class="filters">
     <label><input type="checkbox" id="fVisa" ${prefs.visaOnly?"checked":""}> 🛂 ${t("visa_support")}</label>
@@ -2480,15 +2727,10 @@ function renderJobs(){
   ${hasLive ? `
   <div class="section-title">${LANG==="jp"?`見つかった求人 (${jobs.length})`:`Results (${jobs.length})`}</div>
   ${jobs.map(j => {
-    const detail = j._matchDetail || scoreJobMatch(j, STATE.profile, STATE.careerDNA, STATE.preferences);
     const q = scoreJobQuality(j, STATE.profile);
+    const m = STATE.dna ? matchJob(j, STATE.dna) : null;
     const scam = detectScam((j.description||"")+" "+(j.full||""));
     const applyUrl = safeHttpsUrl(j.url) || "";
-    const matchPct = j.matchScore || detail.overall || q.overall;
-    const whyMatch = (detail.whyMatch||[]).slice(0,3);
-    const whyNot = (detail.whyNot||[]).slice(0,2);
-    const missing = (detail.missing||[]).slice(0,2);
-    const interviewL = detail.interviewLikelihood || matchPct;
     return `<div class="job-card">
       <div class="job-company-row">
         <div class="job-company-logo" aria-label="Company website logo">
@@ -2504,26 +2746,15 @@ function renderJobs(){
         ${j.eng!==false?`<span class="badge eng">🌎 ${t("english_friendly")}</span>`:""}
         ${j.remote?`<span class="badge remote">🏠 ${t("remote")}</span>`:""}
         <span class="badge risk-${scam.risk}">${scam.risk} risk</span>
-        <span class="chip">${matchPct}% match</span>
-        <span class="chip" style="background:rgba(244,180,0,.15)">🎯 ${interviewL}% interview likelihood</span>
+        <span class="chip ${(m?m.total:j.matchScore||q.overall)>=60?"ok":""}">${m?m.total:(j.matchScore||q.overall)}% ${tx("match","一致")}</span>${m?`<span class="chip ${m.interview.label==="high"?"ok":m.interview.label==="low"?"bad":""}">🎯 ${tx("Interview chance","面接の可能性")}: ${tx(m.interview.label==="high"?"High":m.interview.label==="medium"?"Medium":"Low", m.interview.label==="high"?"高":m.interview.label==="medium"?"中":"低")} · ${m.interview.pct}%</span>`:""}
       </div>
       <div style="font-size:13px;color:var(--mu);margin-top:6px">${esc((j.description||"").slice(0,140))}…</div>
-      <details style="margin-top:8px;font-size:13px">
-        <summary style="cursor:pointer;color:var(--ac);font-weight:600">${LANG==="jp"?"マッチ詳細を見る":"Why this job matches"}</summary>
-        <div style="margin-top:6px;line-height:1.45">
-          ${whyMatch.length?`<div style="margin-bottom:4px"><strong style="color:var(--ok,#4ade80)">✓ ${LANG==="jp"?"合う理由":"Why it matches"}</strong><ul style="margin:4px 0 0 16px">${whyMatch.map(w=>`<li>${esc(w)}</li>`).join("")}</ul></div>`:""}
-          ${whyNot.length?`<div style="margin-bottom:4px"><strong style="color:var(--er,#f87171)">✗ ${LANG==="jp"?"合わない理由":"Why it may not"}</strong><ul style="margin:4px 0 0 16px">${whyNot.map(w=>`<li>${esc(w)}</li>`).join("")}</ul></div>`:""}
-          ${missing.length?`<div style="margin-bottom:4px"><strong>${LANG==="jp"?"不足している要件":"Missing requirements"}</strong><ul style="margin:4px 0 0 16px">${missing.map(w=>`<li>${esc(w)}</li>`).join("")}</ul></div>`:""}
-          <div style="font-size:12px;color:var(--mu);margin-top:6px">
-            Exp ${detail.components?.experience||"—"}% · Interest ${detail.components?.interest||"—"}% · Skill ${detail.components?.skill||"—"}% · Lang ${detail.components?.language||"—"}% · Visa ${detail.components?.visa||"—"}%
-          </div>
-        </div>
-      </details>
+      ${m?renderMatchBox(m):""}
       <div class="apply-row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
         ${applyUrl ? `<a class="btn" href="${applyUrl}" target="_blank" rel="noopener" style="flex:1;min-height:48px;font-size:15px;text-decoration:none;text-align:center">${LANG==="jp"?"求人を開く":"Open job"} ↗</a>` : ""}
         <button class="btn secondary" data-save-job="${esc(j.id)}" data-job-title="${esc(j.title)}" data-job-company="${esc(j.company||"")}" data-job-url="${esc(applyUrl)}" style="flex:1;min-height:48px;font-size:14px">${t("gen_app")}</button>
+        <button class="btn secondary" data-share-job="${esc(j.id)}" aria-label="Share" style="flex:0 0 52px;min-height:48px;font-size:18px">📤</button>
         <button class="btn secondary" data-score-job="${esc(j.id)}" style="flex:1;min-height:48px;font-size:14px">📊 ${tx("Score","採点")}</button>
-        <button class="btn secondary" data-share-job="${esc(j.id)}" data-job-title="${esc(j.title)}" data-job-company="${esc(j.company||"")}" data-job-url="${esc(applyUrl)}" style="flex:0 0 auto;min-height:48px;min-width:48px;font-size:18px" title="${LANG==="jp"?"共有":"Share"}">📤</button>
       </div>
     </div>`;
   }).join("")}
@@ -2753,8 +2984,30 @@ function render(){
   const v = STATE.view || "landing";
   updateProgress();
   updateNavLabels();
-  $("btnBack")?.classList.toggle("hidden", !(STATE.profile && v !== "landing"));
-  if(v === "landing" || !STATE.profile){
+  $("btnBack")?.classList.toggle("hidden", v === "landing" || v === "onboarding");
+  // Onboarding flow takes priority until complete
+  if(v === "onboarding"){
+    main.innerHTML = renderOnboarding();
+    $("bottomNav").style.display = "none";
+    $("progressWrap")?.classList.remove("hidden");
+    wireOnboarding();
+    return;
+  }
+  if(v === "roles"){
+    main.innerHTML = renderRoleSelector() + `<div class="action-row" style="margin-top:16px"><button class="btn" id="rolesFindJobs" style="width:100%;min-height:56px">${tx("Find jobs","求人を探す")}</button></div>`;
+    $("bottomNav").style.display = "none";
+    $("progressWrap")?.classList.remove("hidden");
+    wireRoles();
+    $("rolesFindJobs")?.addEventListener("click", () => {
+      if(!selectedRoles().length){ say(t("pick_one"),0); return; }
+      STATE.view = "jobs";
+      persist();
+      render();
+      setTimeout(() => searchLiveJobs(), 200);
+    });
+    return;
+  }
+  if(v === "landing" || (!STATE.profile && v !== "tools" && v !== "tracker")){
     main.innerHTML = renderLanding();
     $("bottomNav").style.display = "none";
     $("progressWrap")?.classList.add("hidden");
@@ -2774,14 +3027,14 @@ function render(){
     else if(v === "directory") main.innerHTML = renderDirectory();
     wireCommon();
     wireRoles();
+    wirePrefs();
   }
   wireV3();
   $$("#bottomNav button").forEach(b => {
     const dv = b.dataset.view;
     let active = dv === v;
-    if(v === "tools") active = active && ((b.dataset.toolFocus === "interview") === (STATE._tool === "interview"));
     if(v === "directory") active = false;
-    b.classList.toggle("active", active);
+    b.classList.toggle("active", !!active);
   });
 }
 
@@ -2792,27 +3045,340 @@ function updateNavLabels(){
   });
 }
 
+
+// ===== V5 ONBOARDING (10-step ordered gate) =====
+const OB_STEPS = [
+  {id:1, key:"resume",  en:"Resume",            jp:"履歴書"},
+  {id:2, key:"exp",     en:"Experience",        jp:"経験"},
+  {id:3, key:"work",    en:"Work type",         jp:"働き方"},
+  {id:4, key:"en",      en:"English",           jp:"英語"},
+  {id:5, key:"ja",      en:"Japanese",          jp:"日本語"},
+  {id:6, key:"ol",      en:"Other languages",   jp:"他言語"},
+  {id:7, key:"loc",     en:"Location",          jp:"勤務地"},
+  {id:8, key:"visa",    en:"Visa",              jp:"ビザ"},
+  {id:9, key:"nat",     en:"Nationality",       jp:"国籍"},
+  {id:10,key:"like",    en:"What I like",       jp:"好きなこと・苦手なこと"}
+];
+
+function obComplete(step){
+  const o = STATE.onboarding || {};
+  switch(step){
+    case 1: return !!(o.hasResume || STATE.cvText || STATE.profile);
+    case 2: return !!o.experience;
+    case 3: return Array.isArray(o.workTypes) && o.workTypes.length > 0;
+    case 4: return o.english >= 1 && o.english <= 5;
+    case 5: return o.japanese >= 1 && o.japanese <= 5;
+    case 6: return typeof o.otherLang === "boolean";
+    case 7: return !!o.location;
+    case 8: return typeof o.visaNeeded === "boolean";
+    case 9: return !!o.nationality;
+    case 10: return true; // skippable
+    default: return false;
+  }
+}
+function firstIncompleteStep(){
+  for(let i=1;i<=10;i++) if(!obComplete(i)) return i;
+  return 11; // all done
+}
+function goOnboarding(step){
+  STATE.onboarding = STATE.onboarding || DEFAULT_ONBOARDING();
+  STATE.onboarding.step = Math.max(1, Math.min(10, step||1));
+  STATE.view = "onboarding";
+  persist();
+  render();
+  window.scrollTo(0,0);
+}
+function advanceOnboarding(){
+  const cur = STATE.onboarding.step || 1;
+  if(cur < 10){
+    goOnboarding(cur + 1);
+  } else {
+    // after step 10 → roles then jobs
+    if(!STATE.dna && STATE.cvText){ try{ rebuildDNA(); }catch(_){ } }
+    else if(!STATE.dna){
+      // minimal DNA from onboarding only
+      const fake = " ";
+      const ana = analyse(fake);
+      STATE.dna = ana.dna;
+      STATE.matches = computeMatches(ana);
+    }
+    // apply onboarding into DNA
+    applyOnboardingToDNA();
+    STATE.view = "roles";
+    persist();
+    render();
+  }
+}
+function applyOnboardingToDNA(){
+  const o = STATE.onboarding || {};
+  if(!STATE.dna) return;
+  if(o.japanese >= 1) STATE.dna.ja = Math.max(STATE.dna.ja||0, o.japanese);
+  if(o.experience === "entry") STATE.dna.level = Math.min(STATE.dna.level||0, 1);
+  if(o.nationality === "japanese" && STATE.dna){
+    // flag for matchJob weight redistribution
+    STATE.dna.nationality = "japanese";
+  } else if(STATE.dna){
+    STATE.dna.nationality = "non_japanese";
+  }
+  if(typeof o.visaNeeded === "boolean") STATE.dna.visaNeeded = o.visaNeeded;
+  if(o.visaDetail) STATE.dna.visaDetail = o.visaDetail;
+  if(o.location) STATE.dna.locationPref = o.location;
+  persist();
+}
+
+function renderOnboarding(){
+  const o = STATE.onboarding || DEFAULT_ONBOARDING();
+  const step = o.step || 1;
+  const sdef = OB_STEPS[step-1] || OB_STEPS[0];
+  const title = tx(sdef.en, sdef.jp);
+  const helper = tx("Tap to select — selected items are highlighted.","タップで選択（選択中は強調表示）。");
+  let body = "";
+  const nextLabel = step < 10 ? tx("Next →","次へ →") : tx("Find jobs","求人を探す");
+  const canNext = obComplete(step) || step === 10 || step === 1;
+
+  if(step === 1){
+    // Resume — reuse upload UI briefly
+    body = `<div class="card">
+      <h3>${tx("Upload your CV","履歴書をアップロード")}</h3>
+      <p class="sub">${tx("PDF, Word, or paste text. Analysis stays on this device.","PDF・Word・テキスト。分析はこの端末のみ。")}</p>
+      <div class="action-row" style="margin-top:12px">
+        <button class="btn" id="obUpload">${tx("Upload CV","履歴書をアップロード")}</button>
+        <button class="btn secondary" id="obPaste">${tx("Paste Resume","履歴書を貼り付け")}</button>
+      </div>
+      <button type="button" class="btn ghost" id="obSkipCv" style="margin-top:12px;width:100%">${tx("Continue without CV","CVなしで続ける")}</button>
+      <input type="file" id="obCvFile" accept=".pdf,.doc,.docx,.txt,application/pdf" class="hidden">
+      <div class="hidden" id="obPasteModal">
+        <div class="field" style="margin-top:10px"><textarea id="obPasteText" placeholder="${tx("Paste the full text of your CV here…","履歴書のテキストをここに貼り付け…")}" style="min-height:160px"></textarea></div>
+        <button class="btn" id="obPasteGo">${tx("Analyze","分析する")}</button>
+      </div>
+    </div>`;
+  } else if(step === 2){
+    body = `<div class="card">
+      <h3>${title}</h3>
+      <p class="sub">${helper}</p>
+      <div class="seg" style="margin-top:12px">
+        <button type="button" data-ob="experience" data-val="experienced" class="${o.experience==="experienced"?"on":""}" role="radio" aria-pressed="${o.experience==="experienced"}">${tx("I have experience","経験あり")}</button>
+        <button type="button" data-ob="experience" data-val="entry" class="${o.experience==="entry"?"on":""}" role="radio" aria-pressed="${o.experience==="entry"}">${tx("No experience / new grad","未経験・新卒")}</button>
+      </div>
+    </div>`;
+  } else if(step === 3){
+    const wts = o.workTypes || [];
+    const opts = [["full","Full-time","正社員"],["part","Part-time","パート"],["remote","Remote","リモート"],["hybrid","Hybrid","ハイブリッド"]];
+    body = `<div class="card">
+      <h3>${title}</h3>
+      <p class="sub">${helper} ${tx("(multi-select OK)","（複数選択可）")}</p>
+      <div class="seg" style="margin-top:12px;flex-wrap:wrap">
+        ${opts.map(([id,en,jp])=>`<button type="button" data-ob="workTypes" data-val="${id}" class="${wts.includes(id)?"on":""}" aria-pressed="${wts.includes(id)}">${tx(en,jp)}</button>`).join("")}
+      </div>
+    </div>`;
+  } else if(step === 4){
+    body = `<div class="card">
+      <h3>${title}</h3>
+      <p class="sub">${tx("1 = basic, 5 = native","1 = 基礎、5 = ネイティブ")}</p>
+      <div class="seg" style="margin-top:12px">
+        ${[1,2,3,4,5].map(n=>`<button type="button" data-ob="english" data-val="${n}" class="${o.english===n?"on":""}" role="radio" aria-pressed="${o.english===n}">${n}</button>`).join("")}
+      </div>
+    </div>`;
+  } else if(step === 5){
+    body = `<div class="card">
+      <h3>${title}</h3>
+      <p class="sub">${tx("5=N1, 4=N2, 3=N3, 2=N4, 1=N5","5=N1、4=N2、3=N3、2=N4、1=N5")}</p>
+      <div class="seg" style="margin-top:12px">
+        ${[1,2,3,4,5].map(n=>`<button type="button" data-ob="japanese" data-val="${n}" class="${o.japanese===n?"on":""}" role="radio" aria-pressed="${o.japanese===n}">${n}</button>`).join("")}
+      </div>
+    </div>`;
+  } else if(step === 6){
+    body = `<div class="card">
+      <h3>${title}</h3>
+      <p class="sub">${helper}</p>
+      <div class="seg" style="margin-top:12px">
+        <button type="button" data-ob="otherLang" data-val="true" class="${o.otherLang===true?"on":""}" role="radio" aria-pressed="${o.otherLang===true}">${tx("Yes","はい")}</button>
+        <button type="button" data-ob="otherLang" data-val="false" class="${o.otherLang===false?"on":""}" role="radio" aria-pressed="${o.otherLang===false}">${tx("No","いいえ")}</button>
+      </div>
+      ${o.otherLang===true?`<div class="field" style="margin-top:12px"><input id="obOtherLangText" placeholder="${tx("e.g. Mandarin, Korean","例: 中国語、韓国語")}" value="${esc(o.otherLangText||"")}"></div>`:""}
+    </div>`;
+  } else if(step === 7){
+    const opts = [["tokyo","Tokyo","東京"],["japan","Anywhere in Japan","日本国内"],["overseas","Overseas","海外"],["both","Japan + Overseas","日本＋海外"]];
+    body = `<div class="card">
+      <h3>${title}</h3>
+      <p class="sub">${helper}</p>
+      <div class="seg" style="margin-top:12px;flex-wrap:wrap">
+        ${opts.map(([id,en,jp])=>`<button type="button" data-ob="location" data-val="${id}" class="${o.location===id?"on":""}" role="radio" aria-pressed="${o.location===id}">${tx(en,jp)}</button>`).join("")}
+      </div>
+    </div>`;
+  } else if(step === 8){
+    body = `<div class="card">
+      <h3>${tx("Do you need visa sponsorship?","ビザのスポンサーが必要ですか？")}</h3>
+      <p class="sub">${helper}</p>
+      <div class="seg" style="margin-top:12px">
+        <button type="button" data-ob="visaNeeded" data-val="true" class="${o.visaNeeded===true?"on":""}" role="radio" aria-pressed="${o.visaNeeded===true}">${tx("Required","必要")}</button>
+        <button type="button" data-ob="visaNeeded" data-val="false" class="${o.visaNeeded===false?"on":""}" role="radio" aria-pressed="${o.visaNeeded===false}">${tx("Not required","不要")}</button>
+      </div>
+      <div class="section-title" style="margin-top:16px">${tx("Or I already have:","または既に持っている：")}</div>
+      <div class="seg" style="flex-wrap:wrap">
+        ${[["work_visa","Already have work visa","就労ビザあり"],["student","Student","留学"],["working_holiday","Working holiday","ワーホリ"],["permanent","Permanent resident","永住者"],["spouse","Spouse visa","配偶者ビザ"]].map(([id,en,jp])=>`<button type="button" data-ob="visaDetail" data-val="${id}" class="${o.visaDetail===id?"on":""}" aria-pressed="${o.visaDetail===id}">${tx(en,jp)}</button>`).join("")}
+      </div>
+    </div>`;
+  } else if(step === 9){
+    body = `<div class="card">
+      <h3>${tx("Are you Japanese?","日本人ですか？")}</h3>
+      <p class="sub">${helper}</p>
+      <div class="seg" style="margin-top:12px">
+        <button type="button" data-ob="nationality" data-val="japanese" class="${o.nationality==="japanese"?"on":""}" role="radio" aria-pressed="${o.nationality==="japanese"}">${tx("Japanese","日本人")}</button>
+        <button type="button" data-ob="nationality" data-val="non_japanese" class="${o.nationality==="non_japanese"?"on":""}" role="radio" aria-pressed="${o.nationality==="non_japanese"}">${tx("Not Japanese","日本人以外")}</button>
+      </div>
+    </div>`;
+  } else if(step === 10){
+    const P = STATE.prefProfile || DEFAULT_PREFS();
+    body = `<div class="card">
+      <h3>${title}</h3>
+      <p class="sub">${tx("Optional. Helps us rank roles better.","任意。職種の優先順位が良くなります。")}</p>
+      <div class="field"><label>${tx("Career story (max 600 chars)","キャリアストーリー（最大600文字）")}</label>
+        <textarea id="obNote" maxlength="600" style="min-height:100px" placeholder="${tx("e.g. I like creating tour packages and travel apps; I can code but prefer managing projects…","例: ツアーパッケージや旅行アプリ作りが好き。コーディングはできるがマネジメントが好き…")}">${esc(P.note||"")}</textarea>
+      </div>
+      <p class="sub" style="margin-top:8px">${tx("Skip if you prefer — you can edit later in Toolkit.","スキップ可。後でツールキットから編集できます。")}</p>
+    </div>`;
+  }
+
+  return `
+  <div class="ob-wrap">
+    <div class="progress-meta" style="padding:8px 0">
+      <span>Step ${step} of 10</span>
+      <span>${esc(title)}</span>
+    </div>
+    <div class="progress-steps" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;font-size:11px">
+      ${OB_STEPS.map(s=>{
+        const done = obComplete(s.id);
+        const cur = s.id === step;
+        if(done && !cur) return `<span class="done">✅</span>`;
+        if(cur) return `<span class="current">👇</span>`;
+        return `<span>⬜</span>`;
+      }).join("")}
+    </div>
+    ${body}
+    <div class="action-row" style="margin-top:16px;position:sticky;bottom:calc(72px + var(--safe-b));background:var(--bg);padding:10px 0;z-index:20">
+      ${step > 1 ? `<button class="btn secondary" id="obBack">${tx("Back","戻る")}</button>` : ""}
+      <button class="btn ${canNext?"":"ghost"}" id="obNext" ${canNext?"":"disabled"}>${nextLabel}</button>
+      ${step === 10 ? `<button class="btn ghost" id="obSkipLike">${tx("Skip for now","今はスキップ")}</button>` : ""}
+    </div>
+    <p style="font-size:11px;color:var(--mu);text-align:center;margin-top:8px">${tx("Rule-based matching · No cloud AI · Your data stays on this device.","ルールベースのマッチング・クラウドAIなし・データは端末内のみ。")}</p>
+  </div>`;
+}
+
+function wireOnboarding(){
+  const o = STATE.onboarding || DEFAULT_ONBOARDING();
+  // selection buttons
+  $$("[data-ob]").forEach(btn => {
+    btn.onclick = () => {
+      const key = btn.dataset.ob;
+      const val = btn.dataset.val;
+      if(key === "workTypes"){
+        const arr = o.workTypes || [];
+        const i = arr.indexOf(val);
+        if(i>=0) arr.splice(i,1); else arr.push(val);
+        o.workTypes = arr;
+      } else if(key === "visaNeeded"){
+        o.visaNeeded = val === "true";
+        if(val === "true") o.visaDetail = "";
+      } else if(key === "visaDetail"){
+        o.visaDetail = val;
+        o.visaNeeded = false; // already have status
+      } else if(key === "otherLang"){
+        o.otherLang = val === "true";
+      } else if(key === "english" || key === "japanese"){
+        o[key] = parseInt(val,10);
+      } else {
+        o[key] = val;
+      }
+      STATE.onboarding = o;
+      persist();
+      render(); // re-render to show highlight
+    };
+  });
+  $("obOtherLangText")?.addEventListener("change", e => {
+    o.otherLangText = e.target.value.slice(0,80);
+    STATE.onboarding = o; persist();
+  });
+  $("obNote")?.addEventListener("change", e => {
+    if(!STATE.prefProfile) STATE.prefProfile = DEFAULT_PREFS();
+    STATE.prefProfile.note = e.target.value.slice(0,600);
+    persist();
+  });
+  $("obBack")?.addEventListener("click", () => goOnboarding((o.step||2)-1));
+  $("obNext")?.addEventListener("click", () => {
+    if(o.step === 10){
+      const note = $("obNote")?.value || "";
+      if(note){ if(!STATE.prefProfile) STATE.prefProfile = DEFAULT_PREFS(); STATE.prefProfile.note = note.slice(0,600); }
+    }
+    advanceOnboarding();
+  });
+  $("obSkipLike")?.addEventListener("click", () => advanceOnboarding());
+  $("obSkipCv")?.addEventListener("click", () => {
+    o.hasResume = false;
+    STATE.profile = STATE.profile || { name:"", skills:[], langs:[], yrs:0, strengths:[], missing:["Upload a CV for full analysis"] };
+    STATE.scores = STATE.scores || { resume:40, japan:40, language:30, experience:30, visa:50 };
+    STATE.onboarding = o;
+    persist();
+    goOnboarding(2);
+  });
+  $("obUpload")?.addEventListener("click", () => $("obCvFile")?.click());
+  $("obCvFile")?.addEventListener("change", async e => {
+    const f = e.target.files?.[0]; if(!f) return;
+    e.target.value = "";
+    say("Reading CV…",1);
+    try{
+      let text = "";
+      if(f.type === "application/pdf" || f.name.endsWith(".pdf")) text = await extractPdfText(f);
+      else text = await f.text();
+      if(text.trim().length < 40){ say("Could not extract enough text. Please paste instead.",0); return; }
+      runAnalysis(text, true); // true = continue onboarding
+    }catch(err){ console.error(err); say("Read failed",0); }
+  });
+  $("obPaste")?.addEventListener("click", () => $("obPasteModal")?.classList.toggle("hidden"));
+  $("obPasteGo")?.addEventListener("click", () => {
+    const t = $("obPasteText")?.value || "";
+    if(t.trim().length < 40){ say("Please paste more text",0); return; }
+    runAnalysis(t, true);
+  });
+}
+
+
 function updateProgress(){
   const wrap = $("progressWrap");
   if(!wrap) return;
   const v = STATE.view || "landing";
+  // During onboarding show 10-step
+  if(v === "onboarding" || v === "roles"){
+    wrap.classList.remove("hidden");
+    const step = (STATE.onboarding && STATE.onboarding.step) || 1;
+    const sdef = typeof OB_STEPS !== "undefined" ? OB_STEPS[Math.min(9, step-1)] : null;
+    if($("stepLabel")) $("stepLabel").textContent = `Step ${Math.min(step,10)} of 10`;
+    if($("stepName")) $("stepName").textContent = sdef ? tx(sdef.en, sdef.jp) : "";
+    if($("progressFill")) $("progressFill").style.width = Math.round((Math.min(step,10) / 10) * 100) + "%";
+    if($("progressSteps") && typeof OB_STEPS !== "undefined"){
+      $("progressSteps").innerHTML = OB_STEPS.map(s => {
+        const done = typeof obComplete === "function" && obComplete(s.id);
+        if(done && s.id !== step) return `<span class="done">✅</span>`;
+        if(s.id === step) return `<span class="current">👇</span>`;
+        return `<span>⬜</span>`;
+      }).join("");
+    }
+    return;
+  }
+  // Post-onboarding simplified bar
   const steps = [
-    {id:"landing", label:t("step_upload"), num:1},
-    {id:"dashboard", label:t("step_analysis"), num:2},
-    {id:"jobs", label:t("step_jobs"), num:3},
-    {id:"tools", label:t("step_apply"), num:4},
-    {id:"tracker", label:t("step_track"), num:5}
+    {id:"dashboard", label:t("step_analysis")||"Home", num:1},
+    {id:"jobs", label:t("step_jobs"), num:2},
+    {id:"tools", label:t("step_apply")||"Toolkit", num:3},
+    {id:"tracker", label:t("step_track"), num:4}
   ];
   let current = 1;
-  if(STATE.profile) current = 2;
-  if(v === "jobs") current = 3;
-  if(v === "tools") current = 4;
-  if(v === "tracker") current = 5;
-  if(v === "directory") current = 3;
-  const pct = Math.round((current / 5) * 100);
-  if($("stepLabel")) $("stepLabel").textContent = `Step ${current} of 5`;
+  if(v === "jobs") current = 2;
+  if(v === "tools") current = 3;
+  if(v === "tracker") current = 4;
+  if($("stepLabel")) $("stepLabel").textContent = `Step ${current} of 4`;
   if($("stepName")) $("stepName").textContent = steps.find(s=>s.num===current)?.label || "";
-  if($("progressFill")) $("progressFill").style.width = pct + "%";
+  if($("progressFill")) $("progressFill").style.width = Math.round((current / 4) * 100) + "%";
   if($("progressSteps")){
     $("progressSteps").innerHTML = steps.map(s => {
       if(s.num < current) return `<span class="done">✅ ${s.label}</span>`;
@@ -2839,7 +3405,10 @@ function wireLanding(){
     STATE.matches = computeMatches({ indScores:{travel:60,hospitality:55,customer:70}, recs:[{t:"Customer Support",ind:"customer"}] });
     STATE.selectedRoles = allRoles();
     STATE.jobs = [];
-    STATE.view = "dashboard";
+    if(!STATE.onboarding) STATE.onboarding = DEFAULT_ONBOARDING();
+    STATE.onboarding.hasResume = false;
+    STATE.onboarding.step = 2;
+    STATE.view = "onboarding";
     persist();
     render();
   });
@@ -2867,7 +3436,11 @@ function wireLanding(){
       else{say("We couldn't read your file. Please paste the text instead.",0);$("pasteModal")?.classList.remove("hidden");}
     }
   });
-  $("btnContinue")?.addEventListener("click", () => setView("dashboard"));
+  $("btnContinue")?.addEventListener("click", () => {
+    const inc = typeof firstIncompleteStep === "function" ? firstIncompleteStep() : 11;
+    if(inc <= 10){ goOnboarding(inc); }
+    else setView("dashboard");
+  });
   $("btnStartOver2")?.addEventListener("click", startOver);
   $("btnRestore")?.addEventListener("click", () => $("restoreFile").click());
   $("btnFastMode")?.addEventListener("click", () => {
@@ -2897,23 +3470,30 @@ function dismissInstall(){
   $("installBanner")?.remove();
 }
 
-function runAnalysis(text){
+function runAnalysis(text, continueOnboarding){
   const ana = analyse(text);
   STATE.profile = {
     name: ana.name, email: ana.em, phone: ana.phone, skills: ana.skills,
     langs: ana.langs, jlpt: ana.jlpt, yrs: ana.yrs, visaStatus: ana.visaStatus,
-    strengths: ana.strengths, missing: ana.missing, signals: ana.signals || {},
-    indScores: ana.indScores, recs: ana.recs
+    strengths: ana.strengths, missing: ana.missing
   };
   STATE.scores = ana.scores;
+  STATE.dna = ana.dna;
   STATE.cvText = String(text).slice(0,15000);
-  STATE.matches = computeMatches(ana); // also sets STATE.careerDNA
-  STATE.careerDNA = STATE.matches?.dna || STATE.careerDNA;
+  STATE.matches = computeMatches(ana);
   STATE.selectedRoles = allRoles();
   STATE.jobs = [];
-  STATE.view = "dashboard";
+  // Mark resume done and continue 10-step flow
+  if(!STATE.onboarding) STATE.onboarding = DEFAULT_ONBOARDING();
+  STATE.onboarding.hasResume = true;
+  STATE.onboarding.step = 2;
+  if(continueOnboarding || !obComplete(2)){
+    STATE.view = "onboarding";
+  } else {
+    STATE.view = "dashboard";
+  }
   persist();
-  say(LANG==="jp"?"分析完了 — キャリアDNAを生成しました":"Analysis complete — Career DNA ready", 1);
+  say("Analysis complete", 1);
   render();
 }
 
@@ -3003,45 +3583,6 @@ function wireCommon(){
   $("goalFast")?.addEventListener("click", () => setGoal("fast"));
   $("goalCareer")?.addEventListener("click", () => setGoal("career"));
   $("goalPart")?.addEventListener("click", () => setGoal("part"));
-  // Preference chips → rebuild Career DNA
-  $$(".pref-like").forEach(b => {
-    b.onclick = () => {
-      const v = b.dataset.like;
-      STATE.preferences.likes = STATE.preferences.likes || [];
-      const i = STATE.preferences.likes.indexOf(v);
-      if(i>=0) STATE.preferences.likes.splice(i,1); else STATE.preferences.likes.push(v);
-      persist();
-      // visual toggle only; full rebuild on button
-      b.classList.toggle("on");
-      b.style.background = b.classList.contains("on") ? "rgba(244,180,0,.2)" : "transparent";
-    };
-  });
-  $$(".pref-dislike").forEach(b => {
-    b.onclick = () => {
-      const v = b.dataset.dislike;
-      STATE.preferences.dislikes = STATE.preferences.dislikes || [];
-      const i = STATE.preferences.dislikes.indexOf(v);
-      if(i>=0) STATE.preferences.dislikes.splice(i,1); else STATE.preferences.dislikes.push(v);
-      persist();
-      b.classList.toggle("on");
-      b.style.background = b.classList.contains("on") ? "rgba(248,113,113,.15)" : "transparent";
-    };
-  });
-  $("btnRebuildDNA")?.addEventListener("click", () => {
-    if(!STATE.profile){ say(LANG==="jp"?"先にCVを分析してください":"Analyse a CV first",0); return; }
-    const dna = buildCareerDNA(STATE.profile, STATE.preferences);
-    STATE.careerDNA = dna;
-    if(STATE.matches) STATE.matches.dna = dna;
-    // refresh titles from DNA
-    if(STATE.matches){
-      STATE.matches.titles = (dna.bestRoles||[]).map(r => ({title:r.title, why:r.why||"Career DNA"}));
-      STATE.matches.avoid = (dna.avoidRoles||[]).map(a => a.title);
-      STATE.matches.industries = dna.bestIndustries || STATE.matches.industries;
-    }
-    persist();
-    say(LANG==="jp"?"キャリアDNAを更新しました":"Career DNA updated",1);
-    render();
-  });
   $$("[data-save-job]").forEach(btn => {
     btn.onclick = (e) => {
       e.preventDefault();
@@ -3106,6 +3647,7 @@ $("btnBackup")?.addEventListener("click", () => {
 });
 
 $("btnBack")?.addEventListener("click", goBack);
+$("btnShare")?.addEventListener("click", () => shareApp());
 $("btnRestart")?.addEventListener("click", () => { if(!STATE.profile && STATE.view === "landing"){ window.scrollTo(0,0); return; } startOver(); });
 $("logoHome")?.addEventListener("click", () => { setView("landing"); window.scrollTo(0,0); });
 $("logoHome")?.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); setView("landing"); } });
@@ -3117,7 +3659,15 @@ if("serviceWorker" in navigator){
 }
 
 $$("#bottomNav button").forEach(b => {
-  b.onclick = () => { STATE._focus = b.dataset.toolFocus || null; STATE._tool = b.dataset.toolFocus || null; setView(b.dataset.view); };
+  b.onclick = () => {
+    if(b.dataset.view === "share" || b.id === "navShare"){
+      shareApp();
+      return;
+    }
+    STATE._focus = b.dataset.toolFocus || null;
+    STATE._tool = b.dataset.toolFocus || null;
+    setView(b.dataset.view);
+  };
 });
 
 // Init language UI
@@ -3131,6 +3681,24 @@ if(LANG === "jp"){
   document.documentElement.lang = "en";
 }
 
+if(STATE.profile && STATE.cvText && (!STATE.dna || (STATE.dna.version||0) < DNA_VERSION)){ try{ rebuildDNA(); }catch(e){ console.error("DNA migration failed", e); } }
+// Deep link: ?tool=ats → open toolkit with that tool expanded
+try{
+  const params = new URLSearchParams(location.search);
+  const tool = params.get("tool");
+  if(tool){ STATE.view = "tools"; STATE._focus = tool; STATE._tool = tool; }
+}catch(_){}
+// Resume mid-flow onboarding at first incomplete step
+if(typeof firstIncompleteStep === "function"){
+  const inc = firstIncompleteStep();
+  if(inc <= 10 && STATE.view !== "tools" && STATE.view !== "tracker" && !new URLSearchParams(location.search).get("tool")){
+    if(!STATE.profile && inc === 1){ /* stay on landing */ }
+    else if(inc <= 10){
+      STATE.onboarding.step = inc;
+      STATE.view = "onboarding";
+    }
+  }
+}
 render();
 
 </script>

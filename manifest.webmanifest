@@ -2,7 +2,7 @@
   "id": "./",
   "name": "FindJob Now",
   "short_name": "FindJob",
-  "description": "AI Job Search Copilot for foreigners in Japan: ATS-fix your CV, score jobs before applying, practise interviews, follow up — free and private.",
+  "description": "Find a job in Japan — one step at a time. Upload CV or skip, answer 10 short questions, match jobs with rule-based Career DNA. Free, private, no sign-up.",
   "lang": "en",
   "start_url": "./",
   "scope": "./",
@@ -12,6 +12,7 @@
   "background_color": "#0C2340",
   "theme_color": "#0C2340",
   "categories": ["business", "productivity"],
+  "version": "5.0.0",
   "icons": [
     {"src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
     {"src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"}
