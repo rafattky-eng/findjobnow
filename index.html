@@ -1371,6 +1371,10 @@ async function jget(url, ms){
   } catch { return null; }
   finally { clearTimeout(timer); }
 }
+function isFastHireJob(job){
+  const hay=[job.title,job.company,job.description,job.full,job.type,job.salary,job.visa].join(" ").toLowerCase();
+  return /visa sponsor|visa sponsorship|sponsor visa|part[- ]time|hourly|entry[- ]level|no experience|未経験|アルバイト|パート|時給|ビザ.{0,8}(支援|サポート)/i.test(hay);
+}
 function scoreLiveJob(j, titles, skills){
   const text = ((j.title||"")+" "+(j.description||"")+" "+(j.company||"")).toLowerCase();
   let s = 20;
@@ -1387,6 +1391,7 @@ async function searchLiveJobs(){
   const skills = STATE.profile?.skills || [];
   if(STATE.matches && !titles.length){ say(t("pick_one"), 0); return; }
   const queries = (titles.length ? titles : [skills[0] || "customer service"]).slice(0,4);
+  if(STATE.journey?.fastMode) ["part-time hourly","entry level no experience","visa sponsorship","アルバイト 未経験 時給"].forEach(q=>{if(queries.length<8)queries.push(q);});
   say(LANG==="jp" ? "求人を検索中…" : "Searching jobs…", 1);
   try {
     const feeds = await Promise.all(queries.flatMap(q => [
@@ -1400,10 +1405,15 @@ async function searchLiveJobs(){
     }
     // score + dedupe
     const seen = new Set();
-    jobs = jobs.map(j => ({
-      ...j,
-      matchScore: scoreLiveJob(j, titles, skills)
-    })).sort((a,b) => (b.matchScore||0) - (a.matchScore||0));
+    jobs = jobs.map(j => ({...j,matchScore:scoreLiveJob(j,titles,skills)}));
+    if(STATE.journey?.fastMode){
+      const fastCount=jobs.filter(isFastHireJob).length;
+      jobs.sort((a,b)=>{
+        if(isFastHireJob(a)!==isFastHireJob(b)) return isFastHireJob(a)?-1:1;
+        return (b.matchScore||0)-(a.matchScore||0);
+      });
+      if(fastCount<3) jobs=jobs; // Keep every result; fast-hire matches are simply floated to the top.
+    } else jobs.sort((a,b)=>(b.matchScore||0)-(a.matchScore||0));
     jobs = jobs.filter(j => {
       const k = (j.url||j.title+j.company).toLowerCase();
       if(seen.has(k)) return false;
@@ -1772,8 +1782,8 @@ NEW_TOOLS.score=p=>{const jt=STATE._jt||{};p.innerHTML=`<div class="card" style=
  $("scJd").value=STATE._jd||"";
  $("scGo").onclick=()=>{const jd=$("scJd").value;if(noCv())return;if(jd.trim().length<60){say(tx("Please paste more of the job ad","求人票をもう少し貼り付けてください"),0);return}STATE._jd=jd;persist();const r=scoreApp(jd);
   const V={apply:tx("✅ Apply now","✅ 今すぐ応募"),tailor:tx("✍️ Tailor your CV first","✍️ CVを調整してから応募"),stretch:tx("⚠️ Stretch — apply with a referral or recruiter","⚠️ ストレッチ — 紹介経由で"),skip:tx("🚫 Skip — scam risk","🚫 見送り — 詐欺リスク")};
-  $("scOut").innerHTML=`<div class="verdict ${r.verdict}">${V[r.verdict]} · ${r.overall}/100</div>${meter(tx("Skills","スキル"),r.kw)}${meter(tx("Language","言語"),r.lang)}${meter(tx("Experience","経験"),r.exp)}${meter(tx("Visa","ビザ"),r.visa)}<p class="sub">${tx("Scam check","詐欺チェック")}: ${esc(r.sc.risk)} — ${esc(r.sc.reasons.join("; "))}</p>${r.fix.length?`<h3>${tx("Fix before applying","応募前の修正")}</h3><ul class="list-check">${r.fix.map(f=>`<li class="miss">✗ ${esc(f)}</li>`).join("")}</ul>`:""}<button class="btn secondary" id="scSave">${tx("Save to Tracker","トラッカーに保存")}</button>`;
-  $("scSave").onclick=()=>{STATE.applications.saved.push({id:"jd-"+Date.now(),title:$("scT").value||"Job",company:$("scC").value||"",url:jt.url||"",score:r.overall,moved:today()});persist();say(tx("Saved to tracker","保存しました"),1);};};};
+  $("scOut").innerHTML=`<div class="verdict ${r.verdict}">${V[r.verdict]} · ${r.overall}/100</div>${meter(tx("Skills","スキル"),r.kw)}${meter(tx("Language","言語"),r.lang)}${meter(tx("Experience","経験"),r.exp)}${meter(tx("Visa","ビザ"),r.visa)}<h3>${tx("Scam check details","詐欺チェックの詳細")} · ${esc(r.sc.risk.toUpperCase())}</h3><ul class="list-check">${r.sc.reasons.map(reason=>`<li class="miss">• ${esc(reason)}</li>`).join("")}</ul>${r.fix.length?`<h3>${tx("What to fix before applying","応募前に修正すること")}</h3><ul class="list-check">${r.fix.map(f=>`<li class="miss">• ${esc(f)}</li>`).join("")}</ul>`:`<p class="sub">${tx("No specific CV fixes were detected by this check.","このチェックでは具体的な修正点は見つかりませんでした。")}</p>`}<button class="btn secondary" id="scSave">${tx("Save to Tracker","トラッカーに保存")}</button>`;
+  $("scSave").onclick=()=>{STATE.applications.saved.push({id:"jd-"+Date.now(),title:$("scT").value||"Job",company:$("scC").value||"",url:jt.url||"",score:r.overall,moved:today(),createdAt:today()});persist();say(tx("Saved to tracker","保存しました"),1);};};};
 NEW_TOOLS.rewrite=p=>{const S=summaries();p.innerHTML=`<div class="card" style="margin-top:12px"><h3>✍️ ${tx("AI Resume Rewriter","履歴書リライト")}</h3><p class="sub">${tx("Paste one weak bullet. Get measurable versions. Replace [brackets] with real facts only.","弱い箇条書きを貼ると成果ベースに変換。[ ]は事実のみで埋めてください。")}</p>${taBox("rwIn","Responsible for handling customer inquiries",80)}<button class="btn" id="rwGo">${tx("Rewrite","書き換え")}</button><div id="rwOut"></div><div class="section-title">${tx("Summary templates","職務要約テンプレート")}</div><div class="letter-box">${esc(S[0])}</div><div class="letter-box" style="margin-top:8px">${esc(S[1])}</div></div>`;
  $("rwGo").onclick=()=>{const v=$("rwIn").value;if(v.trim().length<8){say(tx("Please type a bullet first","先に文を入力してください"),0);return}$("rwOut").innerHTML=rewriteBullet(v).map(x=>`<div class="letter-box" style="margin-top:8px">${esc(x)}</div>`).join("");};};
 NEW_TOOLS.interview=p=>{const qs=IQ.core.concat(IQ[STATE.track==="entry"?"entry":"pro"]);let i=(STATE._qi||0)%qs.length;
@@ -1868,25 +1878,13 @@ function renderLanding(){
     </div>
   </div>
 
-  <div class="card" style="margin-top:10px;border-color:var(--ac)">
-    <div style="font-size:13px;font-weight:700;color:var(--ac);margin-bottom:8px">⚡ ${LANG==="jp"?"急いで仕事が必要な人へ":"Need a job fast?"}</div>
-    <p style="font-size:13px;color:var(--mu);margin:0 0 12px">
-      ${LANG==="jp"
-        ? "「今日応募できる現実的な求人」を優先表示します。パート・時給・ビザ支援も対応。"
-        : "We prioritize realistic jobs you can apply to today — including part-time, hourly, and visa-sponsored roles."}
-    </p>
-    <button class="btn secondary" id="btnFastMode" style="min-height:48px;font-size:14px">
-      ⚡ ${LANG==="jp"?"Need a Job Fast モードをON":"Turn on Need a Job Fast mode"}
-    </button>
-  </div>
-
-  <div style="text-align:center;margin:16px 0 8px">
-    <button class="btn ghost" id="btnSkip" style="max-width:300px;min-height:48px;font-size:15px">${t("skip")}</button>
+  <div style="text-align:center;margin:10px 0 4px">
+    <button type="button" id="btnSkip" style="background:none;border:0;color:var(--mu);font-size:13px;text-decoration:underline;padding:8px 10px;min-height:40px;cursor:pointer">Just browsing? See jobs without a CV →</button>
   </div>
   `}
 
   <p style="margin-top:14px;font-size:12px;color:var(--mu);text-align:center">${t("free_private") || (LANG==="jp"?"無料 · プライベート · 登録不要 · 端末内のみ":"Free · Private · No signup · On this device only")}</p>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.1.0 Guided</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.2.0 Hiring Copilot</div>
 
   <div style="text-align:center;margin-top:6px"><button class="btn ghost" id="btnRestore" style="max-width:300px;min-height:44px;font-size:14px">⬆ ${t("restore")}</button></div>
   <input type="file" id="restoreFile" accept="application/json,.json" class="hidden">
@@ -1901,6 +1899,44 @@ function renderLanding(){
   `;
 }
 
+function calculateHiringProbability(profile,scores,cv){
+  const p=profile||{},s=scores||{},text=String(cv||"").toLowerCase();
+  let value=38;const reasons=[],blockers=[];
+  const langs=(p.langs||[]).join(" ").toLowerCase();
+  if(/english|英語/.test(langs)||/english/.test(text)){value+=13;reasons.push("English communication is stated");}
+  if((p.yrs||0)>=5){value+=15;reasons.push("Substantial work experience is present");}
+  else if((p.yrs||0)>=2){value+=10;reasons.push("Relevant work experience is present");}
+  else if((p.yrs||0)>0){value+=5;reasons.push("Some work experience is present");}
+  if(/travel|tourism|hotel|hospitality|customer|service|営業|観光|旅行/.test(text)){value+=9;reasons.push("Customer service or tourism experience appears in the CV");}
+  if(p.jlpt){value+=({N1:14,N2:11,N3:8,N4:5,N5:3})[p.jlpt]||0;reasons.push("Japanese proficiency is stated as "+p.jlpt);}
+  else blockers.push("JLPT or practical Japanese level is not stated");
+  if(/\d+%|\b\d{2,}\b|increased|improved|achieved|reduced|generated|saved/i.test(text)) {value+=8;reasons.push("The CV includes measurable results");}
+  else blockers.push("Add measurable achievements with numbers");
+  if(p.visaStatus){value+=7;reasons.push("Residence / work status is stated");}
+  else blockers.push("Clarify current residence status and work permission");
+  if((p.skills||[]).length>=4){value+=5;reasons.push("Several job-related skills are identified");}
+  if(!/summary|profile|職務要約|自己pr/i.test(text))blockers.push("Add a short professional summary");
+  if((s.resume||0)<65)blockers.push("Improve CV structure and completeness");
+  value=Math.max(25,Math.min(92,Math.round(value)));
+  const improvements=[];
+  if(blockers.includes("Add measurable achievements with numbers"))improvements.push("Add 2–3 verified achievements with numbers, scale or time saved");
+  if(blockers.includes("JLPT or practical Japanese level is not stated"))improvements.push("State your honest Japanese speaking level and any JLPT result");
+  if(blockers.includes("Clarify current residence status and work permission"))improvements.push("Add your current residence status and work-permission details");
+  if(blockers.includes("Add a short professional summary"))improvements.push("Write a 3-line summary tailored to your target roles");
+  if(!improvements.length)improvements.push("Tailor the first half of your CV to one target job");
+  return {value,reasons,blockers,improvements};
+}
+function renderHiringProbability(){
+  const h=calculateHiringProbability(STATE.profile,STATE.scores,STATE.cvText),target=Math.min(95,Math.max(80,h.value+12));
+  return `<section class="card" style="border:1px solid var(--ac);margin:14px 0">
+    <div style="font-size:13px;font-weight:800;color:var(--ac);text-transform:uppercase">📈 Hiring Readiness Estimate</div>
+    <div style="display:flex;align-items:center;gap:14px;margin:10px 0"><div style="font-size:38px;font-weight:900;color:var(--ac)">${h.value}%</div><div style="font-size:13px;color:var(--mu)">CV-based readiness indicator<br><small>Heuristic estimate — not a measured hiring probability or guarantee.</small></div></div>
+    <div class="progress-bar"><i style="width:${h.value}%"></i></div>
+    <h3>Why this score exists</h3><ul class="list-check">${h.reasons.map(x=>`<li class="ok">✓ ${esc(x)}</li>`).join("")||"<li>Limited evidence found in the CV</li>"}</ul>
+    <h3>Biggest blockers</h3><ul class="list-check">${h.blockers.map(x=>`<li class="miss">⚠ ${esc(x)}</li>`).join("")||"<li>No major CV blockers detected by this basic check</li>"}</ul>
+    <h3>Fastest improvement</h3><div class="step-guide" style="margin:8px 0"><span class="hand">👇</span><div><div class="step-text">${esc(h.improvements[0])}</div><div class="step-sub">Illustrative target guide: ${target}% after addressing key gaps — not a prediction.</div></div></div>
+  </section>`;
+}
 function renderDashboard(){
   const p = STATE.profile || {};
   const s = STATE.scores || {resume:0,japan:0,language:0,experience:0,visa:0};
@@ -1924,6 +1960,7 @@ function renderDashboard(){
     <div class="score-card"><div class="num">${s.language||0}</div><div class="lbl">Language</div></div>
     <div class="score-card"><div class="num">${s.visa||0}</div><div class="lbl">Visa</div></div>
   </div>
+  ${renderHiringProbability()}
 
   <!-- ONE PRIMARY ACTION -->
   <div class="card" style="border:2px solid var(--ac);margin:16px 0">
@@ -1970,7 +2007,7 @@ function renderDashboard(){
     <button class="btn secondary" data-go="tracker">${t("tracker")}</button>
     <button class="btn secondary" data-go="directory">🌐 ${t("sites")}</button>
   </div>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.1.0 Guided</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.2.0 Hiring Copilot</div>
   `;
 }
 
@@ -2084,7 +2121,7 @@ function renderJobs(){
     </div>`;
   }).join("")}
 
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.1.0 Guided</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.2.0 Hiring Copilot</div>
   `;
 }
 
@@ -2172,7 +2209,7 @@ function renderDirectory(){
       </div>
     </div>`;
   }).join("")}
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.1.0 Guided</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.2.0 Hiring Copilot</div>
   `;
 }
 
@@ -2371,13 +2408,15 @@ function wireLanding(){
         text = await f.text();
       }
       if(text.trim().length < 40){
-        say("Could not extract enough text. Try paste or another file.",0);
-        return;
+        if(f.type==="application/pdf"||/\.pdf$/i.test(f.name)){showPdfPasteFallback();return;}
+        say("Could not extract enough text. Please paste the text instead.",0);
+        $("pasteModal")?.classList.remove("hidden");$("pasteText")?.focus();return;
       }
       runAnalysis(text);
     } catch(err){
-      say("Analysis failed — try paste or continue without CV",0);
-      console.error(err);
+      console.error("CV extraction failed:",err);
+      if(f.type==="application/pdf"||/\.pdf$/i.test(f.name))showPdfPasteFallback();
+      else{say("We couldn't read your file. Please paste the text instead.",0);$("pasteModal")?.classList.remove("hidden");}
     }
   });
   $("btnContinue")?.addEventListener("click", () => setView("dashboard"));
@@ -2428,20 +2467,42 @@ function runAnalysis(text){
   render();
 }
 
-async function extractPdfText(file){
-  // Minimal fallback — if pdf.js is loaded use it, else read as text (works for some)
+let pdfJsPromise = null;
+async function ensurePdfJs(){
   if(window.pdfjsLib){
-    const buf = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({data:buf}).promise;
-    let text = "";
-    for(let i=1;i<=Math.min(pdf.numPages,8);i++){
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      text += content.items.map(it=>it.str).join(" ") + "\n";
-    }
-    return text;
+    if(window.pdfjsLib.GlobalWorkerOptions && !window.pdfjsLib.GlobalWorkerOptions.workerSrc)
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    return window.pdfjsLib;
   }
-  return file.text();
+  if(!pdfJsPromise){
+    pdfJsPromise=new Promise((resolve,reject)=>{
+      const script=document.createElement("script");
+      const timer=setTimeout(()=>reject(new Error("PDF.js load timed out")),12000);
+      script.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+      script.async=true;
+      script.onload=()=>{clearTimeout(timer);window.pdfjsLib?resolve(window.pdfjsLib):reject(new Error("PDF.js unavailable"));};
+      script.onerror=()=>{clearTimeout(timer);reject(new Error("PDF.js failed to load"));};
+      document.head.appendChild(script);
+    }).then(lib=>{lib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";return lib;})
+      .catch(err=>{pdfJsPromise=null;throw err;});
+  }
+  return pdfJsPromise;
+}
+async function extractPdfText(file){
+  const pdfjs=await ensurePdfJs();
+  const pdf=await pdfjs.getDocument({data:await file.arrayBuffer()}).promise;
+  let text="";
+  for(let i=1;i<=Math.min(pdf.numPages,12);i++){
+    const page=await pdf.getPage(i),content=await page.getTextContent();
+    text+=content.items.map(it=>it.str).join(" ")+"\n";
+  }
+  if(text.trim().length<40)throw new Error("No readable PDF text");
+  return text.trim();
+}
+function showPdfPasteFallback(){
+  $("pasteModal")?.classList.remove("hidden");
+  $("pasteText")?.focus();
+  say(LANG==="jp"?"PDFを読み取れませんでした。CVのテキストを貼り付けてください。":"We couldn't read your PDF. Please paste the text instead.",0);
 }
 
 function wireTools(){
@@ -2503,7 +2564,7 @@ function wireCommon(){
       const exists = Object.values(STATE.applications).flat().some(a => a.id === id);
       if(!exists){
         STATE.applications.saved = STATE.applications.saved || [];
-        STATE.applications.saved.push({id, title, company, url, moved: today()});
+        STATE.applications.saved.push({id,title,company,url,moved:today(),createdAt:today()});
         persist();
       }
       STATE._lastJobForLetter = {title, company, url};
@@ -2558,11 +2619,7 @@ $("btnBackup")?.addEventListener("click", () => {
 $("logoHome")?.addEventListener("click", () => { setView("landing"); window.scrollTo(0,0); });
 $("logoHome")?.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); setView("landing"); } });
 
-// Load pdf.js for better extraction
-const s = document.createElement("script");
-s.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
-s.onload = () => { if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"; };
-document.head.appendChild(s);
+// PDF.js is loaded on demand by ensurePdfJs() when a PDF is selected.
 
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("./sw.js").catch(()=>{});

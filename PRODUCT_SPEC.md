@@ -1,4 +1,4 @@
-# FindJob Now V3.1 — Guided Hiring Journey
+# FindJob Now V3.2 — Hiring Copilot
 
 ## Core Principle
 Every screen has **only ONE primary next action**.  
@@ -34,3 +34,13 @@ Users (especially foreigners with weak English / no experience) never wonder wha
 
 ## Version
 V3.1.0 Guided — builds on V3.0.0 engines (ATS, Interview Coach, Rewriter, Application Score, Recruiter Match).
+
+
+## V3.2.0 Implementation Notes
+- Added a transparent CV-based Hiring Readiness Estimate with reasons, blockers and one suggested improvement.
+- The estimate is a heuristic readiness indicator, not a real-world hiring probability or guarantee.
+- PDF.js loads on demand; unreadable PDFs open the existing Paste CV modal with a clear fallback message.
+- Fast Job Mode adds part-time, hourly, entry-level, no-experience, Japanese-language and visa-support search terms, then floats relevant roles to the top without removing results.
+- Saved applications retain the save date (`moved` and `createdAt`) for follow-up timing.
+- Application Score displays scam-check reasons and pre-application fixes as separate bullet lists.
+- Landing page keeps Upload CV as the primary action and makes browsing without a CV a small secondary text link.
