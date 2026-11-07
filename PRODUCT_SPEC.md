@@ -52,3 +52,8 @@ V3.1.0 Guided — builds on V3.0.0 engines (ATS, Interview Coach, Rewriter, Appl
 - Score renamed "CV Readiness Score" with plain wording (it is a heuristic, not a hiring probability).
 - Accessibility: pinch-zoom re-enabled, visible keyboard focus, reduced-motion support.
 - Footer repeated only once. Service-worker cache bumped to fj-v3.3.0.
+
+## V3.3.1 Navigation + Motion
+- Header back arrow (←) appears on every screen after the CV is loaded; it follows the real screen history.
+- 🔄 Restart button in the header clears the profile, goal and job results (tracker is kept) after a confirmation.
+- 👇 finger now taps up and down; the main button has a soft gold pulse. Both stop when the device asks for reduced motion.

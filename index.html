@@ -293,9 +293,25 @@ main {
   margin: 16px 0 10px;
 }
 .step-guide .hand {
-  font-size: 28px;
+  font-size: 30px;
   line-height: 1;
   flex-shrink: 0;
+  display: inline-block;
+  transform-origin: 50% 20%;
+  animation: fingerTap 1.4s ease-in-out infinite;
+  filter: drop-shadow(0 3px 4px rgba(0,0,0,.35));
+}
+@keyframes fingerTap {
+  0%, 100% { transform: translateY(-4px) rotate(-6deg) scale(1); }
+  35% { transform: translateY(8px) rotate(0deg) scale(.92); }
+  50% { transform: translateY(8px) rotate(0deg) scale(.92); }
+  70% { transform: translateY(-2px) rotate(-4deg) scale(1); }
+}
+.btn-lg { position: relative; animation: ctaPulse 2.2s ease-out infinite; }
+@keyframes ctaPulse {
+  0% { box-shadow: 0 0 0 0 rgba(244,180,0,.55); }
+  70% { box-shadow: 0 0 0 14px rgba(244,180,0,0); }
+  100% { box-shadow: 0 0 0 0 rgba(244,180,0,0); }
 }
 .step-guide .step-text {
   font-size: 15px;
@@ -1061,12 +1077,14 @@ details.more[open]>summary{margin-bottom:14px}
 <body>
 <div class="app" id="app">
 <header>
+  <button class="icon-btn hidden" id="btnBack" type="button" aria-label="Go back" title="Back">←</button>
   <div class="logo" id="logoHome" role="button" tabindex="0" title="Main menu"><img src="./icon-192.png" alt="FindJob Now" class="logo-img" width="32" height="32"> FindJob Now</div>
   <div class="header-actions">
     <div class="lang-switch">
       <button type="button" id="btnEn" class="active">EN</button>
       <button type="button" id="btnJp">JP</button>
     </div>
+    <button class="icon-btn" id="btnRestart" type="button" aria-label="Start from the beginning" title="Start from the beginning">🔄</button>
     <button class="icon-btn" id="btnBackup" title="Backup">💾</button>
   </div>
 </header>
@@ -1662,6 +1680,7 @@ function startOver(){
   if(!confirm(t("confirm_over"))) return;
   STATE.cvText = ""; STATE.profile = null; STATE.scores = null; STATE.matches = null;
   STATE.selectedRoles = null; STATE.jobs = [];
+  STATE.journey = { step: 1, mode: null, goal: null, fastMode: false }; STATE.track = null; STATE._jd = ""; STATE._jt = null; NAVSTACK.length = 0;
   STATE.view = "landing";
   persist(); render(); window.scrollTo(0,0);
   say(t("cleared"), 1);
@@ -1813,7 +1832,18 @@ NEW_TOOLS.premium=p=>{const R=[["Now · Free","ATS check, application score, rew
  p.innerHTML=`<div class="card" style="margin-top:12px"><h3>💎 ${tx("Premium Roadmap","プレミアム計画")}</h3>${R.map(r=>`<div class="roadmap-step"><strong>${tx(r[0],r[2])}</strong><span>${tx(r[1],r[3])}</span></div>`).join("")}</div>`;};
 
 // ---------- Views ----------
+const NAVSTACK = [];
+function goBack(){
+  const prev = NAVSTACK.pop();
+  const fallback = STATE.profile ? "dashboard" : "landing";
+  STATE.view = prev || (STATE.view === fallback ? "landing" : fallback);
+  if(!STATE.profile) STATE.view = "landing";
+  persist(); render(); window.scrollTo(0,0);
+}
 function setView(v){
+  if(STATE.view && STATE.view !== v && STATE.view !== "landing") NAVSTACK.push(STATE.view);
+  else if(STATE.view === "landing" && STATE.profile && v !== "landing") NAVSTACK.push("landing");
+  if(NAVSTACK.length > 20) NAVSTACK.shift();
   STATE.view = v;
   persist();
   render();
@@ -1885,7 +1915,7 @@ function renderLanding(){
   `}
 
   <p style="margin-top:14px;font-size:12px;color:var(--mu);text-align:center">${t("free_private") || (LANG==="jp"?"無料 · プライベート · 登録不要 · 端末内のみ":"Free · Private · No signup · On this device only")}</p>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.3.0 Hiring Copilot</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V3.3.1 Hiring Copilot</div>
 
   <details class="more" style="margin-top:8px"><summary>${LANG==="jp"?"バックアップから復元":"Restore a backup"}</summary><div style="text-align:center;margin-top:6px"><button class="btn ghost" id="btnRestore" style="max-width:300px;min-height:44px;font-size:14px">⬆ ${t("restore")}</button></div></details>
   <input type="file" id="restoreFile" accept="application/json,.json" class="hidden">
@@ -2301,6 +2331,7 @@ function render(){
   const v = STATE.view || "landing";
   updateProgress();
   updateNavLabels();
+  $("btnBack")?.classList.toggle("hidden", !(STATE.profile && v !== "landing"));
   if(v === "landing" || !STATE.profile){
     main.innerHTML = renderLanding();
     $("bottomNav").style.display = "none";
@@ -2611,6 +2642,8 @@ $("btnBackup")?.addEventListener("click", () => {
   say(t("backup_ok"), 1);
 });
 
+$("btnBack")?.addEventListener("click", goBack);
+$("btnRestart")?.addEventListener("click", () => { if(!STATE.profile && STATE.view === "landing"){ window.scrollTo(0,0); return; } startOver(); });
 $("logoHome")?.addEventListener("click", () => { setView("landing"); window.scrollTo(0,0); });
 $("logoHome")?.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); setView("landing"); } });
 
