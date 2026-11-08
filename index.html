@@ -38,6 +38,75 @@
   --safe-b: env(safe-area-inset-bottom, 0px);
   --touch: 56px;
 }
+/* Light mode */
+[data-theme="light"] {
+  --bg: #F3EFE6;
+  --cd: #FFFFFF;
+  --cd2: #E8E4DA;
+  --tx: #0E1218;
+  --mu: #4A5568;
+  --ac: #C9A227;
+  --bd: rgba(14, 18, 24, 0.12);
+  --ok: #16A34A;
+  --er: #DC2626;
+  --btn: #C9A227;
+  --btnText: #0E1218;
+  --btn2: #0B1A2E;
+  --btn2Text: #FFFFFF;
+  --input: #FFFFFF;
+  --shadow: 0 4px 24px rgba(0,0,0,.08);
+}
+[data-theme="light"] body { background: var(--bg); color: var(--tx); }
+[data-theme="light"] header {
+  background: rgba(243, 239, 230, 0.94);
+  border-bottom-color: var(--bd);
+}
+[data-theme="light"] .nav-bottom {
+  background: rgba(243, 239, 230, 0.96);
+  border-top-color: var(--bd);
+}
+[data-theme="light"] .card, [data-theme="light"] .job-card, [data-theme="light"] .welcome-card {
+  background: var(--cd);
+  border-color: var(--bd);
+}
+[data-theme="light"] .icon-btn {
+  background: rgba(14,18,24,.06);
+  color: var(--tx);
+}
+[data-theme="light"] .lang-switch button {
+  color: var(--mu);
+}
+[data-theme="light"] .lang-switch button.active {
+  background: var(--ac);
+  color: #000;
+}
+[data-theme="light"] .progress-bar-wrap {
+  background: rgba(243, 239, 230, 0.94);
+}
+[data-theme="light"] .ob-sticky {
+  background: rgba(243, 239, 230, 0.96) !important;
+}
+[data-theme="light"] input, [data-theme="light"] textarea, [data-theme="light"] select {
+  background: var(--input);
+  border-color: var(--bd);
+  color: var(--tx);
+}
+.theme-btn {
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--bd);
+  background: transparent;
+  color: var(--tx);
+  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; padding: 0; height: 100%; }
 body {
@@ -1124,6 +1193,7 @@ details.mwhy>summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--a
       <button type="button" id="btnEn" class="active">EN</button>
       <button type="button" id="btnJp">JP</button>
     </div>
+    <button type="button" class="theme-btn" id="btnTheme" aria-label="Toggle dark mode" title="Dark / Light">🌙</button>
     <button class="icon-btn" id="btnRestart" type="button" aria-label="Start from the beginning" title="Start from the beginning">🔄</button>
     <button class="icon-btn" id="btnBackup" title="Backup">💾</button>
   </div>
@@ -1148,7 +1218,7 @@ details.mwhy>summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--a
 <script>
 
 // ===== FindJob Now V5.0.0 — Career DNA for Japan =====
-const APP_VERSION = "5.3.0";
+const APP_VERSION = "5.3.1";
 const $ = id => document.getElementById(id);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 const L = (k,d) => { try { const v = localStorage.getItem(k); return v!=null ? JSON.parse(v) : d; } catch { return d; } };
@@ -1207,6 +1277,20 @@ let LANG = STATE.settings.lang || "en";
 let THEME = STATE.settings.theme || "dark";
 document.documentElement.setAttribute("data-theme", THEME);
 document.documentElement.lang = LANG;
+
+function applyTheme(th){
+  THEME = (th === "light") ? "light" : "dark";
+  if(!STATE.settings) STATE.settings = {};
+  STATE.settings.theme = THEME;
+  document.documentElement.setAttribute("data-theme", THEME);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute("content", THEME === "light" ? "#F3EFE6" : "#0C2340");
+  const b = $("btnTheme");
+  if(b){ b.textContent = THEME === "light" ? "☀️" : "🌙"; b.setAttribute("aria-label", THEME === "light" ? "Switch to dark mode" : "Switch to light mode"); }
+  try{ persist(); }catch(_){}
+}
+function toggleTheme(){ applyTheme(THEME === "dark" ? "light" : "dark"); }
+
 
 function persist(){ W("fj2_state", STATE); }
 function say(msg, ok){
@@ -2501,19 +2585,8 @@ function wirePrefs(){
 }
 
 function renderLanding(){
-  const showInstall = !L("fj2_install_dismissed", false) && /iPhone|iPad|iPod/.test(navigator.userAgent);
   const hasProfile = !!STATE.profile;
   return `
-  ${showInstall ? `
-  <div class="install-banner install-slim" id="installBanner" style="padding:10px 12px;margin-bottom:10px;display:flex;align-items:center;gap:10px">
-    <div style="flex:1;font-size:13px;line-height:1.4;color:var(--mu)">
-      <strong style="color:var(--tx)">📱 ${tx("Add to Home Screen","ホーム画面に追加")}</strong>
-      — ${tx("Safari Share → Add to Home Screen","Safari共有 → ホーム画面に追加")}
-    </div>
-    <button class="btn secondary" id="gotInstall" style="min-height:40px;padding:0 14px;font-size:13px;flex-shrink:0">${t("got_it")}</button>
-    <button class="close-x" id="dismissInstall" aria-label="Dismiss" style="position:static;padding:4px 6px">×</button>
-  </div>` : ""}
-
   ${hasProfile ? `
   <div class="welcome-card">
     <div class="step-guide" style="margin:0 0 12px">
@@ -2581,7 +2654,7 @@ function renderLanding(){
   </details>
 
   <p style="margin-top:14px;font-size:12px;color:var(--mu);text-align:center">${t("free_private") || (LANG==="jp"?"無料 · プライベート · 登録不要 · 端末内のみ":"Free · Private · No signup · On this device only")}</p>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V5.3.0</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V5.3.1</div>
 
   <details class="more" style="margin-top:8px"><summary>${LANG==="jp"?"バックアップから復元":"Restore a backup"}</summary><div style="text-align:center;margin-top:6px"><button class="btn ghost" id="btnRestore" style="max-width:300px;min-height:44px;font-size:14px">⬆ ${t("restore")}</button></div></details>
   <input type="file" id="restoreFile" accept="application/json,.json" class="hidden">
@@ -3722,6 +3795,8 @@ $("btnBackup")?.addEventListener("click", () => {
 });
 
 $("btnBack")?.addEventListener("click", goBack);
+$("btnTheme")?.addEventListener("click", () => toggleTheme());
+applyTheme(THEME); // sync icon on boot
 $("btnRestart")?.addEventListener("click", () => { if(!STATE.profile && STATE.view === "landing"){ window.scrollTo(0,0); return; } startOver(); });
 $("logoHome")?.addEventListener("click", () => { setView("landing"); window.scrollTo(0,0); });
 $("logoHome")?.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); setView("landing"); } });
