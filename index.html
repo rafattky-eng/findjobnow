@@ -92,19 +92,40 @@
   color: var(--tx);
 }
 .theme-btn {
-  min-width: 40px;
-  min-height: 40px;
-  border-radius: 10px;
-  border: 1px solid var(--bd);
-  background: transparent;
-  color: var(--tx);
-  font-size: 18px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 12px;
+  border: 1.5px solid var(--ac);
+  background: rgba(244, 180, 0, 0.18);
+  color: var(--ac);
+  font-size: 20px;
+  line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.theme-btn:active { transform: scale(0.96); }
+/* Light mode: keep gold ring, dark icon surface so sun/moon stays readable */
+[data-theme="light"] .theme-btn {
+  background: #0B1A2E;
+  border-color: #0B1A2E;
+  color: #F4B400;
+  box-shadow: 0 1px 3px rgba(0,0,0,.12);
+}
+[data-theme="dark"] .theme-btn {
+  background: rgba(244, 180, 0, 0.22);
+  border-color: var(--ac);
+  color: #F4B400;
+}
+/* Header icon buttons also clearer in light mode */
+[data-theme="light"] .icon-btn {
+  background: #0B1A2E;
+  color: #F4B400;
+  border: 1px solid #0B1A2E;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -1218,7 +1239,7 @@ details.mwhy>summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--a
 <script>
 
 // ===== FindJob Now V5.0.0 — Career DNA for Japan =====
-const APP_VERSION = "5.3.1";
+const APP_VERSION = "5.3.2";
 const $ = id => document.getElementById(id);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 const L = (k,d) => { try { const v = localStorage.getItem(k); return v!=null ? JSON.parse(v) : d; } catch { return d; } };
@@ -1286,7 +1307,13 @@ function applyTheme(th){
   const meta = document.querySelector('meta[name="theme-color"]');
   if(meta) meta.setAttribute("content", THEME === "light" ? "#F3EFE6" : "#0C2340");
   const b = $("btnTheme");
-  if(b){ b.textContent = THEME === "light" ? "☀️" : "🌙"; b.setAttribute("aria-label", THEME === "light" ? "Switch to dark mode" : "Switch to light mode"); }
+  if(b){
+    // Show what you will switch TO for clarity: sun = go light, moon = go dark is inverted —
+    // Show CURRENT mode icon, high contrast button already styled in CSS
+    b.textContent = THEME === "light" ? "☀️" : "🌙";
+    b.title = THEME === "light" ? "Light mode — tap for dark" : "Dark mode — tap for light";
+    b.setAttribute("aria-label", THEME === "light" ? "Light mode, switch to dark" : "Dark mode, switch to light");
+  }
   try{ persist(); }catch(_){}
 }
 function toggleTheme(){ applyTheme(THEME === "dark" ? "light" : "dark"); }
@@ -2654,7 +2681,7 @@ function renderLanding(){
   </details>
 
   <p style="margin-top:14px;font-size:12px;color:var(--mu);text-align:center">${t("free_private") || (LANG==="jp"?"無料 · プライベート · 登録不要 · 端末内のみ":"Free · Private · No signup · On this device only")}</p>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V5.3.1</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V5.3.2</div>
 
   <details class="more" style="margin-top:8px"><summary>${LANG==="jp"?"バックアップから復元":"Restore a backup"}</summary><div style="text-align:center;margin-top:6px"><button class="btn ghost" id="btnRestore" style="max-width:300px;min-height:44px;font-size:14px">⬆ ${t("restore")}</button></div></details>
   <input type="file" id="restoreFile" accept="application/json,.json" class="hidden">
