@@ -38,96 +38,6 @@
   --safe-b: env(safe-area-inset-bottom, 0px);
   --touch: 56px;
 }
-/* Light mode */
-[data-theme="light"] {
-  --bg: #F3EFE6;
-  --cd: #FFFFFF;
-  --cd2: #E8E4DA;
-  --tx: #0E1218;
-  --mu: #4A5568;
-  --ac: #C9A227;
-  --bd: rgba(14, 18, 24, 0.12);
-  --ok: #16A34A;
-  --er: #DC2626;
-  --btn: #C9A227;
-  --btnText: #0E1218;
-  --btn2: #0B1A2E;
-  --btn2Text: #FFFFFF;
-  --input: #FFFFFF;
-  --shadow: 0 4px 24px rgba(0,0,0,.08);
-}
-[data-theme="light"] body { background: var(--bg); color: var(--tx); }
-[data-theme="light"] header {
-  background: rgba(243, 239, 230, 0.94);
-  border-bottom-color: var(--bd);
-}
-[data-theme="light"] .nav-bottom {
-  background: rgba(243, 239, 230, 0.96);
-  border-top-color: var(--bd);
-}
-[data-theme="light"] .card, [data-theme="light"] .job-card, [data-theme="light"] .welcome-card {
-  background: var(--cd);
-  border-color: var(--bd);
-}
-[data-theme="light"] .icon-btn {
-  background: rgba(14,18,24,.06);
-  color: var(--tx);
-}
-[data-theme="light"] .lang-switch button {
-  color: var(--mu);
-}
-[data-theme="light"] .lang-switch button.active {
-  background: var(--ac);
-  color: #000;
-}
-[data-theme="light"] .progress-bar-wrap {
-  background: rgba(243, 239, 230, 0.94);
-}
-[data-theme="light"] .ob-sticky {
-  background: rgba(243, 239, 230, 0.96) !important;
-}
-[data-theme="light"] input, [data-theme="light"] textarea, [data-theme="light"] select {
-  background: var(--input);
-  border-color: var(--bd);
-  color: var(--tx);
-}
-.theme-btn {
-  min-width: 44px;
-  min-height: 44px;
-  border-radius: 12px;
-  border: 1.5px solid var(--ac);
-  background: rgba(244, 180, 0, 0.18);
-  color: var(--ac);
-  font-size: 20px;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: 0;
-  flex-shrink: 0;
-  -webkit-tap-highlight-color: transparent;
-}
-.theme-btn:active { transform: scale(0.96); }
-/* Light mode: keep gold ring, dark icon surface so sun/moon stays readable */
-[data-theme="light"] .theme-btn {
-  background: #0B1A2E;
-  border-color: #0B1A2E;
-  color: #F4B400;
-  box-shadow: 0 1px 3px rgba(0,0,0,.12);
-}
-[data-theme="dark"] .theme-btn {
-  background: rgba(244, 180, 0, 0.22);
-  border-color: var(--ac);
-  color: #F4B400;
-}
-/* Header icon buttons also clearer in light mode */
-[data-theme="light"] .icon-btn {
-  background: #0B1A2E;
-  color: #F4B400;
-  border: 1px solid #0B1A2E;
-}
-
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; padding: 0; height: 100%; }
 body {
@@ -1177,11 +1087,6 @@ details.more[open]>summary{margin-bottom:14px}
 .pchip{min-height:40px;padding:8px 14px;border-radius:999px;border:1px solid var(--bd);background:transparent;color:var(--tx);font-size:13px;font-weight:600;cursor:pointer}
 .pchip.on{background:var(--ac);color:#000;border-color:var(--ac)}
 .sel { outline: 2px solid var(--ac); background: rgba(244,180,0,.18); color: var(--ac); font-weight: 800; }
-.ob-next-ready { box-shadow: 0 0 0 0 rgba(244,180,0,.5); animation: obPulse 1.6s ease-out infinite; }
-@keyframes obPulse { 0%{ box-shadow:0 0 0 0 rgba(244,180,0,.45);} 70%{ box-shadow:0 0 0 12px rgba(244,180,0,0);} 100%{ box-shadow:0 0 0 0 rgba(244,180,0,0);} }
-@media (prefers-reduced-motion: reduce){ .ob-next-ready { animation: none; } }
-.seg button { min-height: 52px; font-size: 15px; }
-.ob-wrap .card { margin-bottom: 8px; }
 .seg button.on, .pchip.on, .role-item.on { outline: 2px solid var(--ac); }
 .pchip.inf{border-style:dashed;border-color:var(--ac)}
 details.more textarea{width:100%;background:transparent;color:var(--tx);border:1px solid var(--bd);border-radius:12px;padding:10px;font:inherit;font-size:14px;box-sizing:border-box}
@@ -1214,7 +1119,6 @@ details.mwhy>summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--a
       <button type="button" id="btnEn" class="active">EN</button>
       <button type="button" id="btnJp">JP</button>
     </div>
-    <button type="button" class="theme-btn" id="btnTheme" aria-label="Toggle dark mode" title="Dark / Light">🌙</button>
     <button class="icon-btn" id="btnRestart" type="button" aria-label="Start from the beginning" title="Start from the beginning">🔄</button>
     <button class="icon-btn" id="btnBackup" title="Backup">💾</button>
   </div>
@@ -1239,7 +1143,7 @@ details.mwhy>summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--a
 <script>
 
 // ===== FindJob Now V5.0.0 — Career DNA for Japan =====
-const APP_VERSION = "5.3.2";
+const APP_VERSION = "5.0.1";
 const $ = id => document.getElementById(id);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 const L = (k,d) => { try { const v = localStorage.getItem(k); return v!=null ? JSON.parse(v) : d; } catch { return d; } };
@@ -1298,26 +1202,6 @@ let LANG = STATE.settings.lang || "en";
 let THEME = STATE.settings.theme || "dark";
 document.documentElement.setAttribute("data-theme", THEME);
 document.documentElement.lang = LANG;
-
-function applyTheme(th){
-  THEME = (th === "light") ? "light" : "dark";
-  if(!STATE.settings) STATE.settings = {};
-  STATE.settings.theme = THEME;
-  document.documentElement.setAttribute("data-theme", THEME);
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if(meta) meta.setAttribute("content", THEME === "light" ? "#F3EFE6" : "#0C2340");
-  const b = $("btnTheme");
-  if(b){
-    // Show what you will switch TO for clarity: sun = go light, moon = go dark is inverted —
-    // Show CURRENT mode icon, high contrast button already styled in CSS
-    b.textContent = THEME === "light" ? "☀️" : "🌙";
-    b.title = THEME === "light" ? "Light mode — tap for dark" : "Dark mode — tap for light";
-    b.setAttribute("aria-label", THEME === "light" ? "Light mode, switch to dark" : "Dark mode, switch to light");
-  }
-  try{ persist(); }catch(_){}
-}
-function toggleTheme(){ applyTheme(THEME === "dark" ? "light" : "dark"); }
-
 
 function persist(){ W("fj2_state", STATE); }
 function say(msg, ok){
@@ -2085,26 +1969,14 @@ function matchJob(job, dna){
   else if(/japanese (?:language|speaking|skills?)|日本語/i.test(low)) needJa = 2;
   const lang = needJa ? (dna.ja >= needJa ? 100 : Math.max(10, 100 - 25*(needJa - dna.ja))) : (dna.ja ? 100 : 88);
   if(needJa && dna.ja < needJa){ missing.push(LANGX()==="jp" ? `日本語 N${6-needJa}` : `Japanese N${6-needJa}`); penalties += 8; whyNot.push(LANGX()==="jp" ? "日本語レベルが要件に届いていません。" : "Your Japanese is below the stated requirement."); }
-  // visa / location eligibility (+ onboarding nationality / visaNeeded / locationPref)
+  // visa / location eligibility
   const loc = (job.location||"");
   const jpOk = /worldwide|anywhere|global|asia|apac|japan|tokyo|osaka|international/i.test(loc) || !loc || /^remote$/i.test(loc.trim());
   const restricted = !jpOk && /\b(usa?|united states|u\.s\.|canada|uk|united kingdom|europe|eu|emea|latam|latin america|australia|germany|france|north america|brazil|india)\b/i.test(loc);
   const authOnly = /(must|need to|required to) (be )?(legally |currently )?(authori[sz]ed|eligible|allowed) to work in (the )?(us|u\.s\.|united states|uk|canada|eu)/i.test(low);
   let visa = (restricted || authOnly) ? 10 : job.visa ? 100 : dna.visaStrong ? 95 : /student/i.test(dna.visaStatus||"") ? 55 : 70;
-  // Onboarding: visa needed → boost sponsorship mentions, soft-penalize auth-only abroad
-  const needsVisa = (typeof dna.visaNeeded === "boolean") ? dna.visaNeeded : !dna.visaStrong;
-  if(needsVisa && job.visa){ visa = Math.max(visa, 100); why.push(LANGX()==="jp" ? "ビザ支援あり（希望と一致）" : "Visa sponsorship mentioned (matches your need)."); }
-  if(needsVisa && authOnly){ visa = Math.min(visa, 15); penalties += 5; }
   if(restricted || authOnly){ whyNot.push(LANGX()==="jp" ? `勤務地の制限: ${loc||"US/EU"}（日本から応募できない可能性）` : `Location-restricted${loc ? " ("+loc+")" : ""} — may not accept applicants in Japan.`); penalties += 30; }
-  // Location preference soft filter signal (hard filter applied in renderJobs)
-  const locPref = dna.locationPref || (STATE.onboarding && STATE.onboarding.location) || "";
-  if(locPref === "tokyo" && /tokyo|東京/i.test(loc)){ exp = Math.min(100, exp + 4); }
-  if(locPref === "japan" && /japan|tokyo|osaka|yokohama|fukuoka|nagoya|日本|東京|大阪/i.test(loc)){ exp = Math.min(100, exp + 3); }
-  // Weights: Japanese nationality → visa weight 0%, redistributed to experience
-  const isJP = (dna.nationality === "japanese") || (STATE.onboarding && STATE.onboarding.nationality === "japanese");
-  let wExp = 0.40, wInt = 0.25, wSk = 0.20, wLang = 0.10, wVisa = 0.05;
-  if(isJP){ wExp = 0.45; wVisa = 0.00; }
-  let total = Math.round(wExp*exp + wInt*it.v + wSk*skill + wLang*lang + wVisa*visa);
+  let total = Math.round(.40*exp + .25*it.v + .20*skill + .10*lang + .05*visa);
   if(restricted || authOnly) total = Math.min(total, 45);
   if(it.hardDis){ total = Math.min(total, 30); whyNot.push(LANGX()==="jp" ? "避けたい仕事の特徴があります。" : "Has traits you said you want to avoid (e.g. call-center or pure-coding work)."); }
   else if(it.softDis){ whyNot.push(LANGX()==="jp" ? "あなたの志向と合わない可能性があります。" : "May not fit what you enjoy."); }
@@ -2612,8 +2484,21 @@ function wirePrefs(){
 }
 
 function renderLanding(){
+  const showInstall = !L("fj2_install_dismissed", false) && /iPhone|iPad|iPod/.test(navigator.userAgent);
   const hasProfile = !!STATE.profile;
   return `
+  ${showInstall ? `
+  <div class="install-banner" id="installBanner">
+    <button class="close-x" id="dismissInstall" aria-label="Dismiss">×</button>
+    <h3>📱 ${t("install_title")}</h3>
+    <ol>
+      <li>${t("install_1")}</li>
+      <li>${t("install_2")}</li>
+      <li>${t("install_3")}</li>
+    </ol>
+    <button class="btn secondary" id="gotInstall">${t("got_it")}</button>
+  </div>` : ""}
+
   ${hasProfile ? `
   <div class="welcome-card">
     <div class="step-guide" style="margin:0 0 12px">
@@ -2681,7 +2566,7 @@ function renderLanding(){
   </details>
 
   <p style="margin-top:14px;font-size:12px;color:var(--mu);text-align:center">${t("free_private") || (LANG==="jp"?"無料 · プライベート · 登録不要 · 端末内のみ":"Free · Private · No signup · On this device only")}</p>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V5.3.2</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V5.0.1</div>
 
   <details class="more" style="margin-top:8px"><summary>${LANG==="jp"?"バックアップから復元":"Restore a backup"}</summary><div style="text-align:center;margin-top:6px"><button class="btn ghost" id="btnRestore" style="max-width:300px;min-height:44px;font-size:14px">⬆ ${t("restore")}</button></div></details>
   <input type="file" id="restoreFile" accept="application/json,.json" class="hidden">
@@ -2826,19 +2711,6 @@ function renderJobs(){
   if(prefs.visaOnly) jobs = jobs.filter(j => j.visa);
   if(prefs.englishOnly) jobs = jobs.filter(j => j.eng !== false);
   if(prefs.remoteOnly) jobs = jobs.filter(j => j.remote);
-  // Onboarding location preference
-  const locPref = (STATE.dna && STATE.dna.locationPref) || (STATE.onboarding && STATE.onboarding.location) || "";
-  if(locPref === "tokyo"){
-    jobs = jobs.filter(j => /tokyo|東京|japan|日本|remote|anywhere|worldwide/i.test((j.location||"")+" "+(j.title||"")) || j.remote);
-  } else if(locPref === "japan"){
-    jobs = jobs.filter(j => /japan|tokyo|osaka|yokohama|fukuoka|nagoya|日本|東京|大阪|remote|anywhere|worldwide|asia|apac/i.test((j.location||"")+" "+(j.title||"")) || j.remote);
-  } else if(locPref === "overseas"){
-    jobs = jobs.filter(j => j.remote || !/japan|tokyo|osaka|日本|東京/i.test(j.location||"") || /remote|worldwide|anywhere/i.test(j.location||""));
-  }
-  // Japan-only toggle
-  if(prefs.japanOnly){
-    jobs = jobs.filter(j => /japan|tokyo|osaka|yokohama|fukuoka|日本|東京|大阪/i.test((j.location||"")+" "+(j.title||"")+" "+(j.company||"")) || (j.src && /daijob|gaijin|careercross|indeed.?jp/i.test(j.src)));
-  }
   const hasLive = jobs.length > 0;
   const titles = (STATE.matches?.titles || []).map(x => x.title || x).filter(Boolean);
 
@@ -2862,32 +2734,23 @@ function renderJobs(){
     ${LANG==="jp"?"ここに出るのは海外・リモートの英語求人です。日本国内の求人は下のボタンから。":"These are overseas / remote English jobs. For jobs located in Japan, use the button below."}
   </p>
 
-  ${(() => {
-    const topRole = (typeof selectedRoles === "function" ? selectedRoles() : []).map(r => r.title || r).filter(Boolean)[0]
-      || (STATE.matches?.titles||[]).find(x => x.selected)?.title
-      || (STATE.dna?.best||[])[0]?.title
-      || "";
-    const q = encodeURIComponent(topRole || "job");
-    const qIndeed = encodeURIComponent(topRole || "");
-    return `<div class="card" style="margin-bottom:12px;padding:12px">
-    <div class="section-title" style="margin:0 0 8px">🇯🇵 ${tx("Japan job boards","日本の求人ボード")}${topRole ? ` · <span style="color:var(--ac);font-weight:700">${esc(topRole)}</span>` : ""}</div>
+  <div class="card" style="margin-bottom:12px;padding:12px">
+    <div class="section-title" style="margin:0 0 8px">🇯🇵 ${tx("Japan job boards","日本の求人ボード")}</div>
     <div style="display:flex;flex-wrap:wrap;gap:8px">
-      <a class="btn secondary" href="https://www.careercross.com/en/job/search?keyword=${q}" target="_blank" rel="noopener" style="min-height:40px;font-size:13px;text-decoration:none">CareerCross</a>
-      <a class="btn secondary" href="https://www.daijob.com/en/job/search?keyword=${q}" target="_blank" rel="noopener" style="min-height:40px;font-size:13px;text-decoration:none">Daijob</a>
-      <a class="btn secondary" href="https://jobs.gaijinpot.com/en/jobs?job_title=${q}" target="_blank" rel="noopener" style="min-height:40px;font-size:13px;text-decoration:none">GaijinPot</a>
-      <a class="btn secondary" href="https://jp.indeed.com/jobs?q=${qIndeed}&l=Japan" target="_blank" rel="noopener" style="min-height:40px;font-size:13px;text-decoration:none">Indeed JP</a>
-      <a class="btn secondary" href="https://www.linkedin.com/jobs/search/?keywords=${q}&location=Japan" target="_blank" rel="noopener" style="min-height:40px;font-size:13px;text-decoration:none">LinkedIn JP</a>
+      <a class="btn secondary" href="https://www.careercross.com/en/" target="_blank" rel="noopener" style="min-height:40px;font-size:13px;text-decoration:none">CareerCross</a>
+      <a class="btn secondary" href="https://www.daijob.com/en/" target="_blank" rel="noopener" style="min-height:40px;font-size:13px;text-decoration:none">Daijob</a>
+      <a class="btn secondary" href="https://jobs.gaijinpot.com/en/" target="_blank" rel="noopener" style="min-height:40px;font-size:13px;text-decoration:none">GaijinPot</a>
+      <a class="btn secondary" href="https://jp.indeed.com/jobs?q=&l=Japan" target="_blank" rel="noopener" style="min-height:40px;font-size:13px;text-decoration:none">Indeed JP</a>
+      <a class="btn secondary" href="https://www.linkedin.com/jobs/search/?location=Japan" target="_blank" rel="noopener" style="min-height:40px;font-size:13px;text-decoration:none">LinkedIn JP</a>
     </div>
-    <p style="font-size:11px;color:var(--mu);margin:8px 0 0">${tx("Links open with your top selected role when available. Overseas / Remote (English) feeds appear below after you search.","選択中の職種で検索を開きます。下は海外・リモート（英語）フィードです。")}</p>
-  </div>`;
-  })()}
+    <p style="font-size:11px;color:var(--mu);margin:8px 0 0">${tx("Overseas / Remote (English) feeds appear below after you search.","下の検索では海外・リモート（英語）フィードが表示されます。")}</p>
+  </div>
   <button class="btn secondary" data-go="directory" style="margin-bottom:12px;min-height:48px">🇯🇵 ${LANG==="jp"?"日本の求人サイト一覧":"All Japan job sites"}</button>
 
   <div class="filters">
     <label><input type="checkbox" id="fVisa" ${prefs.visaOnly?"checked":""}> 🛂 ${t("visa_support")}</label>
     <label><input type="checkbox" id="fRemote" ${prefs.remoteOnly?"checked":""}> 🏠 ${t("remote")}</label>
     <label><input type="checkbox" id="fEng" ${prefs.englishOnly?"checked":""}> 🌎 ${t("english_friendly")}</label>
-    <label><input type="checkbox" id="fJapan" ${prefs.japanOnly?"checked":""}> 🇯🇵 ${tx("Japan only","日本のみ")}</label>
   </div>
 
   ${hasLive ? `
@@ -3248,11 +3111,7 @@ function firstIncompleteStep(){
 }
 function goOnboarding(step){
   STATE.onboarding = STATE.onboarding || DEFAULT_ONBOARDING();
-  const next = Math.max(1, Math.min(10, step||1));
-  if(STATE.view === "onboarding" && STATE.onboarding.step && STATE.onboarding.step !== next){
-    try{ NAVSTACK.push("onboarding:"+STATE.onboarding.step); }catch(_){}
-  }
-  STATE.onboarding.step = next;
+  STATE.onboarding.step = Math.max(1, Math.min(10, step||1));
   STATE.view = "onboarding";
   persist();
   render();
@@ -3426,10 +3285,10 @@ function renderOnboarding(){
       }).join("")}
     </div>
     ${body}
-    <div class="action-row ob-sticky" style="margin-top:16px;position:sticky;bottom:calc(8px + var(--safe-b));background:rgba(12,35,64,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:12px 4px;z-index:30;border-top:1px solid var(--bd);gap:10px">
-      ${step > 1 ? `<button class="btn secondary" id="obBack" style="min-height:52px;flex:0 0 auto;padding:0 18px">${tx("Back","戻る")}</button>` : ""}
-      <button class="btn ${canNext?"ob-next-ready":"ghost"}" id="obNext" style="min-height:52px;flex:1;font-size:17px;font-weight:800" ${canNext?"":"disabled"}>${nextLabel}</button>
-      ${step === 10 ? `<button class="btn ghost" id="obSkipLike" style="min-height:48px">${tx("Skip for now","今はスキップ")}</button>` : ""}
+    <div class="action-row" style="margin-top:16px;position:sticky;bottom:calc(72px + var(--safe-b));background:var(--bg);padding:10px 0;z-index:20">
+      ${step > 1 ? `<button class="btn secondary" id="obBack">${tx("Back","戻る")}</button>` : ""}
+      <button class="btn ${canNext?"":"ghost"}" id="obNext" ${canNext?"":"disabled"}>${nextLabel}</button>
+      ${step === 10 ? `<button class="btn ghost" id="obSkipLike">${tx("Skip for now","今はスキップ")}</button>` : ""}
     </div>
     <p style="font-size:11px;color:var(--mu);text-align:center;margin-top:8px">${tx("Rule-based matching · No cloud AI · Your data stays on this device.","ルールベースのマッチング・クラウドAIなし・データは端末内のみ。")}</p>
   </div>`;
@@ -3788,11 +3647,6 @@ function wireCommon(){
     STATE.preferences.remoteOnly = e.target.checked;
     persist(); render();
   });
-  $("fJapan")?.addEventListener("change", e => {
-    if(!STATE.preferences) STATE.preferences = {};
-    STATE.preferences.japanOnly = e.target.checked;
-    persist(); render();
-  });
 }
 
 // Header actions
@@ -3822,8 +3676,6 @@ $("btnBackup")?.addEventListener("click", () => {
 });
 
 $("btnBack")?.addEventListener("click", goBack);
-$("btnTheme")?.addEventListener("click", () => toggleTheme());
-applyTheme(THEME); // sync icon on boot
 $("btnRestart")?.addEventListener("click", () => { if(!STATE.profile && STATE.view === "landing"){ window.scrollTo(0,0); return; } startOver(); });
 $("logoHome")?.addEventListener("click", () => { setView("landing"); window.scrollTo(0,0); });
 $("logoHome")?.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); setView("landing"); } });
