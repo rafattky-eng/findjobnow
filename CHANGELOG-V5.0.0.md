@@ -63,3 +63,10 @@ You now answer 10 short questions (resume optional). Selected options are clearl
 - Removed bottom-nav Share tab
 - Install banner text updated to use Safari’s system Share icon (not the old in-app button)
 - How-to-share expandable sections remain on Landing + Dashboard
+
+
+## V5.1.0
+- Updated application, service-worker cache, and manifest version to 5.1.0.
+- Bumped Career DNA data version to 5 so existing saved profiles can migrate through the existing DNA rebuild check.
+- Fixed CV upload and pasted-CV analysis to always enter onboarding at step 2.
+- Preserved the existing V4 Career DNA rules and analysis implementation.

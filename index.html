@@ -1142,8 +1142,8 @@ details.mwhy>summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--a
 <div class="toast" id="toast"></div>
 <script>
 
-// ===== FindJob Now V5.0.0 — Career DNA for Japan =====
-const APP_VERSION = "5.0.1";
+// ===== FindJob Now V5.2.0 — Career DNA for Japan =====
+const APP_VERSION = "5.2.0";
 const $ = id => document.getElementById(id);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 const L = (k,d) => { try { const v = localStorage.getItem(k); return v!=null ? JSON.parse(v) : d; } catch { return d; } };
@@ -1612,7 +1612,7 @@ const ROADMAPS = {
 
 // ---------- CV Analysis (enhanced heuristics) ----------
 // ===== CAREER DNA ENGINE (V4.0) =====
-const DNA_VERSION = 4;
+const DNA_VERSION = 5;
 const _rx = (a, f) => new RegExp(a, f || "gi");
 const DOMAINS = {
   management: { en: "Management", jp: "マネジメント", re: _rx("\\b(managed|managing|manager|head of|supervis\\w+|oversaw|oversee\\w*|team of \\d+|direct reports?|headcount|people management|budget (?:of|owner)|responsible for (?:a )?team)\\b|マネージャー|管理職|部長|課長|統括|責任者") },
@@ -2566,7 +2566,7 @@ function renderLanding(){
   </details>
 
   <p style="margin-top:14px;font-size:12px;color:var(--mu);text-align:center">${t("free_private") || (LANG==="jp"?"無料 · プライベート · 登録不要 · 端末内のみ":"Free · Private · No signup · On this device only")}</p>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V5.0.1</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V5.2.0</div>
 
   <details class="more" style="margin-top:8px"><summary>${LANG==="jp"?"バックアップから復元":"Restore a backup"}</summary><div style="text-align:center;margin-top:6px"><button class="btn ghost" id="btnRestore" style="max-width:300px;min-height:44px;font-size:14px">⬆ ${t("restore")}</button></div></details>
   <input type="file" id="restoreFile" accept="application/json,.json" class="hidden">
@@ -3426,7 +3426,7 @@ function wireLanding(){
   $("btnPasteGo")?.addEventListener("click", () => {
     const text = $("pasteText")?.value || "";
     if(text.trim().length < 40){ say("Please paste more text from your CV", 0); return; }
-    runAnalysis(text);
+    runAnalysis(text, true);
   });
   $("btnSkip")?.addEventListener("click", () => {
     STATE.profile = { name:"", skills:[], langs:[], yrs:0, strengths:[], missing:["Upload a CV for full analysis"] };
@@ -3512,15 +3512,12 @@ function runAnalysis(text, continueOnboarding){
   STATE.matches = computeMatches(ana);
   STATE.selectedRoles = allRoles();
   STATE.jobs = [];
-  // Mark resume done and continue 10-step flow
+  // A CV analysis always enters the 10-step onboarding flow.
+  // Keep the parameter for backward compatibility with existing callers.
   if(!STATE.onboarding) STATE.onboarding = DEFAULT_ONBOARDING();
   STATE.onboarding.hasResume = true;
   STATE.onboarding.step = 2;
-  if(continueOnboarding || !obComplete(2)){
-    STATE.view = "onboarding";
-  } else {
-    STATE.view = "dashboard";
-  }
+  STATE.view = "onboarding";
   persist();
   say("Analysis complete", 1);
   render();
