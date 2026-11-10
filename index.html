@@ -1137,13 +1137,14 @@ details.mwhy>summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--a
   <button data-view="jobs"><span>💼</span><span class="nav-label" data-i18n="nav_jobs">Jobs</span></button>
   <button data-view="tools"><span>🧰</span><span class="nav-label" data-i18n="nav_tools">Toolkit</span></button>
   <button data-view="tracker"><span>🗂</span><span class="nav-label" data-i18n="nav_tracker">Tracker</span></button>
+  <button data-view="onboarding"><span>📄</span><span class="nav-label" data-i18n="nav_resume">Resume</span></button>
 </nav>
 </div>
 <div class="toast" id="toast"></div>
 <script>
 
 // ===== FindJob Now V5.2.0 — Career DNA for Japan =====
-const APP_VERSION = "5.2.0";
+const APP_VERSION = "5.2.1";
 const $ = id => document.getElementById(id);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 const L = (k,d) => { try { const v = localStorage.getItem(k); return v!=null ? JSON.parse(v) : d; } catch { return d; } };
@@ -1241,6 +1242,7 @@ const I18N = {
     nav_jobs: "Jobs",
     nav_apply: "Apply",
     nav_tracker: "Tracker",
+    nav_resume: "Resume",
     nav_share: "Share",
     step_upload: "Resume",
     step_analysis: "Experience",
@@ -1341,6 +1343,7 @@ const I18N = {
     nav_jobs: "求人",
     nav_apply: "応募",
     nav_tracker: "管理",
+    nav_resume: "履歴書",
     nav_share: "シェア",
     step_upload: "履歴書",
     step_analysis: "経験",
@@ -1510,6 +1513,16 @@ function scoreLiveJob(j, titles, skills){
   return Math.min(99, s);
 }
 
+function locationAllowed(job){
+  const p = STATE.dna && STATE.dna.locationPref;
+  if(!p || p === "both") return true;
+  const loc = (job.location || "").toLowerCase();
+  if(p === "tokyo")   return /tokyo|japan|remote|worldwide|anywhere|asia|apac/i.test(loc) && !/\busa\b|united states|canada|\buk\b|europe|emea|latam|india/i.test(loc);
+  if(p === "japan")   return /japan|tokyo|osaka|kyoto|fukuoka|remote|worldwide|anywhere/i.test(loc);
+  if(p === "overseas")return /usa|united states|uk|europe|canada|latam|apac|asia|remote|worldwide|anywhere/i.test(loc);
+  return true;
+}
+
 async function searchLiveJobs(){
   const sel = selectedRoles();
   const dna = STATE.dna;
@@ -1537,9 +1550,10 @@ async function searchLiveJobs(){
     const seen = new Set();
     jobs = jobs.filter(j => { const k = (j.url || j.title + j.company).toLowerCase(); if(seen.has(k)) return false; seen.add(k); return true; });
     jobs = jobs.map(j => {
+      if(!locationAllowed(j)) return null;
       const m = dna ? matchJob(j, dna) : null;
       return { ...j, matchScore: m ? m.total : scoreLiveJob(j, sel, skills), _avoid: !!(m && m.avoid), fastHire: isFastHireJob(j) };
-    });
+    }).filter(Boolean);
     if(dna){
       const kept = jobs.filter(j => !j._avoid);
       if(kept.length >= 5) jobs = kept;
@@ -1976,7 +1990,13 @@ function matchJob(job, dna){
   const authOnly = /(must|need to|required to) (be )?(legally |currently )?(authori[sz]ed|eligible|allowed) to work in (the )?(us|u\.s\.|united states|uk|canada|eu)/i.test(low);
   let visa = (restricted || authOnly) ? 10 : job.visa ? 100 : dna.visaStrong ? 95 : /student/i.test(dna.visaStatus||"") ? 55 : 70;
   if(restricted || authOnly){ whyNot.push(LANGX()==="jp" ? `勤務地の制限: ${loc||"US/EU"}（日本から応募できない可能性）` : `Location-restricted${loc ? " ("+loc+")" : ""} — may not accept applicants in Japan.`); penalties += 30; }
-  let total = Math.round(.40*exp + .25*it.v + .20*skill + .10*lang + .05*visa);
+  const isJapanese = dna.nationality === "japanese";
+  let total = isJapanese
+    ? Math.round(.42*exp + .26*it.v + .22*skill + .10*lang + 0*visa)  // visa weight redistributed
+    : Math.round(.40*exp + .25*it.v + .20*skill + .10*lang + .05*visa);
+  if(dna.visaNeeded === true && job.visa === true) total += 3;
+  if(dna.visaNeeded === true && job.visa === false && /must be authorised|right to work|work permit required/i.test(low)) total -= 10;
+  total = Math.max(0, Math.min(99, total));
   if(restricted || authOnly) total = Math.min(total, 45);
   if(it.hardDis){ total = Math.min(total, 30); whyNot.push(LANGX()==="jp" ? "避けたい仕事の特徴があります。" : "Has traits you said you want to avoid (e.g. call-center or pure-coding work)."); }
   else if(it.softDis){ whyNot.push(LANGX()==="jp" ? "あなたの志向と合わない可能性があります。" : "May not fit what you enjoy."); }
@@ -2295,7 +2315,7 @@ const taBox=(id,ph,h)=>`<div class="field"><textarea id="${id}" placeholder="${p
 const noCv=()=>{if(!cvText()){say(tx("Please upload or paste your CV first","先にCVをアップロードしてください"),0);return true}return false};
 const TOOLS3={ats:["🎯","ATS Optimizer","ATS最適化","Match your CV to any job ad","求人票とCVを照合"],score:["📊","Application Score","応募スコア","Fit, language, visa, scam risk — apply, tailor or skip","適合度・言語・ビザ・詐欺リスク"],rewrite:["✍️","Resume Rewriter","履歴書リライト","Turn weak bullets into measurable achievements","弱い文を成果ベースに"],interview:["🎤","Interview Coach","面接コーチ","Real questions for Japan + answer feedback","日本向け質問と回答フィードバック"],recruiters:["🤝","Recruiter Matches","エージェント推薦","Agencies that fit your level and Japanese","あなたに合うエージェント"],starter:["🌱","No-Experience Starter","未経験スタート","Turn study, part-time & volunteering into proof","学業・バイト等を実績に"],premium:["💎","Premium Roadmap","プレミアム計画","What is coming next","今後の機能"]};
 const toolCard=k=>{const x=TOOLS3[k];return `<div class="card" data-tool="${k}" style="cursor:pointer"><h3>${x[0]} ${tx(x[1],x[2])}</h3><p style="font-size:13px;color:var(--mu);margin:0">${tx(x[3],x[4])}</p></div>`};
-const toolCards=()=>(STATE.track==="entry"?["starter"]:[]).concat(["ats","score","rewrite","interview","recruiters"],STATE.track==="entry"?[]:["starter"]).map(toolCard).join("");
+const toolCards=()=>(STATE.track==="entry"?["starter"]:[]).concat(["ats","score","rewrite","interview","recruiters"]).map(toolCard).join("");
 const segHTML=()=>`<div class="seg" id="trackSeg"><button type="button" data-track="pro" class="${STATE.track==="pro"?"on":""}">💼 ${tx("I have experience","経験者")}</button><button type="button" data-track="entry" class="${STATE.track==="entry"?"on":""}">🌱 ${tx("New / no experience","未経験・新卒")}</button></div>`;
 function renderCopilot(){
  const A=STATE.applications,n=k=>(A[k]||[]).length,sent=n("applied")+n("interview")+n("offer")+n("rejected"),rate=sent?Math.round((n("interview")+n("offer"))/sent*100):0;
@@ -2520,7 +2540,7 @@ function renderLanding(){
 
   <!-- GUIDED STEP 1 -->
   <div class="start-card" style="border-width:2px">
-    <div class="start-label">STEP 1 OF 5</div>
+    <div class="start-label">STEP 1 OF 10</div>
     <div class="step-guide" style="justify-content:center;margin:8px 0 12px">
       <span class="hand">👇</span>
       <div class="step-text" style="font-size:16px">${LANG==="jp"?"まず履歴書をアップロードしてください":"First: Upload your CV"}</div>
@@ -2566,7 +2586,7 @@ function renderLanding(){
   </details>
 
   <p style="margin-top:14px;font-size:12px;color:var(--mu);text-align:center">${t("free_private") || (LANG==="jp"?"無料 · プライベート · 登録不要 · 端末内のみ":"Free · Private · No signup · On this device only")}</p>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V5.2.0</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V5.2.1</div>
 
   <details class="more" style="margin-top:8px"><summary>${LANG==="jp"?"バックアップから復元":"Restore a backup"}</summary><div style="text-align:center;margin-top:6px"><button class="btn ghost" id="btnRestore" style="max-width:300px;min-height:44px;font-size:14px">⬆ ${t("restore")}</button></div></details>
   <input type="file" id="restoreFile" accept="application/json,.json" class="hidden">
@@ -2711,6 +2731,7 @@ function renderJobs(){
   if(prefs.visaOnly) jobs = jobs.filter(j => j.visa);
   if(prefs.englishOnly) jobs = jobs.filter(j => j.eng !== false);
   if(prefs.remoteOnly) jobs = jobs.filter(j => j.remote);
+  jobs = jobs.filter(j => locationAllowed(j));
   const hasLive = jobs.length > 0;
   const titles = (STATE.matches?.titles || []).map(x => x.title || x).filter(Boolean);
 
@@ -2728,10 +2749,10 @@ function renderJobs(){
   ${(STATE.matches?.titles||[]).length ? `<div class="section-title" style="margin-top:0">${t("best_matches")}</div>${renderRoleSelector()}` : ""}
 
   <button class="btn btn-lg" id="btnSearchJobs" style="margin-bottom:10px">
-    🔍 ${LANG==="jp"?"ライブ求人を検索":"Search Live Jobs"}
+    🔍 ${LANG==="jp"?"海外・リモート求人を検索":"Search overseas / remote jobs"}
   </button>
   <p style="margin:0 0 12px;font-size:12px;color:var(--mu);text-align:center">
-    ${LANG==="jp"?"ここに出るのは海外・リモートの英語求人です。日本国内の求人は下のボタンから。":"These are overseas / remote English jobs. For jobs located in Japan, use the button below."}
+    ${LANG==="jp"?"Remotive・Jobicy・Greenhouse・Lever・Ashby の求人です。日本国内の求人は下のボードから。":"Results from Remotive / Jobicy / Greenhouse / Lever / Ashby. For jobs in Japan, use the boards below."}
   </p>
 
   <div class="card" style="margin-bottom:12px;padding:12px">
@@ -3394,27 +3415,12 @@ function updateProgress(){
     }
     return;
   }
-  // Post-onboarding simplified bar
-  const steps = [
-    {id:"dashboard", label:t("step_analysis")||"Home", num:1},
-    {id:"jobs", label:t("step_jobs"), num:2},
-    {id:"tools", label:t("step_apply")||"Toolkit", num:3},
-    {id:"tracker", label:t("step_track"), num:4}
-  ];
-  let current = 1;
-  if(v === "jobs") current = 2;
-  if(v === "tools") current = 3;
-  if(v === "tracker") current = 4;
-  if($("stepLabel")) $("stepLabel").textContent = `Step ${current} of 4`;
-  if($("stepName")) $("stepName").textContent = steps.find(s=>s.num===current)?.label || "";
-  if($("progressFill")) $("progressFill").style.width = Math.round((current / 4) * 100) + "%";
-  if($("progressSteps")){
-    $("progressSteps").innerHTML = steps.map(s => {
-      if(s.num < current) return `<span class="done">✅ ${s.label}</span>`;
-      if(s.num === current) return `<span class="current">👇 ${s.label}</span>`;
-      return `<span>⬜ ${s.label}</span>`;
-    }).join("");
-  }
+  // Post-onboarding: setup complete
+  if($("stepLabel")) $("stepLabel").textContent = "✅ Setup complete";
+  if($("stepName")) $("stepName").textContent = "";
+  if($("progressFill")) $("progressFill").style.width = "100%";
+  if($("progressSteps")) $("progressSteps").innerHTML = "";
+  return;
 }
 
 function wireLanding(){
@@ -3564,6 +3570,8 @@ function showPdfPasteFallback(){
 function wireTools(){
   $$("[data-tool]").forEach(el => {
     el.style.cursor = "pointer";
+    const toolsThatKeepJd = new Set(["ats","score"]);
+    if(!toolsThatKeepJd.has(el.dataset.tool)) STATE._jd = "";
     el.onclick = () => { STATE._tool = el.dataset.tool; renderToolPanel(el.dataset.tool); $("toolPanel")?.scrollIntoView({behavior:"smooth",block:"start"}); };
   });
 }

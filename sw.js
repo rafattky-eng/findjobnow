@@ -1,6 +1,6 @@
-// FindJob Now V5.2.0 PWA service worker.
+// FindJob Now V5.2.1 PWA service worker.
 // Caches the app shell and PDF.js for best-effort offline loading. Live job searches need internet.
-const V = "fj-v5.2.0";
+const V = "fj-v5.2.1";
 // Works at the domain root (Cloudflare) and in a sub-folder (GitHub Pages: /findjobnow/)
 const BASE = new URL("./", self.location).pathname;
 const SHELL = [BASE, BASE + "index.html", BASE + "manifest.webmanifest", BASE + "icon-192.png", BASE + "icon-512.png", BASE + "apple-touch-icon.png"];
