@@ -601,3 +601,23 @@ details.more > summary::-webkit-details-marker { display: none; }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
+
+/* App footer copyright */
+.app-footer {
+  text-align: center;
+  padding: 16px 12px 88px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--mu);
+  opacity: 0.85;
+}
+.app-footer div + div {
+  margin-top: 2px;
+  font-weight: 600;
+  color: var(--tx);
+  opacity: 0.7;
+}
+/* When bottom nav is hidden (landing / wizard), reduce bottom padding */
+body.no-nav .app-footer {
+  padding-bottom: 24px;
+}

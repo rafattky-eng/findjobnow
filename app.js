@@ -431,11 +431,13 @@ function render() {
   if (v === "landing" || (v === "onboarding" && STATE.onboarding?.step === 1 && !STATE.profile && !STATE.cvText)) {
     main.innerHTML = renderLanding();
     if (nav) nav.style.display = "none";
+    document.body.classList.add("no-nav");
     if (progress) progress.classList.add("hidden");
     wireLanding();
   } else if (v === "onboarding") {
     main.innerHTML = renderOnboarding();
     if (nav) nav.style.display = "none";
+    document.body.classList.add("no-nav");
     if (progress) {
       progress.classList.remove("hidden");
       const ws = STATE.onboarding?.wizardStep || 1;
@@ -446,6 +448,7 @@ function render() {
     wireOnboarding();
   } else {
     if (nav) nav.style.display = "";
+    document.body.classList.remove("no-nav");
     if (progress) progress.classList.add("hidden");
     if (v === "dashboard") main.innerHTML = renderDashboard();
     else if (v === "jobs") { main.innerHTML = renderJobs(); wireJobs(); }
@@ -458,6 +461,10 @@ function render() {
   $$("#bottomNav button").forEach(b => {
     b.classList.toggle("active", b.dataset.view === v);
   });
+  const foot = $("appFooter");
+  if (foot) {
+    foot.innerHTML = `<div>© 2026 Rafat Kotaki. All rights reserved.</div><div>FindJob Now · v${APP_VERSION}</div>`;
+  }
 }
 
 function wireCommon() {
