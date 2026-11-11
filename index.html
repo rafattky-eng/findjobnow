@@ -8,7 +8,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="FindJob Now">
 <meta name="theme-color" content="#0C2340">
-<meta name="description" content="Find a job in Japan — one step at a time. Upload your CV (or skip). Answer 10 short questions. Smart (rule-based) matching — no cloud AI, no sign-up. Free and private.">
+<meta name="description" content="Career Target Intelligence for Japan. Upload resume + set industries, titles & goals. Smart matching with Target Career DNA. Rule-based, private, no sign-up.">
 <meta name="application-name" content="FindJob Now">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; worker-src 'self' blob: https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.google.com https://www.gstatic.com https://icons.duckduckgo.com; font-src 'self' data:; connect-src 'self' https://boards-api.greenhouse.io https://api.lever.co https://api.ashbyhq.com https://remotive.com https://jobicy.com; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; upgrade-insecure-requests">
 <link rel="manifest" href="./manifest.webmanifest">
@@ -428,22 +428,81 @@ main {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: rgba(244, 180, 0, 0.18);
-  color: var(--ac);
+  background: rgba(255,255,255,0.07);
+  color: var(--mu);
+  border: 1.5px solid var(--bd);
   border-radius: 99px;
-  padding: 5px 11px;
-  font-size: 12px;
+  padding: 8px 14px;
+  font-size: 13px;
   font-weight: 600;
-  margin: 2px;
+  margin: 3px;
+  cursor: pointer;
+  min-height: 40px;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.chip.on, .chip.sel {
+  background: rgba(244, 180, 0, 0.18);
+  border-color: var(--ac);
+  color: var(--ac);
+  font-weight: 800;
 }
 .chip.bad {
   background: rgba(248, 113, 113, 0.18);
   color: var(--er);
+  border-color: transparent;
 }
 .chip.ok {
   background: rgba(74, 222, 128, 0.18);
   color: var(--ok);
+  border-color: transparent;
 }
+.chip-row { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0 4px; }
+.field-label { font-size: 13px; font-weight: 700; color: var(--mu); margin-bottom: 4px; }
+.step-badge {
+  display: inline-block;
+  background: var(--ac);
+  color: #000;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 99px;
+  letter-spacing: .02em;
+}
+.tag-box { display: flex; flex-wrap: wrap; gap: 6px; min-height: 36px; margin-bottom: 8px; }
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(244,180,0,.15);
+  border: 1px solid var(--ac);
+  color: var(--ac);
+  border-radius: 99px;
+  padding: 6px 10px 6px 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.tag button {
+  background: transparent;
+  border: none;
+  color: var(--ac);
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 2px;
+  cursor: pointer;
+  min-width: 22px;
+  min-height: 22px;
+}
+.tag-input {
+  width: 100%;
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: var(--input);
+  border: 1px solid var(--bd);
+  color: var(--tx);
+  min-height: 48px;
+}
+.score-val { font-size: 28px; font-weight: 900; color: var(--ac); line-height: 1.1; }
+.score-lbl { font-size: 11px; color: var(--mu); margin-top: 2px; font-weight: 600; }
 .badge {
   font-size: 11px;
   font-weight: 700;
@@ -1137,14 +1196,14 @@ details.mwhy>summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--a
   <button data-view="jobs"><span>💼</span><span class="nav-label" data-i18n="nav_jobs">Jobs</span></button>
   <button data-view="tools"><span>🧰</span><span class="nav-label" data-i18n="nav_tools">Toolkit</span></button>
   <button data-view="tracker"><span>🗂</span><span class="nav-label" data-i18n="nav_tracker">Tracker</span></button>
-  <button data-view="onboarding"><span>📄</span><span class="nav-label" data-i18n="nav_resume">Resume</span></button>
 </nav>
 </div>
 <div class="toast" id="toast"></div>
 <script>
 
-// ===== FindJob Now V5.2.0 — Career DNA for Japan =====
-const APP_VERSION = "5.2.1";
+// ===== FindJob Now V6.0.0 — Career Target Intelligence Platform =====
+const APP_VERSION = "6.0.0";
+const DNA_ENGINE_VERSION = 6;
 const $ = id => document.getElementById(id);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 const L = (k,d) => { try { const v = localStorage.getItem(k); return v!=null ? JSON.parse(v) : d; } catch { return d; } };
@@ -1175,28 +1234,46 @@ if(!STATE.journey) STATE.journey = { step: 1, mode: null, goal: null, fastMode: 
 const DEFAULT_PREFS = () => ({ likes:[], dislikes:[], style:{ remote:"any" }, path:"", note:"" });
 if(!STATE.prefProfile) STATE.prefProfile = DEFAULT_PREFS();
 if(typeof STATE.prefProfile.note !== "string") STATE.prefProfile.note = "";
+
+// V6: Target Career Profile (replaces multi-step onboarding)
+const DEFAULT_TARGET = () => ({
+  industries: [],
+  titles: [],
+  careerGoal: ""
+});
+if(!STATE.targetJobs) STATE.targetJobs = DEFAULT_TARGET();
+
 const DEFAULT_ONBOARDING = () => ({
-  step: 1,
+  step: 1,                   // 1 = Resume, 2 = Career Target Profile
   hasResume: false,
-  experience: null,          // "experienced" | "entry"
-  workTypes: [],             // ["full","part","remote","hybrid"]
+  experience: null,          // "entry"|"1-3"|"3-5"|"5-10"|"10+"
   english: 0,                // 1..5
   japanese: 0,               // 1..5
-  otherLang: false,
-  otherLangText: "",
+  otherLangs: [],            // multi-select
   location: null,            // "tokyo"|"japan"|"overseas"|"both"
-  visaNeeded: true,
-  visaDetail: "",
-  nationality: "non_japanese"
+  visaStatus: null,          // "need_sponsorship"|"work_visa"|"student"|"wh"|"pr"|"spouse"|"national"
+  workTypes: []              // kept for compatibility
 });
 if(!STATE.onboarding){
   STATE.onboarding = DEFAULT_ONBOARDING();
-  // Migration: if profile already exists, assume resume done → start at step 2
   if(STATE.profile || STATE.cvText){ STATE.onboarding.step = 2; STATE.onboarding.hasResume = !!(STATE.cvText); }
 }
 if(STATE.onboarding.step < 1) STATE.onboarding.step = 1;
-if(!STATE.onboarding.nationality) STATE.onboarding.nationality = "non_japanese";
-if(typeof STATE.onboarding.visaNeeded !== "boolean") STATE.onboarding.visaNeeded = true;
+// Migrate old fields
+if(STATE.onboarding.visaDetail && !STATE.onboarding.visaStatus){
+  const vd = String(STATE.onboarding.visaDetail||"").toLowerCase();
+  if(/sponsor|need/.test(vd)) STATE.onboarding.visaStatus = "need_sponsorship";
+  else if(/work/.test(vd)) STATE.onboarding.visaStatus = "work_visa";
+  else if(/student/.test(vd)) STATE.onboarding.visaStatus = "student";
+  else if(/holiday|wh/.test(vd)) STATE.onboarding.visaStatus = "wh";
+  else if(/permanent|pr/.test(vd)) STATE.onboarding.visaStatus = "pr";
+  else if(/spouse/.test(vd)) STATE.onboarding.visaStatus = "spouse";
+  else if(/national|japanese/.test(vd)) STATE.onboarding.visaStatus = "national";
+}
+if(!Array.isArray(STATE.onboarding.otherLangs)) STATE.onboarding.otherLangs = [];
+if(typeof STATE.onboarding.visaNeeded === "boolean" && !STATE.onboarding.visaStatus){
+  STATE.onboarding.visaStatus = STATE.onboarding.visaNeeded ? "need_sponsorship" : "work_visa";
+}
 const UIOPEN = {};
 
 let LANG = STATE.settings.lang || "en";
@@ -2586,7 +2663,7 @@ function renderLanding(){
   </details>
 
   <p style="margin-top:14px;font-size:12px;color:var(--mu);text-align:center">${t("free_private") || (LANG==="jp"?"無料 · プライベート · 登録不要 · 端末内のみ":"Free · Private · No signup · On this device only")}</p>
-  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V5.2.1</div>
+  <div class="footer-copy">© 2026 Rafat Kotaki. All rights reserved.<br>FindJobNow · V6.0.0</div>
 
   <details class="more" style="margin-top:8px"><summary>${LANG==="jp"?"バックアップから復元":"Restore a backup"}</summary><div style="text-align:center;margin-top:6px"><button class="btn ghost" id="btnRestore" style="max-width:300px;min-height:44px;font-size:14px">⬆ ${t("restore")}</button></div></details>
   <input type="file" id="restoreFile" accept="application/json,.json" class="hidden">
@@ -2643,82 +2720,110 @@ function renderDashboard(){
   const p = STATE.profile || {};
   const s = STATE.scores || {resume:0,japan:0,language:0,experience:0,visa:0};
   const m = STATE.matches || {industries:[],titles:[],avoid:[]};
-  const goal = STATE.journey?.goal;
-  const fast = STATE.journey?.fastMode;
+  const td = STATE.targetDNA || null;
+  const tj = STATE.targetJobs || {};
+  const lang = LANG || "en";
+
+  // Ensure target DNA exists if we have targets
+  if(!td && (tj.titles?.length || tj.industries?.length || tj.careerGoal)){
+    try{ buildTargetCareerDNA(); }catch(_){}
+  }
+  const targetDNA = STATE.targetDNA;
+
+  // Scores
+  const resumeScore = s.resume || 0;
+  const jobReady = Math.round((resumeScore * 0.4 + (s.language||0) * 0.3 + (s.experience||0) * 0.3));
+  const targetMatch = targetDNA ? Math.min(98, 55 + (tj.titles?.length||0)*5 + (tj.industries?.length||0)*3 + (tj.careerGoal?8:0)) : 0;
+
   return `
-  <div class="step-guide">
-    <span class="hand">👇</span>
-    <div>
-      <div class="step-text">${LANG==="jp"?"STEP 2 — 分析結果":"STEP 2 — Analysis"}</div>
-      <div class="step-sub">${LANG==="jp"?"スコアを確認したら、下の大きなボタンを押してください":"Review scores, then tap the big button below"}</div>
+  <div class="card" style="border:1px solid var(--ac);margin-top:8px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <h2 style="margin:0;font-size:18px;font-weight:800">${lang==="jp"?"キャリアダッシュボード":"Career Dashboard"}</h2>
+      <span style="font-size:12px;color:var(--mu)">V${APP_VERSION}</span>
     </div>
+    <p style="color:var(--mu);margin:6px 0 0;font-size:13px">${esc(p.name||"Your profile")} · ${lang==="jp"?"端末内のみ":"Local only"}</p>
   </div>
-  ${renderDNACard()}
-  ${renderPrefs()}
 
-  <!-- ONE PRIMARY ACTION -->
-  <div class="card" style="border:2px solid var(--ac);margin:16px 0">
-    <div class="step-guide" style="margin:0 0 10px">
-      <span class="hand">👇</span>
-      <div class="step-text">${LANG==="jp"?"次にやること（1つだけ）":"Your next action (only one)"}</div>
+  <!-- Core scores - compact -->
+  <div class="score-grid" style="margin-top:12px">
+    <div class="score-card"><div class="score-val">${resumeScore}</div><div class="score-lbl">${lang==="jp"?"履歴書スコア":"Resume Score"}</div></div>
+    <div class="score-card"><div class="score-val">${jobReady}</div><div class="score-lbl">${lang==="jp"?"就職準備度":"Job Readiness"}</div></div>
+    <div class="score-card"><div class="score-val">${targetMatch||"—"}</div><div class="score-lbl">${lang==="jp"?"目標マッチ":"Target Match"}</div></div>
+    <div class="score-card"><div class="score-val">${s.japan||0}</div><div class="score-lbl">${lang==="jp"?"日本適合度":"Japan Fit"}</div></div>
+  </div>
+
+  ${targetDNA ? `
+  <!-- Target Career DNA -->
+  <div class="card dna" style="margin-top:14px">
+    <div style="font-size:12px;font-weight:800;color:var(--ac);letter-spacing:.04em;margin-bottom:8px">TARGET CAREER DNA</div>
+    <div style="display:grid;gap:8px">
+      <div><span style="color:var(--mu);font-size:13px">${lang==="jp"?"現在":"Current"}</span><br><strong style="font-size:16px">${esc(targetDNA.currentIdentity)}</strong></div>
+      <div style="text-align:center;color:var(--ac);font-size:20px">↓</div>
+      <div><span style="color:var(--mu);font-size:13px">${lang==="jp"?"目標":"Target"}</span><br><strong style="font-size:16px;color:var(--ac)">${esc(targetDNA.targetIdentity)}</strong></div>
     </div>
-    ${!goal ? `
-      <p style="font-size:14px;margin:0 0 12px">${LANG==="jp"?"まず目標を選んでください：":"First choose your goal:"}</p>
-      <div style="display:grid;gap:8px">
-        <button class="btn" id="goalFast" style="min-height:56px">⚡ ${LANG==="jp"?"今すぐ仕事が必要 (Need a Job Fast)":"Need a Job Fast"}</button>
-        <button class="btn secondary" id="goalCareer" style="min-height:52px">💼 ${LANG==="jp"?"キャリアを築きたい":"Build a career"}</button>
-        <button class="btn secondary" id="goalPart" style="min-height:52px">🕒 ${LANG==="jp"?"パート・時給から":"Part-time / Hourly first"}</button>
-      </div>
-    ` : `
-      <p style="font-size:14px;margin:0 0 12px;color:var(--mu)">${LANG==="jp"?"目標: ":"Goal: "}<strong style="color:var(--ac)">${goal==="fast"? (LANG==="jp"?"今すぐ仕事":"Need a Job Fast") : goal==="career"? (LANG==="jp"?"キャリア":"Career") : (LANG==="jp"?"パート優先":"Part-time first")}</strong></p>
-      <button class="btn btn-lg" data-go="jobs" style="font-size:18px">
-        🔍 ${LANG==="jp"?"現実的な求人を探す":"Find realistic jobs for me"}
-      </button>
-    `}
+    ${targetDNA.gaps?.length ? `
+    <div style="margin-top:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--mu);margin-bottom:6px">${lang==="jp"?"ギャップ":"Gaps"}</div>
+      <div class="chip-row">${targetDNA.gaps.map(g=>`<span class="chip" style="cursor:default">${esc(g)}</span>`).join("")}</div>
+    </div>` : ""}
+    ${targetDNA.progression?.length > 1 ? `
+    <div style="margin-top:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--mu);margin-bottom:6px">${lang==="jp"?"推奨キャリアパス":"Recommended Progression"}</div>
+      <div style="font-size:13px;line-height:1.6">${targetDNA.progression.map((p,i)=>esc(p)).join(' <span style="color:var(--ac)">→</span> ')}</div>
+    </div>` : ""}
   </div>
 
-  ${renderHiringProbability()}
-
-  <details class="more" data-k="full" ${UIOPEN.full?"open":""}>
-    <summary>${LANG==="jp"?"詳しい分析を見る":"See full analysis"}</summary>
-  ${renderDNADetails()}
-  ${renderCopilot()}
-  <h2 style="margin:0 0 4px;font-size:20px;font-weight:800">${LANG==="jp"?"あなたの現状":"Your Hiring Snapshot"}</h2>
-  <p style="color:var(--mu);margin:0 0 12px;font-size:14px">${esc(p.name||"Your profile")} · ${LANG==="jp"?"端末内のみ":"Local only"} ${fast?'· ⚡ Fast mode':''}</p>
-  <div class="score-grid">
-    <div class="score-card"><div class="num">${s.resume||0}</div><div class="lbl">${t("resume_score")}</div></div>
-    <div class="score-card"><div class="num">${s.japan||0}</div><div class="lbl">${t("japan_score")}</div></div>
-    <div class="score-card"><div class="num">${s.language||0}</div><div class="lbl">Language</div></div>
-    <div class="score-card"><div class="num">${s.visa||0}</div><div class="lbl">Visa</div></div>
-  </div>
-
-  ${p.strengths?.length ? `<div class="card"><h3>${LANG==="jp"?"強み":"Strengths"}</h3><ul class="list-check">${p.strengths.map(x=>`<li class="ok">✓ ${esc(x)}</li>`).join("")}</ul>
-  ${p.missing?.length?`<h3 style="margin-top:12px">${LANG==="jp"?"改善点":"Missing"}</h3><ul class="list-check">${p.missing.map(x=>`<li class="miss">✗ ${esc(x)}</li>`).join("")}</ul>`:""}</div>`:""}
-  <div class="section-title">Best Industries</div>
+  <!-- Recommended Roles -->
   <div class="card">
-    ${(m.industries||[]).slice(0,5).map(i=>`
-      <div class="match-row"><span style="min-width:110px;font-size:13px">${esc(i.label)}</span>
-      <div class="bar"><i style="width:${i.pct}%"></i></div><span class="pct">${i.pct}%</span></div>`).join("")||"<p style='color:var(--mu);font-size:13px'>Upload a CV to see matches</p>"}
+    <h3 style="margin:0 0 10px;font-size:15px">${lang==="jp"?"推奨ロール":"Recommended Roles"}</h3>
+    ${targetDNA.roles?.immediate?.length ? `<div style="margin-bottom:10px"><div style="font-size:12px;color:var(--ok);font-weight:700;margin-bottom:4px">✓ ${lang==="jp"?"今すぐ":"Immediate"}</div><div class="chip-row">${targetDNA.roles.immediate.map(r=>`<span class="chip on" style="cursor:default">${esc(r)}</span>`).join("")}</div></div>` : ""}
+    ${targetDNA.roles?.growth?.length ? `<div style="margin-bottom:10px"><div style="font-size:12px;color:var(--ac);font-weight:700;margin-bottom:4px">↗ ${lang==="jp"?"成長":"Growth"}</div><div class="chip-row">${targetDNA.roles.growth.map(r=>`<span class="chip" style="cursor:default">${esc(r)}</span>`).join("")}</div></div>` : ""}
+    ${targetDNA.roles?.stretch?.length ? `<div style="margin-bottom:10px"><div style="font-size:12px;color:var(--mu);font-weight:700;margin-bottom:4px">🚀 ${lang==="jp"?"ストレッチ":"Stretch"}</div><div class="chip-row">${targetDNA.roles.stretch.map(r=>`<span class="chip" style="cursor:default">${esc(r)}</span>`).join("")}</div></div>` : ""}
+    ${targetDNA.roles?.avoid?.length ? `<div><div style="font-size:12px;color:var(--er);font-weight:700;margin-bottom:4px">✗ ${lang==="jp"?"避ける":"Avoid"}</div><div class="chip-row">${targetDNA.roles.avoid.map(r=>`<span class="chip" style="cursor:default;opacity:.7">${esc(r)}</span>`).join("")}</div></div>` : ""}
   </div>
-  <div class="section-title">${t("best_matches")}</div>
-  ${renderRoleSelector()}
-    <div class="more-links">
-      <button class="btn secondary" data-go="tools">🧰 ${t("improve_cv")}</button>
-      <button class="btn secondary" data-go="tracker">🗂 ${t("tracker")}</button>
-      <button class="btn secondary" data-go="directory">🌐 ${t("sites")}</button>
+  ` : `
+  <div class="card" style="text-align:center;padding:20px">
+    <p style="margin:0 0 12px;color:var(--mu)">${lang==="jp"?"キャリアターゲットを設定すると、より精度の高い推薦が表示されます。":"Set your Career Target for more focused recommendations."}</p>
+    <button class="btn primary" data-go="onboarding" style="min-height:48px">${lang==="jp"?"ターゲットを設定":"Set Career Target"}</button>
+  </div>
+  `}
+
+  ${renderDNACard()}
+
+  <!-- Primary CTA -->
+  <div class="card" style="border:2px solid var(--ac);margin:16px 0">
+    <button class="btn btn-lg" data-go="jobs" style="font-size:18px;width:100%">
+      🔍 ${lang==="jp"?"マッチする求人を探す":"Find Matching Jobs"}
+    </button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+      <button class="btn secondary" data-go="tools" style="min-height:48px">🧰 ${lang==="jp"?"ツール":"Tools"}</button>
+      <button class="btn secondary" data-go="onboarding" style="min-height:48px">🎯 ${lang==="jp"?"ターゲット編集":"Edit Target"}</button>
     </div>
+  </div>
+
+  <details class="more" data-k="full">
+    <summary>${lang==="jp"?"詳しい分析を見る":"View Details"}</summary>
+    ${renderDNADetails()}
+    ${renderHiringProbability()}
+    <div class="section-title">${lang==="jp"?"ベスト業界":"Best Industries"}</div>
+    <div class="card">
+      ${(m.industries||[]).slice(0,5).map(i=>`
+        <div class="match-row"><span style="min-width:110px;font-size:13px">${esc(i.label)}</span>
+        <div class="bar"><i style="width:${i.pct}%"></i></div><span class="pct">${i.pct}%</span></div>`).join("")||"<p style='color:var(--mu);font-size:13px'>Upload a CV to see matches</p>"}
+    </div>
+    <div class="section-title">${lang==="jp"?"推奨職種":"Suggested Roles"}</div>
+    ${renderRoleSelector()}
   </details>
 
   <details class="more" style="margin-top:12px">
-    <summary style="cursor:pointer;font-weight:700;color:var(--ac);min-height:44px;display:flex;align-items:center">📤 ${tx("How to share & install","共有・インストール方法")}</summary>
+    <summary style="cursor:pointer;font-weight:700;color:var(--ac);min-height:44px;display:flex;align-items:center">📤 ${lang==="jp"?"共有・インストール方法":"How to share & install"}</summary>
     <div style="padding:8px 0;font-size:13px;line-height:1.5;color:var(--mu)">
-      <p style="margin:0 0 6px"><strong style="color:var(--tx)">${tx("Share a job or your DNA","求人やDNAを共有")}</strong> — ${tx("use the 📤 button on any job card or Career DNA card.","求人カードまたはキャリアDNAカードの📤ボタンを使います。")}</p>
-      <p style="margin:0 0 6px"><strong style="color:var(--tx)">${tx("Add to Home Screen (iPhone)","ホーム画面に追加（iPhone）")}</strong></p>
+      <p style="margin:0 0 6px"><strong style="color:var(--tx)">${lang==="jp"?"求人やDNAを共有":"Share a job or your DNA"}</strong> — ${lang==="jp"?"求人カードまたはキャリアDNAカードの📤ボタンを使います。":"use the 📤 button on any job card or Career DNA card."}</p>
+      <p style="margin:0 0 6px"><strong style="color:var(--tx)">${lang==="jp"?"ホーム画面に追加（iPhone）":"Add to Home Screen (iPhone)"}</strong></p>
       <ol style="margin:0 0 8px;padding-left:18px">
-        <li>${tx("Safari Share icon → “Add to Home Screen”","Safari共有 →「ホーム画面に追加」")}</li>
-        <li>${tx("Opens like an app, works offline","アプリアイコンから起動・オフライン対応")}</li>
+        <li>${lang==="jp"?"Safari共有 →「ホーム画面に追加」":"Safari Share icon → “Add to Home Screen”"}</li>
+        <li>${lang==="jp"?"アプリアイコンから起動・オフライン対応":"Opens like an app, works offline"}</li>
       </ol>
-      <p style="margin:0;font-size:12px">${tx("Android: Chrome menu → Add to Home screen / Install app.","Android: Chromeメニュー → ホーム画面に追加。")}</p>
     </div>
   </details>
   `;
@@ -3043,21 +3148,7 @@ function render(){
     wireOnboarding();
     return;
   }
-  if(v === "roles"){
-    main.innerHTML = renderRoleSelector() + `<div class="action-row" style="margin-top:16px"><button class="btn" id="rolesFindJobs" style="width:100%;min-height:56px">${tx("Find jobs","求人を探す")}</button></div>`;
-    $("bottomNav").style.display = "none";
-    $("progressWrap")?.classList.remove("hidden");
-    wireRoles();
-    $("rolesFindJobs")?.addEventListener("click", () => {
-      if(!selectedRoles().length){ say(t("pick_one"),0); return; }
-      STATE.view = "jobs";
-      persist();
-      render();
-      setTimeout(() => searchLiveJobs(), 200);
-    });
-    return;
-  }
-  if(v === "landing" || (!STATE.profile && v !== "tools" && v !== "tracker")){
+  if(v === "landing" || (!STATE.profile && !STATE.cvText && v !== "tools" && v !== "tracker" && v !== "dashboard")){
     main.innerHTML = renderLanding();
     $("bottomNav").style.display = "none";
     $("progressWrap")?.classList.add("hidden");
@@ -3096,43 +3187,63 @@ function updateNavLabels(){
 }
 
 
-// ===== V5 ONBOARDING (10-step ordered gate) =====
+// ===== V6 ONBOARDING (2-step: Resume → Career Target) =====
+// ===== V6 Onboarding: Resume → Single-page Career Target Profile =====
 const OB_STEPS = [
   {id:1, key:"resume",  en:"Resume",            jp:"履歴書"},
-  {id:2, key:"exp",     en:"Experience",        jp:"経験"},
-  {id:3, key:"work",    en:"Work type",         jp:"働き方"},
-  {id:4, key:"en",      en:"English",           jp:"英語"},
-  {id:5, key:"ja",      en:"Japanese",          jp:"日本語"},
-  {id:6, key:"ol",      en:"Other languages",   jp:"他言語"},
-  {id:7, key:"loc",     en:"Location",          jp:"勤務地"},
-  {id:8, key:"visa",    en:"Visa",              jp:"ビザ"},
-  {id:9, key:"nat",     en:"Nationality",       jp:"国籍"},
-  {id:10,key:"like",    en:"What I like",       jp:"好きなこと・苦手なこと"}
+  {id:2, key:"target",  en:"Career Target",     jp:"キャリア目標"}
 ];
+
+const INDUSTRY_OPTIONS = [
+  "Travel","Tourism","Hospitality","Airline","Hotel","Customer Service",
+  "Sales","Marketing","Operations","Management","Technology","Education",
+  "Recruitment","Finance","E-commerce","Customer Success","Remote Jobs","International Business"
+];
+
+const VISA_OPTIONS = [
+  {id:"need_sponsorship", en:"Need Sponsorship", jp:"スポンサー必要"},
+  {id:"work_visa", en:"Work Visa", jp:"就労ビザ"},
+  {id:"student", en:"Student Visa", jp:"学生ビザ"},
+  {id:"wh", en:"Working Holiday", jp:"ワーキングホリデー"},
+  {id:"pr", en:"Permanent Resident", jp:"永住者"},
+  {id:"spouse", en:"Spouse Visa", jp:"配偶者ビザ"},
+  {id:"national", en:"Japanese National", jp:"日本国籍"}
+];
+
+const EXP_OPTIONS = [
+  {id:"entry", en:"Entry Level", jp:"新卒・未経験"},
+  {id:"1-3", en:"1–3 Years", jp:"1–3年"},
+  {id:"3-5", en:"3–5 Years", jp:"3–5年"},
+  {id:"5-10", en:"5–10 Years", jp:"5–10年"},
+  {id:"10+", en:"10+ Years", jp:"10年以上"}
+];
+
+const LOC_OPTIONS = [
+  {id:"tokyo", en:"Tokyo", jp:"東京"},
+  {id:"japan", en:"Japan", jp:"日本国内"},
+  {id:"overseas", en:"Overseas", jp:"海外"},
+  {id:"both", en:"Japan + Overseas", jp:"日本＋海外"}
+];
+
+const OTHER_LANG_OPTIONS = ["Arabic","Chinese","Korean","French","Spanish","German","Portuguese","Hindi","Thai","Vietnamese","Other"];
 
 function obComplete(step){
   const o = STATE.onboarding || {};
+  const tj = STATE.targetJobs || {};
   switch(step){
     case 1: return !!(o.hasResume || STATE.cvText || STATE.profile);
-    case 2: return !!o.experience;
-    case 3: return Array.isArray(o.workTypes) && o.workTypes.length > 0;
-    case 4: return o.english >= 1 && o.english <= 5;
-    case 5: return o.japanese >= 1 && o.japanese <= 5;
-    case 6: return typeof o.otherLang === "boolean";
-    case 7: return !!o.location;
-    case 8: return typeof o.visaNeeded === "boolean";
-    case 9: return !!o.nationality;
-    case 10: return true; // skippable
+    case 2: return !!(o.experience && o.english >= 1 && o.japanese >= 1 && o.location && o.visaStatus);
     default: return false;
   }
 }
 function firstIncompleteStep(){
-  for(let i=1;i<=10;i++) if(!obComplete(i)) return i;
-  return 11; // all done
+  if(!obComplete(1)) return 1;
+  if(!obComplete(2)) return 2;
+  return 3; // done
 }
 function goOnboarding(step){
   STATE.onboarding = STATE.onboarding || DEFAULT_ONBOARDING();
-  STATE.onboarding.step = Math.max(1, Math.min(10, step||1));
+  STATE.onboarding.step = Math.max(1, Math.min(2, step||1));
   STATE.view = "onboarding";
   persist();
   render();
@@ -3140,229 +3251,326 @@ function goOnboarding(step){
 }
 function advanceOnboarding(){
   const cur = STATE.onboarding.step || 1;
-  if(cur < 10){
+  if(cur < 2){
     goOnboarding(cur + 1);
   } else {
-    // after step 10 → roles then jobs
-    if(!STATE.dna && STATE.cvText){ try{ rebuildDNA(); }catch(_){ } }
-    else if(!STATE.dna){
-      // minimal DNA from onboarding only
-      const fake = " ";
-      const ana = analyse(fake);
-      STATE.dna = ana.dna;
-      STATE.matches = computeMatches(ana);
-    }
-    // apply onboarding into DNA
-    applyOnboardingToDNA();
-    STATE.view = "roles";
-    persist();
-    render();
+    // Finalize Career Target Profile → generate Target Career DNA → results
+    finalizeTargetProfile();
   }
+}
+function finalizeTargetProfile(){
+  // Capture any last form values
+  const goalEl = $("obCareerGoal");
+  if(goalEl){
+    STATE.targetJobs = STATE.targetJobs || DEFAULT_TARGET();
+    STATE.targetJobs.careerGoal = (goalEl.value || "").slice(0,1000);
+  }
+  // Apply into DNA & rebuild
+  if(STATE.cvText){
+    try{ rebuildDNA(); }catch(_){}
+  } else if(!STATE.dna){
+    const ana = analyse(" ");
+    STATE.dna = ana.dna;
+    STATE.matches = computeMatches(ana);
+  }
+  applyOnboardingToDNA();
+  buildTargetCareerDNA();
+  STATE.view = "dashboard";
+  persist();
+  render();
+  window.scrollTo(0,0);
+  say(LANG==="jp" ? "キャリア分析が完了しました" : "Career analysis complete", 1);
 }
 function applyOnboardingToDNA(){
   const o = STATE.onboarding || {};
   if(!STATE.dna) return;
   if(o.japanese >= 1) STATE.dna.ja = Math.max(STATE.dna.ja||0, o.japanese);
-  if(o.experience === "entry") STATE.dna.level = Math.min(STATE.dna.level||0, 1);
-  if(o.nationality === "japanese" && STATE.dna){
-    // flag for matchJob weight redistribution
-    STATE.dna.nationality = "japanese";
-  } else if(STATE.dna){
-    STATE.dna.nationality = "non_japanese";
+  // Map experience levels
+  const expMap = { "entry":1, "1-3":2, "3-5":3, "5-10":4, "10+":5 };
+  if(o.experience && expMap[o.experience]){
+    STATE.dna.level = Math.max(STATE.dna.level||0, expMap[o.experience]);
   }
-  if(typeof o.visaNeeded === "boolean") STATE.dna.visaNeeded = o.visaNeeded;
-  if(o.visaDetail) STATE.dna.visaDetail = o.visaDetail;
+  if(o.visaStatus === "national" || o.visaStatus === "pr"){
+    STATE.dna.nationality = "japanese";
+    STATE.dna.visaNeeded = false;
+  } else {
+    STATE.dna.nationality = "non_japanese";
+    STATE.dna.visaNeeded = (o.visaStatus === "need_sponsorship" || o.visaStatus === "student" || o.visaStatus === "wh");
+  }
+  STATE.dna.visaDetail = o.visaStatus || "";
   if(o.location) STATE.dna.locationPref = o.location;
+  if(o.english >= 1) STATE.dna.en = Math.max(STATE.dna.en||0, o.english);
   persist();
+}
+
+// ===== Target Career DNA Engine (V6) =====
+function buildTargetCareerDNA(){
+  const tj = STATE.targetJobs || DEFAULT_TARGET();
+  const o = STATE.onboarding || {};
+  const dna = STATE.dna || {};
+  const currentTitles = (dna.best || []).slice(0,3).map(r => r.title);
+  const current = currentTitles[0] || (STATE.profile && STATE.profile.name) || "Professional";
+  const target = (tj.titles && tj.titles[0]) || (tj.industries && tj.industries[0] + " Specialist") || "Target Role";
+  const goal = (tj.careerGoal || "").toLowerCase();
+
+  // Infer gaps from goal + titles
+  const gaps = [];
+  if(/manag|lead|supervisor|director|ops/i.test(goal + " " + (tj.titles||[]).join(" "))){
+    if(!/lead|manag|supervis/i.test((STATE.cvText||""))) gaps.push("Leadership");
+    gaps.push("Operations Management");
+  }
+  if(/vendor|supplier|partner/i.test(goal)) gaps.push("Vendor Management");
+  if(/product/i.test(goal + " " + (tj.titles||[]).join(" "))) gaps.push("Product Management");
+  if(/salesforce|crm|gds|amadeus|sabre/i.test(goal)) gaps.push("Systems (GDS / CRM)");
+  if(o.japanese < 4 && /japan|tokyo|client/i.test(goal)) gaps.push("Japanese N2+");
+  if(!gaps.length) gaps.push("Domain depth in target industry");
+
+  // Progression path
+  const progression = [];
+  if(current) progression.push(current);
+  if(tj.titles && tj.titles.length){
+    tj.titles.slice(0,3).forEach(t => { if(!progression.includes(t)) progression.push(t); });
+  } else {
+    progression.push("Senior " + (current || "Role"));
+    progression.push(target);
+  }
+
+  // Role buckets
+  const immediate = [], growth = [], stretch = [], avoid = [];
+  const allTitles = [...(tj.titles||[])];
+  (dna.best||[]).forEach(r => {
+    if(allTitles.some(t => r.title.toLowerCase().includes(t.toLowerCase().split(" ")[0]))) immediate.push(r.title);
+    else if(r.fit >= 60) immediate.push(r.title);
+    else if(r.fit >= 40) growth.push(r.title);
+  });
+  (tj.titles||[]).forEach(t => {
+    if(!immediate.includes(t) && !growth.includes(t)) growth.push(t);
+  });
+  if(dna.avoid) dna.avoid.forEach(r => avoid.push(typeof r === "string" ? r : r.title));
+  // From goal
+  if(/call.?cent|telemarket|pure coding|software engineer only/i.test(goal)){
+    ["Call Center Agent","Pure Software Engineer"].forEach(a => { if(!avoid.includes(a)) avoid.push(a); });
+  }
+  if(!stretch.length && growth.length) stretch.push("Director of Operations");
+
+  STATE.targetDNA = {
+    currentIdentity: current,
+    targetIdentity: target,
+    gaps,
+    progression,
+    roles: {
+      immediate: [...new Set(immediate)].slice(0,5),
+      growth: [...new Set(growth)].slice(0,5),
+      stretch: [...new Set(stretch)].slice(0,3),
+      avoid: [...new Set(avoid)].slice(0,4)
+    },
+    industries: tj.industries || [],
+    titles: tj.titles || [],
+    careerGoal: tj.careerGoal || "",
+    version: DNA_ENGINE_VERSION
+  };
+  persist();
+  return STATE.targetDNA;
 }
 
 function renderOnboarding(){
   const o = STATE.onboarding || DEFAULT_ONBOARDING();
   const step = o.step || 1;
-  const sdef = OB_STEPS[step-1] || OB_STEPS[0];
-  const title = tx(sdef.en, sdef.jp);
-  const helper = tx("Tap to select — selected items are highlighted.","タップで選択（選択中は強調表示）。");
-  let body = "";
-  const nextLabel = step < 10 ? tx("Next →","次へ →") : tx("Find jobs","求人を探す");
-  const canNext = obComplete(step) || step === 10 || step === 1;
+  const tj = STATE.targetJobs || DEFAULT_TARGET();
+  const lang = LANG || "en";
 
   if(step === 1){
-    // Resume — reuse upload UI briefly
-    body = `<div class="card">
-      <h3>${tx("Upload your CV","履歴書をアップロード")}</h3>
-      <p class="sub">${tx("PDF, Word, or paste text. Analysis stays on this device.","PDF・Word・テキスト。分析はこの端末のみ。")}</p>
-      <div class="action-row" style="margin-top:12px">
-        <button class="btn" id="obUpload">${tx("Upload CV","履歴書をアップロード")}</button>
-        <button class="btn secondary" id="obPaste">${tx("Paste Resume","履歴書を貼り付け")}</button>
+    // ===== STEP 1: Resume Upload =====
+    return `
+    <div class="card" style="margin-top:8px">
+      <div class="step-badge">1 / 2</div>
+      <h2 style="margin:8px 0 4px">${lang==="jp"?"履歴書をアップロード":"Upload your Resume"}</h2>
+      <p class="sub">${lang==="jp"?"PDF・Word・テキスト。分析はすべてこの端末内で行われます。":"PDF, Word, or paste text. Analysis stays on this device."}</p>
+      <div style="display:grid;gap:12px;margin-top:16px">
+        <button class="btn primary" id="obUpload" type="button" style="min-height:56px;font-size:17px">📄 ${lang==="jp"?"ファイルを選択":"Choose File (PDF / DOCX / TXT)"}</button>
+        <input type="file" id="obCvFile" accept=".pdf,.doc,.docx,.txt,application/pdf,text/plain" class="hidden">
+        <button class="btn secondary" id="obPaste" type="button" style="min-height:52px">📋 ${lang==="jp"?"テキストを貼り付け":"Paste Resume Text"}</button>
+        <button class="btn ghost" id="obSkipCv" type="button">${lang==="jp"?"履歴書なしで続ける":"Continue without CV"}</button>
       </div>
-      <button type="button" class="btn ghost" id="obSkipCv" style="margin-top:12px;width:100%">${tx("Continue without CV","CVなしで続ける")}</button>
-      <input type="file" id="obCvFile" accept=".pdf,.doc,.docx,.txt,application/pdf" class="hidden">
-      <div class="hidden" id="obPasteModal">
-        <div class="field" style="margin-top:10px"><textarea id="obPasteText" placeholder="${tx("Paste the full text of your CV here…","履歴書のテキストをここに貼り付け…")}" style="min-height:160px"></textarea></div>
-        <button class="btn" id="obPasteGo">${tx("Analyze","分析する")}</button>
+      <div id="obPasteModal" class="hidden" style="margin-top:14px">
+        <textarea id="obPasteText" rows="8" placeholder="${lang==="jp"?"履歴書のテキストを貼り付け…":"Paste your resume text here…"}" style="width:100%;border-radius:14px;padding:12px;background:var(--input);border:1px solid var(--bd);color:var(--tx)"></textarea>
+        <button class="btn primary" id="obPasteGo" type="button" style="margin-top:10px;width:100%">${lang==="jp"?"分析する":"Analyze"}</button>
       </div>
-    </div>`;
-  } else if(step === 2){
-    body = `<div class="card">
-      <h3>${title}</h3>
-      <p class="sub">${helper}</p>
-      <div class="seg" style="margin-top:12px">
-        <button type="button" data-ob="experience" data-val="experienced" class="${o.experience==="experienced"?"on":""}" role="radio" aria-pressed="${o.experience==="experienced"}">${tx("I have experience","経験あり")}</button>
-        <button type="button" data-ob="experience" data-val="entry" class="${o.experience==="entry"?"on":""}" role="radio" aria-pressed="${o.experience==="entry"}">${tx("No experience / new grad","未経験・新卒")}</button>
-      </div>
-    </div>`;
-  } else if(step === 3){
-    const wts = o.workTypes || [];
-    const opts = [["full","Full-time","正社員"],["part","Part-time","パート"],["remote","Remote","リモート"],["hybrid","Hybrid","ハイブリッド"]];
-    body = `<div class="card">
-      <h3>${title}</h3>
-      <p class="sub">${helper} ${tx("(multi-select OK)","（複数選択可）")}</p>
-      <div class="seg" style="margin-top:12px;flex-wrap:wrap">
-        ${opts.map(([id,en,jp])=>`<button type="button" data-ob="workTypes" data-val="${id}" class="${wts.includes(id)?"on":""}" aria-pressed="${wts.includes(id)}">${tx(en,jp)}</button>`).join("")}
-      </div>
-    </div>`;
-  } else if(step === 4){
-    body = `<div class="card">
-      <h3>${title}</h3>
-      <p class="sub">${tx("1 = basic, 5 = native","1 = 基礎、5 = ネイティブ")}</p>
-      <div class="seg" style="margin-top:12px">
-        ${[1,2,3,4,5].map(n=>`<button type="button" data-ob="english" data-val="${n}" class="${o.english===n?"on":""}" role="radio" aria-pressed="${o.english===n}">${n}</button>`).join("")}
-      </div>
-    </div>`;
-  } else if(step === 5){
-    body = `<div class="card">
-      <h3>${title}</h3>
-      <p class="sub">${tx("5=N1, 4=N2, 3=N3, 2=N4, 1=N5","5=N1、4=N2、3=N3、2=N4、1=N5")}</p>
-      <div class="seg" style="margin-top:12px">
-        ${[1,2,3,4,5].map(n=>`<button type="button" data-ob="japanese" data-val="${n}" class="${o.japanese===n?"on":""}" role="radio" aria-pressed="${o.japanese===n}">${n}</button>`).join("")}
-      </div>
-    </div>`;
-  } else if(step === 6){
-    body = `<div class="card">
-      <h3>${title}</h3>
-      <p class="sub">${helper}</p>
-      <div class="seg" style="margin-top:12px">
-        <button type="button" data-ob="otherLang" data-val="true" class="${o.otherLang===true?"on":""}" role="radio" aria-pressed="${o.otherLang===true}">${tx("Yes","はい")}</button>
-        <button type="button" data-ob="otherLang" data-val="false" class="${o.otherLang===false?"on":""}" role="radio" aria-pressed="${o.otherLang===false}">${tx("No","いいえ")}</button>
-      </div>
-      ${o.otherLang===true?`<div class="field" style="margin-top:12px"><input id="obOtherLangText" placeholder="${tx("e.g. Mandarin, Korean","例: 中国語、韓国語")}" value="${esc(o.otherLangText||"")}"></div>`:""}
-    </div>`;
-  } else if(step === 7){
-    const opts = [["tokyo","Tokyo","東京"],["japan","Anywhere in Japan","日本国内"],["overseas","Overseas","海外"],["both","Japan + Overseas","日本＋海外"]];
-    body = `<div class="card">
-      <h3>${title}</h3>
-      <p class="sub">${helper}</p>
-      <div class="seg" style="margin-top:12px;flex-wrap:wrap">
-        ${opts.map(([id,en,jp])=>`<button type="button" data-ob="location" data-val="${id}" class="${o.location===id?"on":""}" role="radio" aria-pressed="${o.location===id}">${tx(en,jp)}</button>`).join("")}
-      </div>
-    </div>`;
-  } else if(step === 8){
-    body = `<div class="card">
-      <h3>${tx("Do you need visa sponsorship?","ビザのスポンサーが必要ですか？")}</h3>
-      <p class="sub">${helper}</p>
-      <div class="seg" style="margin-top:12px">
-        <button type="button" data-ob="visaNeeded" data-val="true" class="${o.visaNeeded===true?"on":""}" role="radio" aria-pressed="${o.visaNeeded===true}">${tx("Required","必要")}</button>
-        <button type="button" data-ob="visaNeeded" data-val="false" class="${o.visaNeeded===false?"on":""}" role="radio" aria-pressed="${o.visaNeeded===false}">${tx("Not required","不要")}</button>
-      </div>
-      <div class="section-title" style="margin-top:16px">${tx("Or I already have:","または既に持っている：")}</div>
-      <div class="seg" style="flex-wrap:wrap">
-        ${[["work_visa","Already have work visa","就労ビザあり"],["student","Student","留学"],["working_holiday","Working holiday","ワーホリ"],["permanent","Permanent resident","永住者"],["spouse","Spouse visa","配偶者ビザ"]].map(([id,en,jp])=>`<button type="button" data-ob="visaDetail" data-val="${id}" class="${o.visaDetail===id?"on":""}" aria-pressed="${o.visaDetail===id}">${tx(en,jp)}</button>`).join("")}
-      </div>
-    </div>`;
-  } else if(step === 9){
-    body = `<div class="card">
-      <h3>${tx("Are you Japanese?","日本人ですか？")}</h3>
-      <p class="sub">${helper}</p>
-      <div class="seg" style="margin-top:12px">
-        <button type="button" data-ob="nationality" data-val="japanese" class="${o.nationality==="japanese"?"on":""}" role="radio" aria-pressed="${o.nationality==="japanese"}">${tx("Japanese","日本人")}</button>
-        <button type="button" data-ob="nationality" data-val="non_japanese" class="${o.nationality==="non_japanese"?"on":""}" role="radio" aria-pressed="${o.nationality==="non_japanese"}">${tx("Not Japanese","日本人以外")}</button>
-      </div>
-    </div>`;
-  } else if(step === 10){
-    const P = STATE.prefProfile || DEFAULT_PREFS();
-    body = `<div class="card">
-      <h3>${title}</h3>
-      <p class="sub">${tx("Optional. Helps us rank roles better.","任意。職種の優先順位が良くなります。")}</p>
-      <div class="field"><label>${tx("Career story (max 600 chars)","キャリアストーリー（最大600文字）")}</label>
-        <textarea id="obNote" maxlength="600" style="min-height:100px" placeholder="${tx("e.g. I like creating tour packages and travel apps; I can code but prefer managing projects…","例: ツアーパッケージや旅行アプリ作りが好き。コーディングはできるがマネジメントが好き…")}">${esc(P.note||"")}</textarea>
-      </div>
-      <p class="sub" style="margin-top:8px">${tx("Skip if you prefer — you can edit later in Toolkit.","スキップ可。後でツールキットから編集できます。")}</p>
+      ${STATE.cvText ? `<p class="sub" style="margin-top:12px;color:var(--ok)">✓ ${lang==="jp"?"履歴書読み込み済み":"Resume loaded"} (${(STATE.cvText.length/1000).toFixed(1)}k chars)</p>` : ""}
     </div>`;
   }
 
+  // ===== STEP 2: Career Target Profile (ALL on one page) =====
+  const selectedInd = new Set(tj.industries || []);
+  const selectedLangs = new Set(o.otherLangs || []);
+  const titles = tj.titles || [];
+
   return `
-  <div class="ob-wrap">
-    <div class="progress-meta" style="padding:8px 0">
-      <span>Step ${step} of 10</span>
-      <span>${esc(title)}</span>
+  <div class="card" style="margin-top:8px">
+    <div class="step-badge">2 / 2</div>
+    <h2 style="margin:8px 0 4px">${lang==="jp"?"キャリアターゲット":"Career Target Profile"}</h2>
+    <p class="sub">${lang==="jp"?"すべての質問はこの1ページにあります。":"All questions on a single page. Minimize scrolling."}</p>
+  </div>
+
+  <!-- SECTION A: Candidate Profile -->
+  <div class="card">
+    <h3 style="margin:0 0 12px;font-size:15px;color:var(--ac)">A · ${lang==="jp"?"候補者プロフィール":"Candidate Profile"}</h3>
+
+    <div class="field-label">${lang==="jp"?"経験レベル":"Experience Level"}</div>
+    <div class="chip-row" id="obExpRow">
+      ${EXP_OPTIONS.map(e => `<button type="button" class="chip ${o.experience===e.id?"on":""}" data-key="experience" data-val="${e.id}">${lang==="jp"?e.jp:e.en}</button>`).join("")}
     </div>
-    <div class="progress-steps" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;font-size:11px">
-      ${OB_STEPS.map(s=>{
-        const done = obComplete(s.id);
-        const cur = s.id === step;
-        if(done && !cur) return `<span class="done">✅</span>`;
-        if(cur) return `<span class="current">👇</span>`;
-        return `<span>⬜</span>`;
-      }).join("")}
+
+    <div class="field-label" style="margin-top:14px">${lang==="jp"?"英語レベル (1–5)":"English Level (1–5)"}</div>
+    <div class="chip-row" id="obEnRow">
+      ${[1,2,3,4,5].map(n => `<button type="button" class="chip ${o.english===n?"on":""}" data-key="english" data-val="${n}">${n}</button>`).join("")}
     </div>
-    ${body}
-    <div class="action-row" style="margin-top:16px;position:sticky;bottom:calc(72px + var(--safe-b));background:var(--bg);padding:10px 0;z-index:20">
-      ${step > 1 ? `<button class="btn secondary" id="obBack">${tx("Back","戻る")}</button>` : ""}
-      <button class="btn ${canNext?"":"ghost"}" id="obNext" ${canNext?"":"disabled"}>${nextLabel}</button>
-      ${step === 10 ? `<button class="btn ghost" id="obSkipLike">${tx("Skip for now","今はスキップ")}</button>` : ""}
+
+    <div class="field-label" style="margin-top:14px">${lang==="jp"?"日本語レベル":"Japanese Level"} <span style="font-weight:400;color:var(--mu);font-size:12px">1=N5 · 2=N4 · 3=N3 · 4=N2 · 5=N1</span></div>
+    <div class="chip-row" id="obJaRow">
+      ${[1,2,3,4,5].map(n => `<button type="button" class="chip ${o.japanese===n?"on":""}" data-key="japanese" data-val="${n}">${n}</button>`).join("")}
     </div>
-    <p style="font-size:11px;color:var(--mu);text-align:center;margin-top:8px">${tx("Rule-based matching · No cloud AI · Your data stays on this device.","ルールベースのマッチング・クラウドAIなし・データは端末内のみ。")}</p>
-  </div>`;
+
+    <div class="field-label" style="margin-top:14px">${lang==="jp"?"その他の言語":"Other Languages"}</div>
+    <div class="chip-row" id="obOlRow">
+      ${OTHER_LANG_OPTIONS.map(l => `<button type="button" class="chip ${selectedLangs.has(l)?"on":""}" data-key="otherLang" data-val="${l}">${l}</button>`).join("")}
+    </div>
+
+    <div class="field-label" style="margin-top:14px">${lang==="jp"?"希望勤務地":"Location Preference"}</div>
+    <div class="chip-row" id="obLocRow">
+      ${LOC_OPTIONS.map(l => `<button type="button" class="chip ${o.location===l.id?"on":""}" data-key="location" data-val="${l.id}">${lang==="jp"?l.jp:l.en}</button>`).join("")}
+    </div>
+
+    <div class="field-label" style="margin-top:14px">${lang==="jp"?"ビザ状況":"Visa Status"}</div>
+    <div class="chip-row" id="obVisaRow">
+      ${VISA_OPTIONS.map(v => `<button type="button" class="chip ${o.visaStatus===v.id?"on":""}" data-key="visaStatus" data-val="${v.id}">${lang==="jp"?v.jp:v.en}</button>`).join("")}
+    </div>
+  </div>
+
+  <!-- SECTION B: Desired Industries -->
+  <div class="card">
+    <h3 style="margin:0 0 12px;font-size:15px;color:var(--ac)">B · ${lang==="jp"?"希望業界":"Desired Job Industries"}</h3>
+    <p class="sub" style="margin-top:-6px">${lang==="jp"?"複数選択可":"Multi-select"}</p>
+    <div class="chip-row" id="obIndRow">
+      ${INDUSTRY_OPTIONS.map(ind => `<button type="button" class="chip ${selectedInd.has(ind)?"on":""}" data-key="industry" data-val="${ind}">${ind}</button>`).join("")}
+    </div>
+  </div>
+
+  <!-- SECTION C: Desired Job Titles -->
+  <div class="card">
+    <h3 style="margin:0 0 12px;font-size:15px;color:var(--ac)">C · ${lang==="jp"?"希望職種":"Desired Job Titles"}</h3>
+    <p class="sub" style="margin-top:-6px">${lang==="jp"?"Enterまたはカンマでタグ追加。複数可。":"Press Enter or comma to add. Multiple titles OK."}</p>
+    <div id="titleTags" class="tag-box">
+      ${titles.map(t => `<span class="tag">${esc(t)} <button type="button" data-rm="${esc(t)}" aria-label="Remove">×</button></span>`).join("")}
+    </div>
+    <input type="text" id="titleInput" class="tag-input" placeholder="${lang==="jp"?"例: Travel Consultant, Tour Coordinator":"e.g. Travel Consultant, Tour Coordinator"}" autocomplete="off">
+  </div>
+
+  <!-- SECTION D: Career Goal -->
+  <div class="card">
+    <h3 style="margin:0 0 12px;font-size:15px;color:var(--ac)">D · ${lang==="jp"?"キャリア目標":"Career Goal"}</h3>
+    <textarea id="obCareerGoal" rows="4" maxlength="1000" placeholder="${lang==="jp"?"例: 旅行業界でマネジメントの機会が欲しい。プロジェクト管理はできるが、純粋なコーディングやコールセンターは避けたい。":"e.g. I want management opportunities in the travel industry. I can manage projects but do not want pure coding or call-center jobs."}" style="width:100%;border-radius:14px;padding:12px;background:var(--input);border:1px solid var(--bd);color:var(--tx);resize:vertical">${esc(tj.careerGoal||"")}</textarea>
+    <div style="text-align:right;font-size:12px;color:var(--mu);margin-top:4px"><span id="goalCount">${(tj.careerGoal||"").length}</span>/1000</div>
+  </div>
+
+  <div style="position:sticky;bottom:calc(72px + var(--safe-b));padding:12px 0;background:linear-gradient(transparent,var(--bg) 30%);z-index:20">
+    <button class="btn primary" id="obNext" type="button" style="width:100%;min-height:56px;font-size:17px">
+      ${lang==="jp"?"分析して結果を見る →":"Analyze & See Results →"}
+    </button>
+    <button class="btn ghost" id="obBack" type="button" style="width:100%;margin-top:8px">${lang==="jp"?"← 履歴書に戻る":"← Back to Resume"}</button>
+  </div>
+  `;
 }
 
 function wireOnboarding(){
   const o = STATE.onboarding || DEFAULT_ONBOARDING();
-  // selection buttons
-  $$("[data-ob]").forEach(btn => {
+  const step = o.step || 1;
+
+  // Shared chip handlers
+  $$("[data-key]").forEach(btn => {
     btn.onclick = () => {
-      const key = btn.dataset.ob;
+      const key = btn.dataset.key;
       const val = btn.dataset.val;
-      if(key === "workTypes"){
-        const arr = o.workTypes || [];
+      if(key === "industry"){
+        STATE.targetJobs = STATE.targetJobs || DEFAULT_TARGET();
+        const arr = STATE.targetJobs.industries || [];
         const i = arr.indexOf(val);
-        if(i>=0) arr.splice(i,1); else arr.push(val);
-        o.workTypes = arr;
-      } else if(key === "visaNeeded"){
-        o.visaNeeded = val === "true";
-        if(val === "true") o.visaDetail = "";
-      } else if(key === "visaDetail"){
-        o.visaDetail = val;
-        o.visaNeeded = false; // already have status
+        if(i >= 0) arr.splice(i,1); else arr.push(val);
+        STATE.targetJobs.industries = arr;
       } else if(key === "otherLang"){
-        o.otherLang = val === "true";
+        const arr = o.otherLangs || [];
+        const i = arr.indexOf(val);
+        if(i >= 0) arr.splice(i,1); else arr.push(val);
+        o.otherLangs = arr;
+        STATE.onboarding = o;
       } else if(key === "english" || key === "japanese"){
         o[key] = parseInt(val,10);
+        STATE.onboarding = o;
       } else {
         o[key] = val;
+        STATE.onboarding = o;
       }
-      STATE.onboarding = o;
       persist();
-      render(); // re-render to show highlight
+      render();
     };
   });
-  $("obOtherLangText")?.addEventListener("change", e => {
-    o.otherLangText = e.target.value.slice(0,80);
-    STATE.onboarding = o; persist();
-  });
-  $("obNote")?.addEventListener("change", e => {
-    if(!STATE.prefProfile) STATE.prefProfile = DEFAULT_PREFS();
-    STATE.prefProfile.note = e.target.value.slice(0,600);
+
+  // Title tag input
+  const titleInput = $("titleInput");
+  const addTitle = (raw) => {
+    STATE.targetJobs = STATE.targetJobs || DEFAULT_TARGET();
+    let titles = STATE.targetJobs.titles || [];
+    const parts = String(raw||"").split(/[,;\n]+/).map(s => s.trim()).filter(Boolean);
+    parts.forEach(p => {
+      if(p && !titles.some(t => t.toLowerCase() === p.toLowerCase())) titles.push(p);
+    });
+    STATE.targetJobs.titles = titles.slice(0,20);
     persist();
+    render();
+  };
+  if(titleInput){
+    titleInput.addEventListener("keydown", e => {
+      if(e.key === "Enter" || e.key === ","){
+        e.preventDefault();
+        addTitle(titleInput.value);
+        titleInput.value = "";
+      }
+    });
+    titleInput.addEventListener("blur", () => {
+      if(titleInput.value.trim()){ addTitle(titleInput.value); titleInput.value = ""; }
+    });
+  }
+  $$("[data-rm]").forEach(btn => {
+    btn.onclick = () => {
+      const rm = btn.dataset.rm;
+      STATE.targetJobs = STATE.targetJobs || DEFAULT_TARGET();
+      STATE.targetJobs.titles = (STATE.targetJobs.titles||[]).filter(t => t !== rm);
+      persist();
+      render();
+    };
   });
-  $("obBack")?.addEventListener("click", () => goOnboarding((o.step||2)-1));
+
+  // Career goal
+  $("obCareerGoal")?.addEventListener("input", e => {
+    STATE.targetJobs = STATE.targetJobs || DEFAULT_TARGET();
+    STATE.targetJobs.careerGoal = e.target.value.slice(0,1000);
+    const c = $("goalCount"); if(c) c.textContent = STATE.targetJobs.careerGoal.length;
+    // debounce persist
+    clearTimeout(window._goalTimer);
+    window._goalTimer = setTimeout(() => persist(), 400);
+  });
+
+  $("obBack")?.addEventListener("click", () => goOnboarding(1));
   $("obNext")?.addEventListener("click", () => {
-    if(o.step === 10){
-      const note = $("obNote")?.value || "";
-      if(note){ if(!STATE.prefProfile) STATE.prefProfile = DEFAULT_PREFS(); STATE.prefProfile.note = note.slice(0,600); }
-    }
+    // Validate minimums
+    if(!o.experience){ say(LANG==="jp"?"経験レベルを選択してください":"Please select experience level",0); return; }
+    if(!(o.english>=1)){ say(LANG==="jp"?"英語レベルを選択してください":"Please select English level",0); return; }
+    if(!(o.japanese>=1)){ say(LANG==="jp"?"日本語レベルを選択してください":"Please select Japanese level",0); return; }
+    if(!o.location){ say(LANG==="jp"?"勤務地を選択してください":"Please select location",0); return; }
+    if(!o.visaStatus){ say(LANG==="jp"?"ビザ状況を選択してください":"Please select visa status",0); return; }
     advanceOnboarding();
   });
-  $("obSkipLike")?.addEventListener("click", () => advanceOnboarding());
+
   $("obSkipCv")?.addEventListener("click", () => {
     o.hasResume = false;
     STATE.profile = STATE.profile || { name:"", skills:[], langs:[], yrs:0, strengths:[], missing:["Upload a CV for full analysis"] };
@@ -3375,36 +3583,38 @@ function wireOnboarding(){
   $("obCvFile")?.addEventListener("change", async e => {
     const f = e.target.files?.[0]; if(!f) return;
     e.target.value = "";
-    say("Reading CV…",1);
+    say(LANG==="jp"?"読み込み中…":"Reading CV…",1);
     try{
       let text = "";
       if(f.type === "application/pdf" || f.name.endsWith(".pdf")) text = await extractPdfText(f);
       else text = await f.text();
-      if(text.trim().length < 40){ say("Could not extract enough text. Please paste instead.",0); return; }
-      runAnalysis(text, true); // true = continue onboarding
-    }catch(err){ console.error(err); say("Read failed",0); }
+      if(text.trim().length < 40){ say(LANG==="jp"?"十分なテキストを抽出できませんでした。貼り付けてください。":"Could not extract enough text. Please paste instead.",0); return; }
+      runAnalysis(text, true);
+    }catch(err){ console.error(err); say(LANG==="jp"?"読み込み失敗":"Read failed",0); }
   });
   $("obPaste")?.addEventListener("click", () => $("obPasteModal")?.classList.toggle("hidden"));
   $("obPasteGo")?.addEventListener("click", () => {
     const t = $("obPasteText")?.value || "";
-    if(t.trim().length < 40){ say("Please paste more text",0); return; }
+    if(t.trim().length < 40){ say(LANG==="jp"?"もっとテキストを貼り付けてください":"Please paste more text",0); return; }
     runAnalysis(t, true);
   });
 }
+
+
 
 
 function updateProgress(){
   const wrap = $("progressWrap");
   if(!wrap) return;
   const v = STATE.view || "landing";
-  // During onboarding show 10-step
-  if(v === "onboarding" || v === "roles"){
+  // During onboarding show 2-step
+  if(v === "onboarding"){
     wrap.classList.remove("hidden");
     const step = (STATE.onboarding && STATE.onboarding.step) || 1;
-    const sdef = typeof OB_STEPS !== "undefined" ? OB_STEPS[Math.min(9, step-1)] : null;
-    if($("stepLabel")) $("stepLabel").textContent = `Step ${Math.min(step,10)} of 10`;
-    if($("stepName")) $("stepName").textContent = sdef ? tx(sdef.en, sdef.jp) : "";
-    if($("progressFill")) $("progressFill").style.width = Math.round((Math.min(step,10) / 10) * 100) + "%";
+    const sdef = typeof OB_STEPS !== "undefined" ? OB_STEPS[Math.min(1, step-1)] : null;
+    if($("stepLabel")) $("stepLabel").textContent = `Step ${Math.min(step,2)} of 2`;
+    if($("stepName")) $("stepName").textContent = sdef ? (LANG==="jp" ? sdef.jp : sdef.en) : "";
+    if($("progressFill")) $("progressFill").style.width = Math.round((Math.min(step,2) / 2) * 100) + "%";
     if($("progressSteps") && typeof OB_STEPS !== "undefined"){
       $("progressSteps").innerHTML = OB_STEPS.map(s => {
         const done = typeof obComplete === "function" && obComplete(s.id);
@@ -3415,11 +3625,7 @@ function updateProgress(){
     }
     return;
   }
-  // Post-onboarding: setup complete
-  if($("stepLabel")) $("stepLabel").textContent = "✅ Setup complete";
-  if($("stepName")) $("stepName").textContent = "";
-  if($("progressFill")) $("progressFill").style.width = "100%";
-  if($("progressSteps")) $("progressSteps").innerHTML = "";
+  wrap.classList.add("hidden");
   return;
 }
 
@@ -3472,8 +3678,8 @@ function wireLanding(){
     }
   });
   $("btnContinue")?.addEventListener("click", () => {
-    const inc = typeof firstIncompleteStep === "function" ? firstIncompleteStep() : 11;
-    if(inc <= 10){ goOnboarding(inc); }
+    const inc = typeof firstIncompleteStep === "function" ? firstIncompleteStep() : 3;
+    if(inc <= 2){ goOnboarding(inc); }
     else setView("dashboard");
   });
   $("btnStartOver2")?.addEventListener("click", startOver);
@@ -3518,7 +3724,7 @@ function runAnalysis(text, continueOnboarding){
   STATE.matches = computeMatches(ana);
   STATE.selectedRoles = allRoles();
   STATE.jobs = [];
-  // A CV analysis always enters the 10-step onboarding flow.
+  // A CV analysis always enters the Career Target flow (step 2).
   // Keep the parameter for backward compatibility with existing callers.
   if(!STATE.onboarding) STATE.onboarding = DEFAULT_ONBOARDING();
   STATE.onboarding.hasResume = true;
@@ -3717,12 +3923,12 @@ try{
   const tool = params.get("tool");
   if(tool){ STATE.view = "tools"; STATE._focus = tool; STATE._tool = tool; }
 }catch(_){}
-// Resume mid-flow onboarding at first incomplete step
+// Resume mid-flow onboarding at first incomplete step (V6: 2 steps)
 if(typeof firstIncompleteStep === "function"){
   const inc = firstIncompleteStep();
-  if(inc <= 10 && STATE.view !== "tools" && STATE.view !== "tracker" && !new URLSearchParams(location.search).get("tool")){
-    if(!STATE.profile && inc === 1){ /* stay on landing */ }
-    else if(inc <= 10){
+  if(inc <= 2 && STATE.view !== "tools" && STATE.view !== "tracker" && !new URLSearchParams(location.search).get("tool")){
+    if(!STATE.profile && !STATE.cvText && inc === 1){ /* stay on landing */ }
+    else if(inc <= 2){
       STATE.onboarding.step = inc;
       STATE.view = "onboarding";
     }

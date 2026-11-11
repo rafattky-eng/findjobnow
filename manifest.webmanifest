@@ -2,7 +2,7 @@
   "id": "./",
   "name": "FindJob Now",
   "short_name": "FindJob",
-  "description": "Find a job in Japan — one step at a time. Upload CV or skip, answer 10 short questions, match jobs with rule-based Career DNA. Free, private, no sign-up.",
+  "description": "Career Target Intelligence for Japan. Upload resume + set industries, titles & goals. Smart matching with Target Career DNA. Rule-based, private, no sign-up.",
   "lang": "en",
   "start_url": "./",
   "scope": "./",
@@ -18,7 +18,7 @@
     "business",
     "productivity"
   ],
-  "version": "5.2.1",
+  "version": "6.0.0",
   "icons": [
     {
       "src": "./icon-192.png",

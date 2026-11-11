@@ -1,6 +1,6 @@
-// FindJob Now V5.2.1 PWA service worker.
+// FindJob Now V6.0.0 PWA service worker.
 // Caches the app shell and PDF.js for best-effort offline loading. Live job searches need internet.
-const V = "fj-v5.2.1";
+const V = "fj-v6.0.0";
 // Works at the domain root (Cloudflare) and in a sub-folder (GitHub Pages: /findjobnow/)
 const BASE = new URL("./", self.location).pathname;
 const SHELL = [BASE, BASE + "index.html", BASE + "manifest.webmanifest", BASE + "icon-192.png", BASE + "icon-512.png", BASE + "apple-touch-icon.png"];
@@ -48,29 +48,37 @@ self.addEventListener("fetch", event => {
         const response = await fetch(request);
         if (response && response.ok) {
           const cache = await caches.open(V);
-          if (isNavigation) await cache.put(BASE, response.clone());
-          else if (SHELL.includes(url.pathname)) await cache.put(request, response.clone());
+          try { await cache.put(request, response.clone()); } catch (_) {}
         }
         return response;
       } catch (_) {
-        const cache = await caches.open(V);
-        if (isNavigation) return (await cache.match(BASE)) || (await cache.match(BASE + "index.html")) || Response.error();
-        return (await cache.match(request)) || Response.error();
+        const cached = await caches.match(request);
+        if (cached) return cached;
+        if (isNavigation) {
+          const shell = await caches.match(BASE + "index.html") || await caches.match(BASE);
+          if (shell) return shell;
+        }
+        throw _;
       }
     })());
     return;
   }
 
+  // PDF.js and other CDN assets: cache-first
   if (CDN_HOSTS.has(url.hostname)) {
     event.respondWith((async () => {
       const cached = await caches.match(request);
       if (cached) return cached;
-      const response = await fetch(request);
-      if (response && (response.ok || response.type === "opaque")) {
-        const cache = await caches.open(V);
-        await cache.put(request, response.clone());
+      try {
+        const response = await fetch(request);
+        if (response && (response.ok || response.type === "opaque")) {
+          const cache = await caches.open(V);
+          try { await cache.put(request, response.clone()); } catch (_) {}
+        }
+        return response;
+      } catch (_) {
+        return cached || Response.error();
       }
-      return response;
     })());
   }
 });
