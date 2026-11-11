@@ -320,12 +320,17 @@ function scoreJobMatch(job, profile, targetDNA, onboarding) {
   skills.forEach(s => { if (text.includes(String(s).toLowerCase())) sk += 12; });
   sk = Math.min(100, sk);
 
-  // Target role 15%
+  // Target role 15% (supports multi-role titles)
   let role = 30;
-  const desired = (o.desiredRole || "").toLowerCase();
-  if (desired) {
-    desired.split(/\s+/).forEach(w => { if (w.length > 3 && text.includes(w)) role += 20; });
-  }
+  const titles = (STATE.targetJobs?.titles || []).length
+    ? STATE.targetJobs.titles
+    : (Array.isArray(o.desiredRoles) && o.desiredRoles.length ? o.desiredRoles : [o.desiredRole || ""]);
+  titles.forEach(t0 => {
+    const desired = String(t0 || "").toLowerCase();
+    if (!desired) return;
+    desired.split(/\s+/).forEach(w => { if (w.length > 3 && text.includes(w)) role += 14; });
+    if (text.includes(desired.slice(0, 18))) role += 10;
+  });
   if (o.desiredIndustry && text.includes(o.desiredIndustry.toLowerCase())) role += 15;
   role = Math.min(100, role);
 
@@ -430,9 +435,23 @@ function finalizeWizard() {
     STATE.scores = ana.scores;
     STATE.dna = ana.dna;
   }
+  // Ensure multi-role titles are set
+  const o = STATE.onboarding || {};
+  if (Array.isArray(o.desiredRoles) && o.desiredRoles.length) {
+    STATE.targetJobs.titles = o.desiredRoles.slice(0, 5);
+    o.desiredRole = o.desiredRoles[0];
+  } else if (o.desiredRole) {
+    STATE.targetJobs.titles = [o.desiredRole];
+  }
   buildTargetDNA({ dna: STATE.dna, scores: STATE.scores, missing: STATE.profile?.missing, name: STATE.profile?.name });
+  // Auto-add foreigner-friendly companies into targets
+  if (typeof autoSuggestTargetCompanies === "function") autoSuggestTargetCompanies();
   STATE.view = "dashboard";
   persist();
   say(t("analysis_done"), 1);
   render();
+  // Kick off live job search in background so Matches tab is populated
+  if (typeof searchLiveJobs === "function") {
+    setTimeout(() => searchLiveJobs(), 400);
+  }
 }

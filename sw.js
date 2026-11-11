@@ -1,5 +1,5 @@
-// FindJob Now V7.1.0 PWA service worker
-const V = "fj-v7.1.0";
+// FindJob Now V7.2.0 PWA service worker
+const V = "fj-v7.2.0";
 const BASE = new URL("./", self.location).pathname;
 const SHELL = [
   BASE,

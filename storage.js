@@ -1,5 +1,5 @@
 // FindJob Now V7.1 — Local storage & state
-const APP_VERSION = "7.1.0";
+const APP_VERSION = "7.2.0";
 const DNA_ENGINE_VERSION = 7;
 const STORAGE_KEY = "fj2_state";
 
@@ -24,6 +24,7 @@ function defaultState() {
       wizardStep: 1, // 1-6
       hasResume: false,
       desiredRole: "",
+      desiredRoles: [], // multi-select support (V7.2+)
       desiredIndustry: "",
       experience: null,
       japanese: 0,
@@ -48,6 +49,9 @@ function migrate(raw) {
   if (!s.tier) s.tier = "free";
   if (!s.targetCompanies) s.targetCompanies = [];
   if (s.onboarding && s.onboarding.location === undefined) s.onboarding.location = "";
+  if (s.onboarding && !Array.isArray(s.onboarding.desiredRoles)) {
+    s.onboarding.desiredRoles = s.onboarding.desiredRole ? [s.onboarding.desiredRole] : [];
+  }
   // Migrate V6 fields
   if (s.onboarding.experience && !["entry","1-3","3-5","5-10","10+"].includes(s.onboarding.experience)) {
     if (s.onboarding.experience === "experienced") s.onboarding.experience = "3-5";

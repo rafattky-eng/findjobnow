@@ -146,15 +146,18 @@ function renderOnboarding() {
 
   let body = "";
   if (ws === 1) {
+    const selected = Array.isArray(o.desiredRoles) ? o.desiredRoles : (o.desiredRole ? [o.desiredRole] : []);
+    const ROLE_SUGGESTIONS = ["Travel Consultant","Tour Coordinator","Travel Operations Manager","Customer Success Manager","Hospitality Manager","Project Manager","Software Engineer","Marketing Manager","Sales Manager","Product Manager"];
     body = `
       <h2>${t("wizard_role")}</h2>
-      <p class="sub">${tx("One role is enough. You can refine later.", "1つでOK。後から変更できます。")}</p>
-      <input class="input" id="wRole" value="${esc(o.desiredRole || "")}" placeholder="${t("wizard_role_ph")}" autocomplete="off">
+      <p class="sub">${tx("Select one or more roles. You can refine later.", "1つ以上選択。後から変更できます。")}</p>
+      <input class="input" id="wRole" value="${esc(selected.join(", "))}" placeholder="${tx("Type a role or pick below…", "職種を入力、または下から選択…")}" autocomplete="off">
       <div class="chip-row" style="margin-top:10px">
-        ${["Travel Consultant","Tour Coordinator","Travel Operations Manager","Customer Success Manager","Hospitality Manager","Project Manager"].map(r =>
-          `<button type="button" class="chip ${o.desiredRole === r ? "on" : ""}" data-role="${esc(r)}">${esc(r)}</button>`
+        ${ROLE_SUGGESTIONS.map(r =>
+          `<button type="button" class="chip ${selected.includes(r) ? "on" : ""}" data-role="${esc(r)}">${esc(r)}</button>`
         ).join("")}
-      </div>`;
+      </div>
+      <p class="sub" style="margin-top:8px">${tx("Selected:", "選択中:")} <strong id="roleCount">${selected.length || 0}</strong></p>`;
   } else if (ws === 2) {
     body = `
       <h2>${t("wizard_industry")}</h2>
@@ -214,13 +217,28 @@ function renderOnboarding() {
 
 function wireOnboarding() {
   const o = STATE.onboarding;
+  if (!Array.isArray(o.desiredRoles)) {
+    o.desiredRoles = o.desiredRole ? [o.desiredRole] : [];
+  }
 
   $$("[data-role]").forEach(b => b.addEventListener("click", () => {
-    o.desiredRole = b.dataset.role;
+    const role = b.dataset.role;
+    const idx = o.desiredRoles.indexOf(role);
+    if (idx >= 0) o.desiredRoles.splice(idx, 1);
+    else o.desiredRoles.push(role);
+    o.desiredRole = o.desiredRoles[0] || "";
+    if ($("wRole")) $("wRole").value = o.desiredRoles.join(", ");
+    const rc = $("roleCount");
+    if (rc) rc.textContent = String(o.desiredRoles.length);
     persist(); render();
   }));
   $("wRole")?.addEventListener("input", e => {
-    o.desiredRole = e.target.value.slice(0, 80);
+    const raw = e.target.value.slice(0, 160);
+    const parts = raw.split(/[,/|]+/).map(s => s.trim()).filter(Boolean);
+    o.desiredRoles = parts.length ? parts : [];
+    o.desiredRole = o.desiredRoles[0] || "";
+    const rc = $("roleCount");
+    if (rc) rc.textContent = String(o.desiredRoles.length);
     persist();
   });
   $$("[data-ind]").forEach(b => b.addEventListener("click", () => {
@@ -252,10 +270,16 @@ function wireOnboarding() {
   $("wNext")?.addEventListener("click", () => {
     const ws = o.wizardStep || 1;
     if (ws === 1) {
-      const role = ($("wRole")?.value || o.desiredRole || "").trim();
-      if (!role) { say(t("pick_role"), 0); return; }
-      o.desiredRole = role;
-      STATE.targetJobs.titles = [role];
+      let roles = Array.isArray(o.desiredRoles) ? o.desiredRoles.filter(Boolean) : [];
+      const typed = ($("wRole")?.value || "").trim();
+      if (typed) {
+        const parts = typed.split(/[,/|]+/).map(s => s.trim()).filter(Boolean);
+        if (parts.length) roles = parts;
+      }
+      if (!roles.length) { say(t("pick_role"), 0); return; }
+      o.desiredRoles = roles;
+      o.desiredRole = roles[0];
+      STATE.targetJobs.titles = roles.slice(0, 5);
     }
     if (ws === 2 && !o.desiredIndustry) { say(t("pick_industry"), 0); return; }
     if (ws === 3 && !o.experience) { say(t("pick_exp"), 0); return; }
