@@ -2,23 +2,17 @@
   "id": "./",
   "name": "FindJob Now",
   "short_name": "FindJob",
-  "description": "Career Target Intelligence for Japan. Upload resume + set industries, titles & goals. Smart matching with Target Career DNA. Rule-based, private, no sign-up.",
+  "description": "Career intelligence for Japan. Resume + 5-question target wizard, Career DNA, Japan job boards, ATS tools. Rule-based, private, no sign-up.",
   "lang": "en",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "display_override": [
-    "standalone",
-    "minimal-ui"
-  ],
+  "display_override": ["standalone", "minimal-ui"],
   "orientation": "any",
-  "background_color": "#0C2340",
-  "theme_color": "#0C2340",
-  "categories": [
-    "business",
-    "productivity"
-  ],
-  "version": "6.0.0",
+  "background_color": "#071B35",
+  "theme_color": "#071B35",
+  "categories": ["business", "productivity"],
+  "version": "7.0.0",
   "icons": [
     {
       "src": "./icon-192.png",
