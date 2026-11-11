@@ -2,7 +2,7 @@
   "id": "./",
   "name": "FindJob Now",
   "short_name": "FindJob",
-  "description": "Career intelligence for Japan. Resume + 5-question target wizard, Career DNA, Japan job boards, ATS tools. Rule-based, private, no sign-up.",
+  "description": "Tokyo-centric career intelligence for foreigners in Japan. Resume + 6-question wizard, Career DNA, foreigner-friendly companies, visa & culture tools. Private, no sign-up.",
   "lang": "en",
   "start_url": "./",
   "scope": "./",
@@ -12,7 +12,7 @@
   "background_color": "#071B35",
   "theme_color": "#071B35",
   "categories": ["business", "productivity"],
-  "version": "7.0.0",
+  "version": "7.1.0",
   "icons": [
     {
       "src": "./icon-192.png",

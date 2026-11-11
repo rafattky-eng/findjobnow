@@ -1,17 +1,22 @@
-// FindJob Now V7 — Resume Intelligence + Interview Coach V2
+// FindJob Now V7.1 — Resume Intelligence + Interview + Japan tools
 
 function renderTools() {
   const tool = STATE._tool || null;
   return `
   <h2>${tx("Toolkit", "ツールキット")}</h2>
-  <p class="sub">${tx("Resume intelligence & interview practice", "履歴書知能と面接練習")}</p>
+  <p class="sub">${tx("11 tools: resume, interview, culture, visa, JLPT & more", "11ツール：履歴書・面接・文化・ビザ・JLPTなど")}</p>
   <div class="tool-grid">
     <button type="button" class="tool-card" data-tool="ats"><span class="icon">📊</span><span class="label">${t("ats_score")}</span></button>
     <button type="button" class="tool-card" data-tool="rewrite"><span class="icon">✍️</span><span class="label">${t("rewrite")}</span></button>
     <button type="button" class="tool-card" data-tool="achieve"><span class="icon">🏆</span><span class="label">${t("achievement")}</span></button>
     <button type="button" class="tool-card" data-tool="interview"><span class="icon">🎤</span><span class="label">${t("interview_practice")}</span></button>
-    <button type="button" class="tool-card" data-tool="salary"><span class="icon">💰</span><span class="label">${tx("Salary", "年収目安")}</span></button>
-    <button type="button" class="tool-card" data-tool="visa"><span class="icon">🛂</span><span class="label">${tx("Visa guide", "ビザ案内")}</span></button>
+    <button type="button" class="tool-card" data-tool="interviewprep"><span class="icon">📋</span><span class="label">${t("interview_prep")}</span></button>
+    <button type="button" class="tool-card" data-tool="salary"><span class="icon">💰</span><span class="label">${t("salary_benchmarks")}</span></button>
+    <button type="button" class="tool-card" data-tool="visa"><span class="icon">🛂</span><span class="label">${t("visa_deep")}</span></button>
+    <button type="button" class="tool-card" data-tool="culture"><span class="icon">🏯</span><span class="label">${t("culture_tips")}</span></button>
+    <button type="button" class="tool-card" data-tool="jpresume"><span class="icon">📝</span><span class="label">${t("jp_resume")}</span></button>
+    <button type="button" class="tool-card" data-tool="jlpt"><span class="icon">📚</span><span class="label">${t("jlpt_resources")}</span></button>
+    <button type="button" class="tool-card" data-tool="areas"><span class="icon">🗺</span><span class="label">${t("tokyo_areas")}</span></button>
   </div>
   <div id="toolPanel" class="tool-panel ${tool ? "" : "hidden"}"></div>
   ${renderTierNote()}
@@ -45,8 +50,13 @@ function renderToolPanel(tool) {
   if (tool === "rewrite") return renderRewrite();
   if (tool === "achieve") return renderAchieve();
   if (tool === "interview") return renderInterview();
+  if (tool === "interviewprep") return renderInterviewPrep();
   if (tool === "salary") return renderSalary();
-  if (tool === "visa") return renderVisa();
+  if (tool === "visa") return renderVisaDeep();
+  if (tool === "culture") return renderCulture();
+  if (tool === "jpresume") return renderJpResume();
+  if (tool === "jlpt") return renderJlpt();
+  if (tool === "areas") return renderTokyoAreas();
   return "";
 }
 
@@ -110,6 +120,12 @@ function wireToolPanel(tool) {
           });
         });
       });
+    });
+  }
+  if (tool === "interviewprep") {
+    $("copyFollowUp")?.addEventListener("click", () => {
+      const text = $("fuTemplate")?.textContent || "";
+      navigator.clipboard?.writeText(text).then(() => say(tx("Copied", "コピーしました"), 1)).catch(() => say(tx("Copy failed", "コピー失敗"), 0));
     });
   }
 }
@@ -234,9 +250,9 @@ function scoreAnswer(ans) {
   const w = String(ans || "").trim().split(/\s+/).filter(Boolean).length;
   const hasNumber = /\d+/.test(ans);
   const hasStar = /situation|task|action|result|まず|次に|結果/i.test(ans);
-  const communication = Math.min(98, 40 + Math.min(w, 80));
-  const structure = hasStar ? 85 : w > 40 ? 60 : 40;
-  const confidence = w >= 30 ? 75 : w >= 15 ? 55 : 35;
+  const communication = Math.min(95, 40 + Math.min(w, 80));
+  const structure = hasStar ? 85 : (w > 40 ? 60 : 40);
+  const confidence = Math.min(90, 50 + Math.floor(w / 3));
   const results = hasNumber ? 80 : 45;
   const overall = Math.round((communication + structure + confidence + results) / 4);
   let tip = tx("Add a concrete result with a number.", "数値を含む具体的な結果を追加。");
@@ -245,35 +261,127 @@ function scoreAnswer(ans) {
   return { communication, structure, confidence, results, overall, tip };
 }
 
-function renderSalary() {
-  const yrs = STATE.profile?.yrs || STATE.dna?.yrs || 2;
-  const base = 3500000 + yrs * 280000;
-  const high = base + 1200000;
+function renderInterviewPrep() {
+  const role = STATE.onboarding?.desiredRole || "the role";
+  const company = (STATE.targetCompanies || [])[0]
+    ? (FOREIGNER_FRIENDLY_COMPANIES.find(c => c.id === STATE.targetCompanies[0])?.name || "the company")
+    : "the company";
+  const template = `Dear [Hiring Manager],
+
+Thank you for the opportunity to interview for the ${role} position at ${company}.
+
+I enjoyed learning more about the team and the role. I remain very interested and believe my experience aligns well with what you are looking for.
+
+Please let me know if you need any additional information. I look forward to hearing from you.
+
+Best regards,
+[Your Name]`;
   return `
-  <h3>${tx("Salary estimator (Japan)", "年収目安（日本）")}</h3>
-  <p class="sub">${tx("Rough mid-market ranges for foreign professionals in Tokyo. Not an offer.", "東京の外国人向け中間相場の目安。オファーではありません。")}</p>
-  <div class="score-grid">
-    <div class="score-card"><div class="score-val" style="font-size:18px">¥${(base/10000).toFixed(0)}万</div><div class="score-lbl">${tx("Lower", "下限")}</div></div>
-    <div class="score-card"><div class="score-val" style="font-size:18px">¥${((base+high)/2/10000).toFixed(0)}万</div><div class="score-lbl">${tx("Mid", "中央")}</div></div>
-    <div class="score-card"><div class="score-val" style="font-size:18px">¥${(high/10000).toFixed(0)}万</div><div class="score-lbl">${tx("Upper", "上限")}</div></div>
+  <h3>${t("interview_prep")}</h3>
+  <p class="sub">${tx("Checklist + follow-up email template for Japan interviews.", "日本の面接向けチェックリストとフォローアップメール。")}</p>
+  <div class="card">
+    <strong>${tx("Before the interview", "面接前")}</strong>
+    <ul style="margin:8px 0 0 18px;font-size:13px;color:var(--mu)">
+      <li>${tx("Research company products, recent news, and values", "会社の製品・ニュース・理念を調べる")}</li>
+      <li>${tx("Prepare 2–3 STAR stories with numbers", "数値付きSTAR事例を2〜3用意")}</li>
+      <li>${tx("Practice self-intro in English and simple Japanese", "英語と簡単な日本語で自己紹介練習")}</li>
+      <li>${tx("Arrive 10 minutes early; bring extra copies of resume", "10分前到着、履歴書の予備を持参")}</li>
+      <li>${tx("Have questions ready (role, team, next steps)", "質問を用意（役割・チーム・次のステップ）")}</li>
+    </ul>
   </div>
-  <p class="sub">${tx("Adjust for industry, Japanese level, and company size.", "業界・日本語レベル・企業規模で調整。")}</p>`;
+  <div class="card" style="margin-top:10px">
+    <strong>${t("follow_up_template")}</strong>
+    <pre id="fuTemplate" style="white-space:pre-wrap;font-size:12px;margin-top:8px;color:var(--tx)">${esc(template)}</pre>
+    <button type="button" class="btn secondary sm" id="copyFollowUp" style="margin-top:8px">${t("copy_template")}</button>
+  </div>`;
 }
 
-function renderVisa() {
-  const v = STATE.onboarding?.visaStatus || "need_sponsorship";
-  const tips = {
-    need_sponsorship: tx("Target companies that state visa support. Engineer/Specialist in Humanities is common.", "ビザサポート明記の企業を狙う。技人国が一般的。"),
-    work_visa: tx("You can change employers with notification. Keep your residence card updated.", "転職時は届出が必要。在留カードを最新に。"),
-    student: tx("Part-time limits apply. Plan job hunting before graduation for status change.", "資格外活動の制限あり。卒業前に就職活動を。"),
-    wh: tx("Working Holiday is time-limited. Use it to build Japan experience.", "期限あり。日本経験の構築に活用を。"),
-    pr: tx("Strong position — focus on role fit and compensation.", "有利な立場。役割と待遇に集中を。"),
-    spouse: tx("Flexible work authorization — highlight stability.", "就労制限が少ない。安定性をアピール。"),
-    national: tx("No visa constraints — compete on skills and culture fit.", "ビザ制約なし。スキルと文化適合で勝負。")
-  };
+function renderSalary() {
+  const role = STATE.onboarding?.desiredRole || "";
+  const key = Object.keys(SALARY_BENCHMARKS).find(k => role && role.toLowerCase().includes(k.toLowerCase().split(" ")[0])) || "default";
+  const b = SALARY_BENCHMARKS[key] || SALARY_BENCHMARKS.default;
+  const exp = STATE.onboarding?.experience || "1-3";
+  const band = exp === "entry" || exp === "1-3" ? b.entry : (exp === "3-5" || exp === "5-10" ? b.mid : b.senior);
   return `
-  <h3>${tx("Visa assistant", "ビザアシスタント")}</h3>
-  <p class="sub">${tx("Status", "状況")}: <strong>${esc(v)}</strong></p>
-  <div class="card">${tips[v] || tips.need_sponsorship}</div>
-  <p class="sub">${tx("This is general information, not legal advice.", "一般情報であり、法的助言ではありません。")}</p>`;
+  <h3>${t("salary_benchmarks")}</h3>
+  <p class="sub">${tx("Tokyo mid-market ranges for foreign professionals (万円 / year). Not an offer.", "東京の外国人向け中間相場（万円/年）。オファーではありません。")}</p>
+  <p class="sub">${tx("Role basis", "職種基準")}: <strong>${esc(key === "default" ? (role || "General") : key)}</strong></p>
+  <div class="score-grid">
+    <div class="score-card"><div class="score-val" style="font-size:16px">¥${band[0]}–${band[1]}万</div><div class="score-lbl">${tx("Your band", "あなたの帯")}</div></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <div style="font-size:12px;font-weight:700;margin-bottom:6px">${tx("Full benchmarks (Tokyo)", "東京フルベンチマーク")}</div>
+    ${Object.entries(SALARY_BENCHMARKS).filter(([k]) => k !== "default").map(([name, v]) =>
+      `<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--bd)">
+        <span>${esc(name)}</span>
+        <span class="muted">${v.entry[0]}–${v.senior[1]}万</span>
+      </div>`
+    ).join("")}
+  </div>
+  <p class="sub">${tx("Adjust for Japanese level, company size, and visa needs.", "日本語レベル・企業規模・ビザで調整。")}</p>`;
+}
+
+function renderVisaDeep() {
+  const v = STATE.onboarding?.visaStatus || "need_sponsorship";
+  return `
+  <h3>${t("visa_deep")}</h3>
+  <p class="sub">${tx("Status", "状況")}: <strong>${esc(v)}</strong> · ${tx("General information only, not legal advice.", "一般情報のみ。法的助言ではありません。")}</p>
+  ${VISA_DEEP_DIVE.map(item => `
+    <div class="card" style="margin:8px 0">
+      <div style="font-weight:700">${tx(item.en, item.jp)}</div>
+      <p class="sub" style="margin-top:4px">${tx(item.body_en, item.body_jp)}</p>
+    </div>
+  `).join("")}`;
+}
+
+function renderCulture() {
+  return `
+  <h3>${t("culture_tips")}</h3>
+  <p class="sub">${tx("Eight practical tips for Japanese business culture.", "日本のビジネス文化のための8つの実践ヒント。")}</p>
+  ${BUSINESS_CULTURE_TIPS.map(tip => `
+    <div class="card" style="margin:8px 0">
+      <div style="font-weight:700">${tx(tip.en, tip.jp)}</div>
+      <p class="sub" style="margin-top:4px">${tx(tip.tip_en, tip.tip_jp)}</p>
+    </div>
+  `).join("")}`;
+}
+
+function renderJpResume() {
+  return `
+  <h3>${t("jp_resume")}</h3>
+  <p class="sub">${tx("What Japanese employers expect beyond a Western CV.", "日本企業が欧米式CV以外に期待するもの。")}</p>
+  ${JP_RESUME_GUIDE.map(g => `
+    <div class="card" style="margin:8px 0">
+      <div style="font-weight:700">${tx(g.title_en, g.title_jp)}</div>
+      <p class="sub" style="margin-top:4px">${tx(g.body_en, g.body_jp)}</p>
+    </div>
+  `).join("")}`;
+}
+
+function renderJlpt() {
+  return `
+  <h3>${t("jlpt_resources")}</h3>
+  <p class="sub">${tx("Study paths by level. Official site: jlpt.jp", "レベル別学習パス。公式: jlpt.jp")}</p>
+  ${JLPT_RESOURCES.map(r => `
+    <div class="card" style="margin:8px 0">
+      <div style="font-weight:700">${esc(r.level)}</div>
+      <div class="chip-row" style="margin-top:6px">${r.items.map(i => `<span class="chip" style="cursor:default">${esc(i)}</span>`).join("")}</div>
+    </div>
+  `).join("")}`;
+}
+
+function renderTokyoAreas() {
+  const wards = TOKYO_AREAS.filter(a => a.type === "ward");
+  const commute = TOKYO_AREAS.filter(a => a.type === "commutable");
+  return `
+  <h3>${t("tokyo_areas")}</h3>
+  <p class="sub">${tx("23 wards focus + common commuting cities from the greater Tokyo area.", "23区中心 + 首都圏の通勤圏都市。")}</p>
+  <div class="card">
+    <div style="font-size:12px;font-weight:700;margin-bottom:6px">${tx("Key wards (selection)", "主要区（抜粋）")}</div>
+    <div class="chip-row">${wards.map(a => `<span class="chip" style="cursor:default">${tx(a.en, a.jp)}</span>`).join("")}</div>
+  </div>
+  <div class="card" style="margin-top:10px">
+    <div style="font-size:12px;font-weight:700;margin-bottom:6px">${tx("Commutable cities", "通勤圏")}</div>
+    <div class="chip-row">${commute.map(a => `<span class="chip" style="cursor:default">${tx(a.en, a.jp)}</span>`).join("")}</div>
+  </div>`;
 }

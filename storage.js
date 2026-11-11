@@ -1,5 +1,5 @@
-// FindJob Now V7 — Local storage & state
-const APP_VERSION = "7.0.0";
+// FindJob Now V7.1 — Local storage & state
+const APP_VERSION = "7.1.0";
 const DNA_ENGINE_VERSION = 7;
 const STORAGE_KEY = "fj2_state";
 
@@ -21,15 +21,17 @@ function defaultState() {
     view: "landing",
     onboarding: {
       step: 1, // 1=resume, 2=wizard
-      wizardStep: 1, // 1-5
+      wizardStep: 1, // 1-6
       hasResume: false,
       desiredRole: "",
       desiredIndustry: "",
       experience: null,
       japanese: 0,
-      visaStatus: null
+      visaStatus: null,
+      location: "" // Tokyo | Osaka | Nagoya | Fukuoka | Remote | Any
     },
     targetJobs: { industries: [], titles: [], careerGoal: "" },
+    targetCompanies: [], // company ids or names the user is tracking
     selectedRoles: null,
     journey: { goal: null, fastMode: false },
     tier: "free" // free | pro | premium (placeholder)
@@ -44,6 +46,8 @@ function migrate(raw) {
   if (!s.settings) s.settings = { lang: "en", theme: "dark" };
   if (!s.journey) s.journey = { goal: null, fastMode: false };
   if (!s.tier) s.tier = "free";
+  if (!s.targetCompanies) s.targetCompanies = [];
+  if (s.onboarding && s.onboarding.location === undefined) s.onboarding.location = "";
   // Migrate V6 fields
   if (s.onboarding.experience && !["entry","1-3","3-5","5-10","10+"].includes(s.onboarding.experience)) {
     if (s.onboarding.experience === "experienced") s.onboarding.experience = "3-5";

@@ -1,4 +1,4 @@
-// FindJob Now V7.0 — Main application controller
+// FindJob Now V7.1 — Main application controller (Tokyo + foreigner focus)
 
 const $ = id => document.getElementById(id);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
@@ -132,14 +132,15 @@ async function extractPdfText(file) {
   return text.trim();
 }
 
-/* ========== ONBOARDING WIZARD (5 questions) ========== */
+/* ========== ONBOARDING WIZARD (6 questions) ========== */
 function renderOnboarding() {
   const o = STATE.onboarding || {};
   if (o.step === 1) {
-    return renderLanding(); // shouldn't happen often
+    return renderLanding();
   }
   const ws = o.wizardStep || 1;
-  const dots = [1, 2, 3, 4, 5].map(i =>
+  const total = 6;
+  const dots = [1, 2, 3, 4, 5, 6].map(i =>
     `<div class="wizard-dot ${i === ws ? "on" : i < ws ? "done" : ""}"></div>`
   ).join("");
 
@@ -179,7 +180,7 @@ function renderOnboarding() {
           `<button type="button" class="chip ${o.japanese === n ? "on" : ""}" data-ja="${n}">${n} (${JA_LABELS[n]})</button>`
         ).join("")}
       </div>`;
-  } else {
+  } else if (ws === 5) {
     body = `
       <h2>${t("wizard_visa")}</h2>
       <div class="chip-row">
@@ -187,16 +188,25 @@ function renderOnboarding() {
           `<button type="button" class="chip ${o.visaStatus === v.id ? "on" : ""}" data-visa="${v.id}">${tx(v.en, v.jp)}</button>`
         ).join("")}
       </div>`;
+  } else {
+    body = `
+      <h2>${t("wizard_location")}</h2>
+      <p class="sub">${tx("Tokyo is the default focus for most foreigner-friendly roles.", "外国人歓迎の求人は東京が中心です。")}</p>
+      <div class="chip-row">
+        ${LOCATION_OPTS.map(loc =>
+          `<button type="button" class="chip ${o.location === loc.id ? "on" : ""}" data-loc="${loc.id}">${tx(loc.en, loc.jp)}</button>`
+        ).join("")}
+      </div>`;
   }
 
   return `
   <div class="card">
-    <div class="step-badge">${t("step_target")} · ${ws}/5</div>
+    <div class="step-badge">${t("step_target")} · ${ws}/${total}</div>
     <div class="wizard-progress">${dots}</div>
     ${body}
   </div>
   <div class="sticky-cta">
-    <button type="button" class="btn primary btn-lg" id="wNext">${ws < 5 ? t("next") : t("see_results")}</button>
+    <button type="button" class="btn primary btn-lg" id="wNext">${ws < total ? t("next") : t("see_results")}</button>
     ${ws > 1 ? `<button type="button" class="btn ghost" id="wBack" style="margin-top:8px">${t("back")}</button>` : ""}
   </div>
   `;
@@ -230,6 +240,10 @@ function wireOnboarding() {
     o.visaStatus = b.dataset.visa;
     persist(); render();
   }));
+  $$("[data-loc]").forEach(b => b.addEventListener("click", () => {
+    o.location = b.dataset.loc;
+    persist(); render();
+  }));
 
   $("wBack")?.addEventListener("click", () => {
     o.wizardStep = Math.max(1, (o.wizardStep || 1) - 1);
@@ -247,8 +261,9 @@ function wireOnboarding() {
     if (ws === 3 && !o.experience) { say(t("pick_exp"), 0); return; }
     if (ws === 4 && !(o.japanese >= 1)) { say(t("pick_ja"), 0); return; }
     if (ws === 5 && !o.visaStatus) { say(t("pick_visa"), 0); return; }
+    if (ws === 6 && !o.location) { say(t("pick_location"), 0); return; }
 
-    if (ws < 5) {
+    if (ws < 6) {
       o.wizardStep = ws + 1;
       persist();
       render();
@@ -275,6 +290,10 @@ function renderDashboard() {
   const ready = s.readiness || s.resume || 0;
   const japan = s.japan || 0;
 
+  const targets = (STATE.targetCompanies || [])
+    .map(id => FOREIGNER_FRIENDLY_COMPANIES.find(c => c.id === id))
+    .filter(Boolean);
+
   return `
   <!-- Hero DNA -->
   <div class="card hero">
@@ -294,9 +313,27 @@ function renderDashboard() {
       <div class="score-card"><div class="score-val">${ready}</div><div class="score-lbl">${t("readiness")} %</div></div>
       <div class="score-card"><div class="score-val">${japan}</div><div class="score-lbl">${t("japan_fit")} %</div></div>
     </div>
+    ${o.location ? `<p class="sub" style="margin-top:8px">${t("location_pref")}: <strong>${esc(o.location)}</strong></p>` : ""}
     ` : `
     <p class="sub" style="margin-top:12px">${tx("Complete the career target wizard to unlock your DNA.", "キャリア目標ウィザードを完了するとDNAが表示されます。")}</p>
     <button type="button" class="btn primary" data-go="onboarding">${tx("Start wizard", "ウィザード開始")}</button>
+    `}
+  </div>
+
+  <!-- Target Companies -->
+  <div class="card" style="margin-top:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3 style="margin:0">${t("target_companies")}</h3>
+      <span class="muted" style="font-size:12px">${targets.length} ${t("companies_tracked")}</span>
+    </div>
+    ${targets.length ? `
+      <div class="chip-row" style="margin-top:8px">
+        ${targets.map(c => `<span class="chip on" style="cursor:default">${esc(c.name)}</span>`).join("")}
+      </div>
+      <button type="button" class="btn secondary sm" data-go="jobs" style="margin-top:8px">${tx("Manage in Jobs tab", "求人タブで管理")}</button>
+    ` : `
+      <p class="sub" style="margin-top:8px">${tx("Add foreigner-friendly companies from the Jobs → Company Directory tab.", "求人 → 企業ディレクトリから追加。")}</p>
+      <button type="button" class="btn secondary sm" data-go="jobs" style="margin-top:6px">${t("company_directory")}</button>
     `}
   </div>
 
@@ -305,15 +342,15 @@ function renderDashboard() {
   <div class="action-grid">
     <button type="button" class="action-card" data-go="jobs">
       <div class="action-icon">🔍</div>
-      <div><div class="action-title">${t("find_jobs")}</div><div class="action-sub">${tx("Japan boards + matches", "日本ボード + マッチ")}</div></div>
+      <div><div class="action-title">${t("find_jobs")}</div><div class="action-sub">${tx("Japan boards + companies", "日本ボード + 企業")}</div></div>
     </button>
     <button type="button" class="action-card" data-go="tools" data-tool="ats">
       <div class="action-icon">📄</div>
-      <div><div class="action-title">${t("improve_resume")}</div><div class="action-sub">ATS · Rewrite · Achievements</div></div>
+      <div><div class="action-title">${t("improve_resume")}</div><div class="action-sub">ATS · Rewrite · JP resume</div></div>
     </button>
-    <button type="button" class="action-card" data-go="tools" data-tool="interview">
-      <div class="action-icon">🎤</div>
-      <div><div class="action-title">${t("interview_practice")}</div><div class="action-sub">${tx("Scored practice", "採点付き練習")}</div></div>
+    <button type="button" class="action-card" data-go="tools" data-tool="culture">
+      <div class="action-icon">🏯</div>
+      <div><div class="action-title">${t("culture_tips")}</div><div class="action-sub">${tx("Visa · JLPT · Interview", "ビザ · JLPT · 面接")}</div></div>
     </button>
   </div>
 
@@ -349,6 +386,7 @@ function nextActionText() {
   const s = STATE.scores || {};
   if ((s.resume || 0) < 55) return tx("Improve resume with ATS tool", "ATSツールで履歴書を改善");
   if ((o.japanese || 0) < 3) return tx("Plan Japanese study toward N3", "日本語N3に向けた学習計画");
+  if (!(STATE.targetCompanies || []).length) return tx("Add 3 target companies from the directory", "企業ディレクトリから3社追加");
   if (!(STATE.jobs || []).length) return tx("Search jobs on Japan boards", "日本の求人ボードで検索");
   return tx("Apply to top 3 matched roles this week", "今週マッチ上位3件に応募");
 }
@@ -387,7 +425,6 @@ function render() {
   const nav = $("bottomNav");
   const progress = $("progressWrap");
 
-  // Language buttons
   $("btnEn")?.classList.toggle("active", STATE.settings.lang !== "jp");
   $("btnJp")?.classList.toggle("active", STATE.settings.lang === "jp");
 
@@ -402,9 +439,9 @@ function render() {
     if (progress) {
       progress.classList.remove("hidden");
       const ws = STATE.onboarding?.wizardStep || 1;
-      if ($("stepLabel")) $("stepLabel").textContent = `Step ${ws} of 5`;
+      if ($("stepLabel")) $("stepLabel").textContent = `Step ${ws} of 6`;
       if ($("stepName")) $("stepName").textContent = t("step_target");
-      if ($("progressFill")) $("progressFill").style.width = Math.round((ws / 5) * 100) + "%";
+      if ($("progressFill")) $("progressFill").style.width = Math.round((ws / 6) * 100) + "%";
     }
     wireOnboarding();
   } else {
@@ -418,7 +455,6 @@ function render() {
     wireCommon();
   }
 
-  // Nav active state
   $$("#bottomNav button").forEach(b => {
     b.classList.toggle("active", b.dataset.view === v);
   });
@@ -433,6 +469,7 @@ function wireCommon() {
         STATE.onboarding.step = 2;
         STATE.onboarding.wizardStep = STATE.onboarding.wizardStep || 1;
       }
+      if (go === "jobs") STATE._jobsTab = STATE._jobsTab || "matches";
       setView(go);
     });
   });
@@ -455,7 +492,6 @@ function wireChrome() {
   $$("#bottomNav button").forEach(b => {
     b.addEventListener("click", () => setView(b.dataset.view));
   });
-  // Restore file input (hidden)
   let restoreInput = $("restoreFile");
   if (!restoreInput) {
     restoreInput = document.createElement("input");
@@ -470,7 +506,6 @@ function wireChrome() {
     if (f) restoreBackup(f);
     e.target.value = "";
   });
-  // Long-press backup button to restore
   let pressTimer;
   $("btnBackup")?.addEventListener("touchstart", () => {
     pressTimer = setTimeout(() => $("restoreFile")?.click(), 800);
@@ -483,21 +518,18 @@ function init() {
   document.documentElement.lang = STATE.settings.lang === "jp" ? "ja" : "en";
   wireChrome();
 
-  // Deep link ?tool=
   try {
     const params = new URLSearchParams(location.search);
     const tool = params.get("tool");
     if (tool) { STATE.view = "tools"; STATE._tool = tool; }
   } catch (_) {}
 
-  // Resume mid-wizard if incomplete
-  if (STATE.onboarding?.step === 2 && STATE.onboarding?.wizardStep < 5 && !STATE.targetDNA) {
+  if (STATE.onboarding?.step === 2 && STATE.onboarding?.wizardStep < 6 && !STATE.targetDNA) {
     if (STATE.view !== "tools" && STATE.view !== "tracker") {
       STATE.view = "onboarding";
     }
   }
 
-  // Register SW
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js").catch(() => {});
   }

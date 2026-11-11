@@ -1,4 +1,4 @@
-// FindJob Now V7 — Japan-focused job discovery
+// FindJob Now V7.1 — Japan-focused job discovery + company directory
 
 const JAPAN_BOARDS = [
   { id: "careercross", name: "CareerCross", url: "https://www.careercross.com/", q: "https://www.careercross.com/en/job-search?keywords=" },
@@ -24,8 +24,14 @@ async function jget(url, ms = 8000) {
 }
 
 function locationAllowed(job) {
-  const loc = STATE.onboarding?.location || STATE.dna?.locationPref;
-  // V7 wizard doesn't collect location in the 5 questions — default allow Japan-relevant
+  const loc = (STATE.onboarding?.location || "").toLowerCase();
+  if (!loc || loc === "any") return true;
+  if (loc === "remote") return !!job.remote || /remote|リモート/i.test(job.location || "");
+  const jl = (job.location || "").toLowerCase();
+  if (loc === "tokyo") return /tokyo|東京|kanto|関東|yokohama|横浜|kawasaki|saitama|chiba/i.test(jl) || jl === "japan" || !jl;
+  if (loc === "osaka") return /osaka|大阪|kansai|関西/i.test(jl) || jl === "japan";
+  if (loc === "nagoya") return /nagoya|名古屋|aichi|愛知/i.test(jl) || jl === "japan";
+  if (loc === "fukuoka") return /fukuoka|福岡|kyushu|九州/i.test(jl) || jl === "japan";
   return true;
 }
 
@@ -54,12 +60,12 @@ function enrichJob(raw, source) {
 async function searchLiveJobs() {
   const role = (STATE.onboarding?.desiredRole || STATE.targetDNA?.targetIdentity || "jobs in Japan").trim();
   const industry = STATE.onboarding?.desiredIndustry || "";
-  const query = [role, industry, "Japan"].filter(Boolean).join(" ");
+  const loc = STATE.onboarding?.location || "";
+  const query = [role, industry, loc === "Tokyo" ? "Tokyo" : "Japan"].filter(Boolean).join(" ");
   say(tx("Searching jobs…", "求人を検索中…"), 1);
 
   const out = [];
 
-  // Remotive (remote-friendly, filter later)
   try {
     const data = await jget("https://remotive.com/api/remote-jobs?limit=30&search=" + encodeURIComponent(role));
     if (data && Array.isArray(data.jobs)) {
@@ -77,7 +83,6 @@ async function searchLiveJobs() {
     }
   } catch (_) {}
 
-  // Jobicy
   try {
     const data = await jget("https://jobicy.com/api/v2/remote-jobs?count=20&tag=" + encodeURIComponent((industry || role).split(" ")[0]));
     if (data && Array.isArray(data.jobs)) {
@@ -95,14 +100,13 @@ async function searchLiveJobs() {
     }
   } catch (_) {}
 
-  // Deduplicate by title+company
   const seen = new Set();
   const unique = [];
   out.forEach(j => {
     const k = (j.title + "|" + j.company).toLowerCase();
     if (seen.has(k)) return;
     seen.add(k);
-    unique.push(j);
+    if (locationAllowed(j)) unique.push(j);
   });
 
   unique.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
@@ -153,15 +157,49 @@ function renderJobCard(job) {
   </article>`;
 }
 
+function renderCompanyCard(c) {
+  const tracked = (STATE.targetCompanies || []).includes(c.id);
+  return `
+  <article class="job-card" style="padding:12px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+      <div>
+        <div class="job-title" style="font-size:15px">${esc(c.name)}</div>
+        <div class="job-company">${esc(c.industry)}</div>
+      </div>
+      <button type="button" class="btn sm ${tracked ? "ghost" : "secondary"}" data-target-co="${esc(c.id)}" style="min-height:32px;font-size:11px;flex-shrink:0">
+        ${tracked ? t("remove_target") : t("add_target")}
+      </button>
+    </div>
+    <div class="job-meta" style="margin-top:6px">
+      ${c.visa ? `<span class="badge visa">Visa</span>` : ""}
+      ${c.tokyo ? `<span class="badge source">Tokyo</span>` : ""}
+      <span class="badge ${c.type === "foreign-friendly" ? "ready" : "source"}">${c.type === "foreign-friendly" ? t("foreign_friendly") : t("japanese_companies")}</span>
+    </div>
+    <p class="sub" style="margin-top:6px;font-size:12px">${esc(c.note)}</p>
+  </article>`;
+}
+
 function renderJobs() {
   const jobs = STATE.jobs || [];
   const role = STATE.onboarding?.desiredRole || "";
   const q = encodeURIComponent(role || "jobs");
+  const tab = STATE._jobsTab || "matches";
+  const coTab = STATE._coTab || "foreign";
+
+  const foreign = FOREIGNER_FRIENDLY_COMPANIES.filter(c => c.type === "foreign-friendly");
+  const japanese = FOREIGNER_FRIENDLY_COMPANIES.filter(c => c.type === "japanese");
+  const list = coTab === "japanese" ? japanese : foreign;
 
   return `
   <h2>${t("find_jobs")}</h2>
-  <p class="sub">${tx("Japan-priority boards + live matches", "日本優先ボード + ライブマッチ")}</p>
+  <p class="sub">${tx("Tokyo-first boards + live matches + company directory", "東京優先ボード + ライブマッチ + 企業ディレクトリ")}</p>
 
+  <div class="tabs" style="margin-bottom:12px">
+    <button type="button" class="tab ${tab === "matches" ? "on" : ""}" data-jtab="matches">${tx("Matches", "マッチ")}</button>
+    <button type="button" class="tab ${tab === "companies" ? "on" : ""}" data-jtab="companies">${t("company_directory")}</button>
+  </div>
+
+  ${tab === "matches" ? `
   <div class="card">
     <div style="font-size:12px;font-weight:700;color:var(--mu);margin-bottom:8px">${tx("Japan job boards", "日本の求人ボード")}</div>
     <div class="chip-row">
@@ -169,6 +207,7 @@ function renderJobs() {
         <a class="chip" href="${b.q}${q}" target="_blank" rel="noopener" style="text-decoration:none">${b.name}</a>
       `).join("")}
     </div>
+    ${STATE.onboarding?.location ? `<p class="sub" style="margin-top:8px">${t("location_pref")}: <strong>${esc(STATE.onboarding.location)}</strong></p>` : ""}
   </div>
 
   <div class="btn-row">
@@ -180,10 +219,26 @@ function renderJobs() {
       <p class="muted">${t("no_jobs")}</p>
     </div>
   `}
+  ` : `
+  <div class="tabs" style="margin-bottom:10px">
+    <button type="button" class="tab ${coTab === "foreign" ? "on" : ""}" data-cotab="foreign">${t("foreign_friendly")} (${foreign.length})</button>
+    <button type="button" class="tab ${coTab === "japanese" ? "on" : ""}" data-cotab="japanese">${t("japanese_companies")} (${japanese.length})</button>
+  </div>
+  <p class="sub">${tx("Tap “Add to targets” to track on your dashboard.", "「ターゲットに追加」でダッシュボードに表示。")}</p>
+  ${list.map(renderCompanyCard).join("")}
+  `}
   `;
 }
 
 function wireJobs() {
+  $$("[data-jtab]").forEach(b => b.addEventListener("click", () => {
+    STATE._jobsTab = b.dataset.jtab;
+    render();
+  }));
+  $$("[data-cotab]").forEach(b => b.addEventListener("click", () => {
+    STATE._coTab = b.dataset.cotab;
+    render();
+  }));
   $("btnSearchJobs")?.addEventListener("click", () => searchLiveJobs());
   $$("[data-save-job]").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -206,6 +261,17 @@ function wireJobs() {
       } else {
         say(tx("Already saved", "保存済み"), 1);
       }
+    });
+  });
+  $$("[data-target-co]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.targetCo;
+      if (!STATE.targetCompanies) STATE.targetCompanies = [];
+      const idx = STATE.targetCompanies.indexOf(id);
+      if (idx >= 0) STATE.targetCompanies.splice(idx, 1);
+      else STATE.targetCompanies.push(id);
+      persist();
+      render();
     });
   });
 }

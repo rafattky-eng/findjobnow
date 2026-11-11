@@ -1,4 +1,4 @@
-// FindJob Now V7 — EN / JP i18n
+// FindJob Now V7.1 — EN / JP i18n
 const I18N = {
   en: {
     nav_home: "Home", nav_jobs: "Jobs", nav_tools: "Tools", nav_tracker: "Tracker",
@@ -17,6 +17,7 @@ const I18N = {
     wizard_exp: "Experience level",
     wizard_ja: "Japanese level",
     wizard_visa: "Visa status",
+    wizard_location: "Where do you want to work?",
     next: "Next →",
     back: "← Back",
     see_results: "See my results →",
@@ -56,6 +57,7 @@ const I18N = {
     pick_exp: "Please select experience level",
     pick_ja: "Please select Japanese level",
     pick_visa: "Please select visa status",
+    pick_location: "Please select a location preference",
     no_jobs: "No jobs yet. Tap Find Jobs or adjust your target.",
     japan_ready: "Japan Ready",
     needs_n3: "Needs N3+",
@@ -69,7 +71,27 @@ const I18N = {
     free_tier: "Free",
     pro_tier: "Pro",
     premium_tier: "Premium",
-    coming_soon: "Coming soon"
+    coming_soon: "Coming soon",
+    company_directory: "Company Directory",
+    foreign_friendly: "Foreigner-friendly",
+    japanese_companies: "Japanese companies",
+    target_companies: "Target Companies",
+    add_target: "Add to targets",
+    remove_target: "Remove",
+    culture_tips: "Business Culture",
+    visa_deep: "Visa Deep-dive",
+    jp_resume: "Japanese Resume",
+    jlpt_resources: "JLPT Resources",
+    interview_prep: "Interview Prep",
+    salary_benchmarks: "Salary Benchmarks",
+    tokyo_filter: "Tokyo focus",
+    interview_countdown: "Interview countdown",
+    follow_up_template: "Follow-up template",
+    days_until: "days until interview",
+    copy_template: "Copy template",
+    companies_tracked: "companies tracked",
+    tokyo_areas: "Tokyo areas",
+    location_pref: "Location preference"
   },
   jp: {
     nav_home: "ホーム", nav_jobs: "求人", nav_tools: "ツール", nav_tracker: "管理",
@@ -88,6 +110,7 @@ const I18N = {
     wizard_exp: "経験レベル",
     wizard_ja: "日本語レベル",
     wizard_visa: "ビザ状況",
+    wizard_location: "希望の勤務地は？",
     next: "次へ →",
     back: "← 戻る",
     see_results: "結果を見る →",
@@ -127,6 +150,7 @@ const I18N = {
     pick_exp: "経験レベルを選択してください",
     pick_ja: "日本語レベルを選択してください",
     pick_visa: "ビザ状況を選択してください",
+    pick_location: "勤務地を選択してください",
     no_jobs: "求人がありません。求人を探すか目標を調整してください。",
     japan_ready: "日本準備OK",
     needs_n3: "N3以上が必要",
@@ -140,7 +164,27 @@ const I18N = {
     free_tier: "無料",
     pro_tier: "Pro",
     premium_tier: "Premium",
-    coming_soon: "近日公開"
+    coming_soon: "近日公開",
+    company_directory: "企業ディレクトリ",
+    foreign_friendly: "外国人歓迎",
+    japanese_companies: "日系企業",
+    target_companies: "ターゲット企業",
+    add_target: "ターゲットに追加",
+    remove_target: "削除",
+    culture_tips: "ビジネス文化",
+    visa_deep: "ビザ詳細",
+    jp_resume: "日本語履歴書",
+    jlpt_resources: "JLPTリソース",
+    interview_prep: "面接準備",
+    salary_benchmarks: "年収ベンチマーク",
+    tokyo_filter: "東京フォーカス",
+    interview_countdown: "面接カウントダウン",
+    follow_up_template: "フォローアップテンプレート",
+    days_until: "日後に面接",
+    copy_template: "テンプレートをコピー",
+    companies_tracked: "社を追跡中",
+    tokyo_areas: "東京エリア",
+    location_pref: "勤務地希望"
   }
 };
 

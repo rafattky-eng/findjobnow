@@ -8,14 +8,14 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="FindJob Now">
 <meta name="theme-color" content="#071B35">
-<meta name="description" content="Career intelligence for Japan. Upload resume, set target role in 5 questions, get DNA, jobs, and tools. Rule-based, private, no sign-up.">
+<meta name="description" content="Career intelligence for Japan. Tokyo-focused, foreigner-friendly. Upload resume, set target in 6 questions, get DNA, jobs, culture & visa tools. Rule-based, private, no sign-up.">
 <meta name="application-name" content="FindJob Now">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; worker-src 'self' blob: https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://remotive.com https://jobicy.com https://boards-api.greenhouse.io https://api.lever.co https://api.ashbyhq.com; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; upgrade-insecure-requests">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
 <link rel="stylesheet" href="./styles.css">
-<title>FindJob Now</title>
+<title>FindJob Now — Japan Career Intelligence</title>
 </head>
 <body>
 <div class="app" id="app">
@@ -36,10 +36,10 @@
 
   <div class="progress-wrap hidden" id="progressWrap" aria-hidden="true">
     <div class="progress-meta">
-      <span id="stepLabel">Step 1 of 5</span>
+      <span id="stepLabel">Step 1 of 6</span>
       <span id="stepName">Career Target</span>
     </div>
-    <div class="progress-track"><i id="progressFill" style="width:20%"></i></div>
+    <div class="progress-track"><i id="progressFill" style="width:16%"></i></div>
   </div>
 
   <main id="main" role="main"></main>
@@ -63,6 +63,7 @@
 
 <script src="./storage.js"></script>
 <script src="./i18n.js"></script>
+<script src="./japan-data.js"></script>
 <script src="./dna-engine.js"></script>
 <script src="./jobs.js"></script>
 <script src="./tools.js"></script>
