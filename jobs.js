@@ -288,10 +288,14 @@ function renderJobs() {
 
   return `
   <h2>${t("find_jobs")}</h2>
-  <p class="sub">${tx("Live matching jobs first · Full Japan English boards · Company directory", "ライブマッチ優先 · 英語対応日本ボード · 企業ディレクトリ")}</p>
+  <p class="sub">${tx("Live matches · Easy Apply · Agencies · SME & Startups · Boards · Directory", "ライブマッチ · 簡単応募 · エージェント · 中小企業 · ボード · 企業一覧")}</p>
 
-  <div class="tabs" style="margin-bottom:12px">
+  <div class="tabs scroll" style="margin-bottom:12px">
     <button type="button" class="tab ${tab === "matches" ? "on" : ""}" data-jtab="matches">${tx("Matches", "マッチ")}</button>
+    <button type="button" class="tab ${tab === "easy" ? "on" : ""}" data-jtab="easy">${tx("🚀 Easy Apply", "🚀 簡単応募")}</button>
+    <button type="button" class="tab ${tab === "agency" ? "on" : ""}" data-jtab="agency">${tx("🤝 Agencies", "🤝 エージェント")}</button>
+    <button type="button" class="tab ${tab === "sme" ? "on" : ""}" data-jtab="sme">${tx("🏢 SME", "🏢 中小企業")}</button>
+    <button type="button" class="tab ${tab === "plan" ? "on" : ""}" data-jtab="plan">${tx("🎯 Plan", "🎯 計画")}</button>
     <button type="button" class="tab ${tab === "boards" ? "on" : ""}" data-jtab="boards">${tx("Japan Boards", "日本ボード")}</button>
     <button type="button" class="tab ${tab === "companies" ? "on" : ""}" data-jtab="companies">${t("company_directory")}</button>
   </div>
@@ -318,7 +322,11 @@ function renderJobs() {
       <p class="sub" style="margin-top:8px">${tx("Tap the button above to search, or open Japan Boards.", "上のボタンで検索するか、日本ボードを開いてください。")}</p>
     </div>
   `}
-  ` : tab === "boards" ? `
+  ` : tab === "easy" ? renderEasyTab()
+  : tab === "agency" ? renderAgencyTab()
+  : tab === "sme" ? renderSmeTab()
+  : tab === "plan" ? renderPlanTab()
+  : tab === "boards" ? `
   <div class="card">
     <div style="font-size:13px;font-weight:700;margin-bottom:4px">${tx("Japan Job Websites — English Language", "英語対応の日本求人サイト")}</div>
     <p class="sub" style="margin-bottom:12px">${tx("Open any board with your role pre-filled. Apply directly on the site.", "希望職種を入れて各サイトを開きます。サイト上で直接応募。")}</p>
@@ -351,6 +359,7 @@ function wireJobs() {
     STATE._coTab = b.dataset.cotab;
     render();
   }));
+  if (typeof wireSources === "function") wireSources();
   $("btnSearchJobs")?.addEventListener("click", () => searchLiveJobs());
   $$("[data-save-job]").forEach(btn => {
     btn.addEventListener("click", () => {

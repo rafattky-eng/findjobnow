@@ -621,3 +621,8 @@ details.more > summary::-webkit-details-marker { display: none; }
 body.no-nav .app-footer {
   padding-bottom: 24px;
 }
+
+/* V7.3 scrollable job tabs */
+.tabs.scroll { scrollbar-width: none; }
+.tabs.scroll::-webkit-scrollbar { display: none; }
+.tabs.scroll .tab { flex: 0 0 auto; padding: 10px 12px; }

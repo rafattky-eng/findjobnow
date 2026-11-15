@@ -1,5 +1,5 @@
 // FindJob Now V7.1 — Local storage & state
-const APP_VERSION = "7.2.1";
+const APP_VERSION = "7.3.0";
 const DNA_ENGINE_VERSION = 7;
 const STORAGE_KEY = "fj2_state";
 
@@ -35,6 +35,7 @@ function defaultState() {
     targetCompanies: [], // company ids or names the user is tracking
     selectedRoles: null,
     journey: { goal: null, fastMode: false },
+    daily: null, // { date, count } daily application counter (V7.3)
     tier: "free" // free | pro | premium (placeholder)
   };
 }
