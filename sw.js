@@ -1,5 +1,5 @@
-// FindJob Now V7.2.0 PWA service worker
-const V = "fj-v7.2.0";
+// FindJob Now V7.2.1 PWA service worker
+const V = "fj-v7.2.1";
 const BASE = new URL("./", self.location).pathname;
 const SHELL = [
   BASE,
@@ -16,7 +16,9 @@ const SHELL = [
   BASE + "app.js",
   BASE + "icon-192.png",
   BASE + "icon-512.png",
-  BASE + "apple-touch-icon.png"
+  BASE + "apple-touch-icon.png",
+  BASE + "icon-maskable-512.png",
+  BASE + "favicon-32.png"
 ];
 const PDF = [
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
