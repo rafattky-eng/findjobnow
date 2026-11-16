@@ -13,8 +13,7 @@ const JAPAN_BOARDS = [
   { id: "jac", name: "JAC Recruitment", url: "https://www.jac-recruitment.jp/en/", q: "https://www.jac-recruitment.jp/en/job-search/?keyword=" },
   { id: "jetro", name: "JETRO Open", url: "https://www.jetro.go.jp/en/hrportal/", q: "https://www.jetro.go.jp/en/hrportal/" },
   { id: "wantedly", name: "Wantedly", url: "https://www.wantedly.com/", q: "https://www.wantedly.com/projects?q=" },
-  { id: "skillhouse", name: "Skillhouse", url: "https://www.skillhouse.co.jp/en/", q: "https://www.skillhouse.co.jp/en/jobs?keyword=" },
-  { id: "japantimes", name: "Japan Times Jobs", url: "https://job.japantimes.com/index_e.php", q: "https://job.japantimes.com/index_e.php" }
+  { id: "skillhouse", name: "Skillhouse", url: "https://www.skillhouse.co.jp/en/", q: "https://www.skillhouse.co.jp/en/jobs?keyword=" }
 ];
 
 async function jget(url, ms = 9000) {

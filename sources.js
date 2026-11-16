@@ -8,6 +8,7 @@ const EASY_APPLY_SOURCES = [
   { id: "daijob", name: "Daijob", url: "https://www.daijob.com/en/", q: "https://www.daijob.com/jobs/search?job_search_form_with_keyword%5Bkeyword%5D=", tags: ["upload", "bilingual"], en: "Resume database. Recruiters contact you.", jp: "履歴書データベース。リクルーターから連絡。" },
   { id: "jobsinjapan", name: "Jobs in Japan", url: "https://jobsinjapan.com/", tags: ["easy", "foreign"], en: "Foreigner-friendly jobs, simple applications.", jp: "外国人歓迎の求人。簡単に応募。" },
   { id: "gaijinpot", name: "GaijinPot Jobs", url: "https://jobs.gaijinpot.com/en/", q: "https://jobs.gaijinpot.com/job/index/lang/en?job_key=", tags: ["upload", "foreign"], en: "Popular with foreign job seekers.", jp: "外国人求職者に人気。" },
+  { id: "wexpats-e", name: "WeXpats Jobs", url: "https://we-xpats.com/en/job/as/jp", tags: ["upload", "foreign"], en: "Foreigner-focused board with profile + consultation. (Added)", jp: "外国人向け求人サイト。プロフィール登録・相談あり。（追加）" },
   { id: "wantedly", name: "Wantedly", url: "https://www.wantedly.com/", q: "https://www.wantedly.com/projects?q=", tags: ["easy", "sme"], en: "Casual “Want to visit” applications. Startups.", jp: "「話を聞きに行きたい」で気軽に応募。スタートアップ。" },
   { id: "green", name: "Green Japan", url: "https://www.green-japan.com/", tags: ["upload", "sme"], en: "IT & startup jobs with profile system.", jp: "IT・スタートアップ求人。プロフィール登録。" },
   { id: "openwork", name: "OpenWork", url: "https://www.openwork.jp/", tags: ["upload"], en: "Company reviews + applications.", jp: "企業口コミ＋応募。" }
@@ -36,8 +37,7 @@ const SME_SOURCES = [
   { id: "japandev2", name: "Japan Dev", url: "https://japan-dev.com/", q: "https://japan-dev.com/jobs?query=", en: "English-friendly tech companies of all sizes.", jp: "英語対応のテック企業（規模問わず）。" },
   { id: "hellowork", name: "Hello Work", url: "https://www.hellowork.mhlw.go.jp/", en: "Government board. Mostly small & regional employers.", jp: "公共職業安定所。中小・地方企業が中心。" },
   { id: "engage", name: "Engage (en-japan)", url: "https://en-gage.net/", en: "Free for SMEs to post, so lots of small employers.", jp: "中小企業が無料で掲載。小規模企業が多い。" },
-  { id: "airwork", name: "AirWork", url: "https://airwork.net/", en: "Recruit’s free posting tool, used by small shops & firms.", jp: "リクルートの無料求人掲載。小規模店舗・企業が多い。" },
-  { id: "jobhouse", name: "JobHouse", url: "https://jobhouse.jp/", en: "Jobs aimed at foreign residents.", jp: "外国人向けの求人。" },
+  { id: "wexpats", name: "WeXpats Jobs", url: "https://we-xpats.com/en/job/as/jp", tags: ["foreign"], en: "20,000+ jobs for foreigners in Japan, incl. small & mid-size firms. (Added)", jp: "外国人向け求人2万件以上。中小企業も多数。（追加）" },
   { id: "indeed2", name: "Indeed Japan", url: "https://jp.indeed.com/", q: "https://jp.indeed.com/jobs?q=", en: "Filter by small company / region in the site.", jp: "サイト内で中小企業・地域を絞り込み。" },
   { id: "doda", name: "doda", url: "https://doda.jp/", en: "Large board with many mid-size firms. (Added)", jp: "中堅企業の求人が多い。（追加）" },
   { id: "mynavi", name: "Mynavi Global", url: "https://global.mynavi.jp/", en: "Mid-size Japanese firms hiring foreigners. (Added)", jp: "外国人採用に積極的な中堅企業。（追加）" }
