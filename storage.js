@@ -1,5 +1,5 @@
 // FindJob Now V7.1 — Local storage & state
-const APP_VERSION = "7.4.0";
+const APP_VERSION = "7.5.0";
 const DNA_ENGINE_VERSION = 7;
 const STORAGE_KEY = "fj2_state";
 
@@ -26,7 +26,7 @@ function defaultState() {
       desiredRole: "",
       desiredRoles: [], // multi-select support (V7.2+)
       desiredIndustry: "", // joined string of desiredIndustries
-      desiredIndustries: [], // multi-select (V7.4.0)
+      desiredIndustries: [], // multi-select (V7.5.0)
       experience: null,
       japanese: 0,
       visaStatus: null,
@@ -59,6 +59,7 @@ function migrate(raw) {
   if (s.onboarding && !Array.isArray(s.onboarding.desiredIndustries)) {
     s.onboarding.desiredIndustries = s.onboarding.desiredIndustry ? [s.onboarding.desiredIndustry] : [];
   }
+  if (Array.isArray(s.jobs)) s.jobs = s.jobs.filter(j => j && j.source !== "Seed"); // V7.5: removed fake seed jobs
   // Migrate V6 fields
   if (s.onboarding.experience && !["entry","1-3","3-5","5-10","10+"].includes(s.onboarding.experience)) {
     if (s.onboarding.experience === "experienced") s.onboarding.experience = "3-5";

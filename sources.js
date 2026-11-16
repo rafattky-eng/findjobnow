@@ -82,7 +82,7 @@ function getDaily() {
 }
 
 /* ---------- Rendering ---------- */
-function srcQuery() { return encodeURIComponent((typeof getSearchRoles === "function" ? getSearchRoles()[0] : "") || "jobs"); }
+function srcQuery() { return encodeURIComponent((typeof getActiveRole === "function" ? getActiveRole() : "") || "jobs"); }
 
 function renderSourceCard(s, kind) {
   const verified = typeof VERIFIED_IDS !== "undefined" && VERIFIED_IDS.includes(s.id);
@@ -95,7 +95,7 @@ function renderSourceCard(s, kind) {
         <div class="job-title" style="font-size:15px">${esc(s.name)}</div>
         <p class="sub" style="margin-top:4px;font-size:12px">${esc(tx(s.en, s.jp))}</p>
       </div>
-      <a class="btn primary sm" href="${esc(safeUrl(href))}" target="_blank" rel="noopener" data-src-open="${kind}" style="flex-shrink:0;min-height:36px">${tx("Open", "開く")}</a>
+      <a class="btn primary sm" href="${esc(safeUrl(href))}" target="_blank" rel="noopener" data-src-open="${kind}" style="flex-shrink:0;min-height:36px">${s.q ? tx("Search", "検索") : (kind === "agency" ? tx("Register", "登録") : tx("Website", "サイト"))}</a>
     </div>
     ${tags ? `<div class="job-meta" style="margin-top:6px">${tags}</div>` : ""}
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:11px">
@@ -103,6 +103,16 @@ function renderSourceCard(s, kind) {
       <button type="button" class="btn ghost sm" data-report="${esc(s.id)}" style="min-height:28px;font-size:11px;padding:2px 8px">⚠ ${tx("Report broken", "リンク切れ報告")}</button>
     </div>
   </article>`;
+}
+
+function renderSourceGroups(list, kind) {
+  const vis = visibleSources(list);
+  const withQ = vis.filter(x => x.q), noQ = vis.filter(x => !x.q);
+  const head = (t0) => `<p class="sub" style="margin:14px 0 6px;font-weight:700">${t0}</p>`;
+  return `${renderRolePicker(false)}
+  ${withQ.length ? head(kind === "agency" ? tx("Search jobs by your role", "職種で検索") : tx("🔎 Search with your role", "🔎 職種で検索")) + withQ.map(x => renderSourceCard(x, kind)).join("") : ""}
+  ${noQ.length ? head(kind === "agency" ? tx("🔗 Register / website links", "🔗 登録・ウェブサイトリンク") : tx("🔗 Website links only (no direct search)", "🔗 ウェブサイトリンクのみ（直接検索なし）")) + noQ.map(x => renderSourceCard(x, kind)).join("") : ""}
+  ${renderRestoreRow(list)}`;
 }
 
 function renderNoteCard() {
@@ -130,7 +140,7 @@ function renderEasyTab() {
     <div style="font-size:13px;font-weight:700">${tx("🚀 Easy Apply / Resume Upload", "🚀 簡単応募 / 履歴書アップロード")}</div>
     <p class="sub" style="margin-top:4px">${tx("Upload your resume once, then apply with a tap. Buttons open each site with your role pre-filled.", "履歴書を一度登録すれば、タップで応募。職種を入力済みで各サイトを開きます。")}</p>
   </div>
-  <div style="margin-top:10px">${visibleSources(EASY_APPLY_SOURCES).map(s => renderSourceCard(s, "easy")).join("")}</div>${renderRestoreRow(EASY_APPLY_SOURCES)}
+  <div style="margin-top:10px">${renderSourceGroups(EASY_APPLY_SOURCES, "easy")}</div>
   ${renderNoteCard()}`;
 }
 
@@ -140,7 +150,7 @@ function renderAgencyTab() {
     <div style="font-size:13px;font-weight:700">${tx("🤝 Recruitment & Staffing Agencies", "🤝 人材紹介・派遣会社")}</div>
     <p class="sub" style="margin-top:4px">${tx("Recruiters submit you directly to employers — one registration, many companies. Register with the ⭐ priority agencies first.", "担当者が企業へ直接推薦。1回の登録で複数社へ。まず⭐優先エージェントに登録。")}</p>
   </div>
-  <div style="margin-top:10px">${visibleSources(AGENCY_SOURCES).map(s => renderSourceCard(s, "agency")).join("")}</div>${renderRestoreRow(AGENCY_SOURCES)}
+  <div style="margin-top:10px">${renderSourceGroups(AGENCY_SOURCES, "agency")}</div>
   <div class="card" style="margin-top:12px"><p class="sub">${tx("Tip: use the note template in the Easy Apply tab when emailing recruiters. Staffing (haken) agencies are the fastest way in for many foreigners.", "ヒント: エージェントへのメールにはEasy Applyタブの応募文を利用。派遣会社は外国人にとって最短の入口になることも。")}</p></div>`;
 }
 
@@ -157,7 +167,7 @@ function renderSmeTab() {
       <li class="good">✓ ${tx("More willing to sponsor visas", "ビザ支援に前向き")}</li>
     </ul>
   </div>
-  <div style="margin-top:10px">${visibleSources(SME_SOURCES).map(s => renderSourceCard(s, "sme")).join("")}</div>${renderRestoreRow(SME_SOURCES)}`;
+  <div style="margin-top:10px">${renderSourceGroups(SME_SOURCES, "sme")}</div>`;
 }
 
 function renderPlanTab() {
