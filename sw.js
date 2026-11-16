@@ -1,5 +1,5 @@
-// FindJob Now V7.3.2 PWA service worker
-const V = "fj-v7.3.2";
+// FindJob Now V7.4.0 PWA service worker
+const V = "fj-v7.4.0";
 const BASE = new URL("./", self.location).pathname;
 const SHELL = [
   BASE,
@@ -12,6 +12,7 @@ const SHELL = [
   BASE + "dna-engine.js",
   BASE + "jobs.js",
   BASE + "sources.js",
+  BASE + "boost.js",
   BASE + "tools.js",
   BASE + "tracker.js",
   BASE + "app.js",

@@ -241,6 +241,7 @@ function renderJobCard(job) {
       <strong style="color:var(--ac)">${score}%</strong>
     </div>
     <div class="match-bar"><i style="width:${score}%"></i></div>
+    ${renderJobFlags(job)}
     ${(job.good?.length || job.miss?.length) ? `
     <div style="font-size:12px;font-weight:700;margin-top:8px;color:var(--mu)">${t("why_match")}</div>
     <ul class="why-list">
@@ -250,6 +251,10 @@ function renderJobCard(job) {
     <div class="btn-row cols-2" style="margin-top:10px">
       <a class="btn primary sm" href="${esc(safeUrl(job.url))}" target="_blank" rel="noopener">${t("apply")}</a>
       <button type="button" class="btn secondary sm" data-save-job="${esc(job.id)}">${t("save")}</button>
+    </div>
+    <div class="btn-row cols-2" style="margin-top:6px">
+      <button type="button" class="btn ghost sm" data-job-applied="${esc(job.id)}">✅ ${tx("I applied", "応募した")}</button>
+      <button type="button" class="btn ghost sm" data-job-note="${esc(job.id)}">✉️ ${tx("Write note", "応募文")}</button>
     </div>
   </article>`;
 }
@@ -298,6 +303,7 @@ function renderJobs() {
     <button type="button" class="tab ${tab === "agency" ? "on" : ""}" data-jtab="agency">${tx("🤝 Agencies", "🤝 エージェント")}</button>
     <button type="button" class="tab ${tab === "sme" ? "on" : ""}" data-jtab="sme">${tx("🏢 SME", "🏢 中小企業")}</button>
     <button type="button" class="tab ${tab === "plan" ? "on" : ""}" data-jtab="plan">${tx("🎯 Plan", "🎯 計画")}</button>
+    <button type="button" class="tab ${tab === "prep" ? "on" : ""}" data-jtab="prep">${tx("🎤 Prep", "🎤 面接準備")}</button>
     <button type="button" class="tab ${tab === "boards" ? "on" : ""}" data-jtab="boards">${tx("Japan Boards", "日本ボード")}</button>
     <button type="button" class="tab ${tab === "companies" ? "on" : ""}" data-jtab="companies">${t("company_directory")}</button>
   </div>
@@ -319,9 +325,10 @@ function renderJobs() {
     <button type="button" class="btn primary" id="btnSearchJobs">${tx("Refresh live matches", "ライブマッチを更新")}</button>
   </div>
 
+  ${renderJobFilters()}
   ${jobs.length ? `
-    <p class="sub" style="margin:10px 0 6px">${tx("Live + curated matches (sorted by fit)", "ライブ + 厳選マッチ（適合度順）")} · ${jobs.length}</p>
-    ${jobs.map(renderJobCard).join("")}
+    <p class="sub" style="margin:10px 0 6px">${tx("Live + curated matches (sorted by fit)", "ライブ + 厳選マッチ（適合度順）")} · ${filteredJobs(jobs).length}/${jobs.length}</p>
+    ${filteredJobs(jobs).map(renderJobCard).join("") || `<div class="card"><p class="sub">${tx("No jobs match these filters — turn one off.", "条件に合う求人がありません。")}</p></div>`}
   ` : `
     <div class="card" style="text-align:center;padding:24px">
       <p class="muted">${t("no_jobs")}</p>
@@ -332,6 +339,7 @@ function renderJobs() {
   : tab === "agency" ? renderAgencyTab()
   : tab === "sme" ? renderSmeTab()
   : tab === "plan" ? renderPlanTab()
+  : tab === "prep" ? renderPrepTab()
   : tab === "boards" ? `
   <div class="card">
     <div style="font-size:13px;font-weight:700;margin-bottom:4px">${tx("Japan Job Websites — English Language", "英語対応の日本求人サイト")}</div>
@@ -366,6 +374,7 @@ function wireJobs() {
     render();
   }));
   wireSwipeTabs();
+  if (typeof wireBoost === "function") wireBoost();
   if (typeof wireSources === "function") wireSources();
   $("btnSearchJobs")?.addEventListener("click", () => searchLiveJobs());
   $$("[data-save-job]").forEach(btn => {

@@ -85,6 +85,7 @@ function getDaily() {
 function srcQuery() { return encodeURIComponent((typeof getSearchRoles === "function" ? getSearchRoles()[0] : "") || "jobs"); }
 
 function renderSourceCard(s, kind) {
+  const verified = typeof VERIFIED_IDS !== "undefined" && VERIFIED_IDS.includes(s.id);
   const href = s.q ? s.q + srcQuery() : s.url;
   const tags = (s.tags || []).map(k => `<span class="badge ${k === "top" ? "ready" : "source"}">${tx(TAG_LABEL[k][0], TAG_LABEL[k][1])}</span>`).join("");
   return `
@@ -97,6 +98,10 @@ function renderSourceCard(s, kind) {
       <a class="btn primary sm" href="${esc(safeUrl(href))}" target="_blank" rel="noopener" data-src-open="${kind}" style="flex-shrink:0;min-height:36px">${tx("Open", "開く")}</a>
     </div>
     ${tags ? `<div class="job-meta" style="margin-top:6px">${tags}</div>` : ""}
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:11px">
+      <span style="color:var(--ok)">${verified ? "✔ " + tx("Checked", "確認済") + " " + VERIFIED_LABEL : ""}</span>
+      <button type="button" class="btn ghost sm" data-report="${esc(s.id)}" style="min-height:28px;font-size:11px;padding:2px 8px">⚠ ${tx("Report broken", "リンク切れ報告")}</button>
+    </div>
   </article>`;
 }
 
@@ -125,7 +130,7 @@ function renderEasyTab() {
     <div style="font-size:13px;font-weight:700">${tx("🚀 Easy Apply / Resume Upload", "🚀 簡単応募 / 履歴書アップロード")}</div>
     <p class="sub" style="margin-top:4px">${tx("Upload your resume once, then apply with a tap. Buttons open each site with your role pre-filled.", "履歴書を一度登録すれば、タップで応募。職種を入力済みで各サイトを開きます。")}</p>
   </div>
-  <div style="margin-top:10px">${EASY_APPLY_SOURCES.map(s => renderSourceCard(s, "easy")).join("")}</div>
+  <div style="margin-top:10px">${visibleSources(EASY_APPLY_SOURCES).map(s => renderSourceCard(s, "easy")).join("")}</div>${renderRestoreRow(EASY_APPLY_SOURCES)}
   ${renderNoteCard()}`;
 }
 
@@ -135,7 +140,7 @@ function renderAgencyTab() {
     <div style="font-size:13px;font-weight:700">${tx("🤝 Recruitment & Staffing Agencies", "🤝 人材紹介・派遣会社")}</div>
     <p class="sub" style="margin-top:4px">${tx("Recruiters submit you directly to employers — one registration, many companies. Register with the ⭐ priority agencies first.", "担当者が企業へ直接推薦。1回の登録で複数社へ。まず⭐優先エージェントに登録。")}</p>
   </div>
-  <div style="margin-top:10px">${AGENCY_SOURCES.map(s => renderSourceCard(s, "agency")).join("")}</div>
+  <div style="margin-top:10px">${visibleSources(AGENCY_SOURCES).map(s => renderSourceCard(s, "agency")).join("")}</div>${renderRestoreRow(AGENCY_SOURCES)}
   <div class="card" style="margin-top:12px"><p class="sub">${tx("Tip: use the note template in the Easy Apply tab when emailing recruiters. Staffing (haken) agencies are the fastest way in for many foreigners.", "ヒント: エージェントへのメールにはEasy Applyタブの応募文を利用。派遣会社は外国人にとって最短の入口になることも。")}</p></div>`;
 }
 
@@ -152,7 +157,7 @@ function renderSmeTab() {
       <li class="good">✓ ${tx("More willing to sponsor visas", "ビザ支援に前向き")}</li>
     </ul>
   </div>
-  <div style="margin-top:10px">${SME_SOURCES.map(s => renderSourceCard(s, "sme")).join("")}</div>`;
+  <div style="margin-top:10px">${visibleSources(SME_SOURCES).map(s => renderSourceCard(s, "sme")).join("")}</div>${renderRestoreRow(SME_SOURCES)}`;
 }
 
 function renderPlanTab() {
@@ -172,6 +177,9 @@ function renderPlanTab() {
     </div>
     <p class="sub" style="margin-top:8px">${tx("Target: 20–30 per day. Resets daily.", "目標：1日20〜30件。毎日リセット。")}</p>
   </div>
+
+  ${renderFollowUpCard()}
+  ${renderProgressCard()}
 
   <div class="card" style="margin-top:12px">
     <div style="font-size:13px;font-weight:700;margin-bottom:6px">${tx("The winning mix", "おすすめ配分")}</div>
@@ -197,7 +205,8 @@ function renderPlanTab() {
     <div style="font-size:13px;font-weight:700;margin-bottom:6px">${tx("5-step strategy", "5ステップ戦略")}</div>
     <ol style="margin:0;padding-left:18px;font-size:13px;line-height:1.7">${STEPS.map(s => `<li>${tx(s[0], s[1])}</li>`).join("")}</ol>
   </div>
-  <div class="card" style="margin-top:12px"><p class="sub"><strong>${tx("Top 10 to start:", "まず登録する10サイト:")}</strong> Recruit Agent · LinkedIn Easy Apply · Indeed · CareerCross · Daijob · JAC · Wantedly · Green · TokyoDev · SME/Startups</p></div>`;
+  <div class="card" style="margin-top:12px"><p class="sub"><strong>${tx("Top 10 to start:", "まず登録する10サイト:")}</strong> Recruit Agent · LinkedIn Easy Apply · Indeed · CareerCross · Daijob · JAC · Wantedly · Green · TokyoDev · SME/Startups</p></div>
+  ${renderPrivacyCard()}`;
 }
 
 function wireSources() {
@@ -217,9 +226,8 @@ function wireSources() {
     // Opening a source never counts as an application; no state change.
   }));
   $$("[data-daily]").forEach(b => b.addEventListener("click", () => {
-    const d = getDaily();
-    d.count = Math.max(0, d.count + (b.dataset.daily === "+1" ? 1 : -1));
-    persist(); render();
-    if (b.dataset.daily === "+1" && d.count === DAILY_GOAL) say(tx("🎉 Daily goal reached!", "🎉 今日の目標達成！"), 1);
+    const c = bumpDaily(b.dataset.daily === "+1" ? 1 : -1);
+    render();
+    if (b.dataset.daily === "+1" && c === DAILY_GOAL) say(tx("🎉 Daily goal reached!", "🎉 今日の目標達成！"), 1);
   }));
 }

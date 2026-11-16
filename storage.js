@@ -1,5 +1,5 @@
 // FindJob Now V7.1 — Local storage & state
-const APP_VERSION = "7.3.2";
+const APP_VERSION = "7.4.0";
 const DNA_ENGINE_VERSION = 7;
 const STORAGE_KEY = "fj2_state";
 
@@ -26,7 +26,7 @@ function defaultState() {
       desiredRole: "",
       desiredRoles: [], // multi-select support (V7.2+)
       desiredIndustry: "", // joined string of desiredIndustries
-      desiredIndustries: [], // multi-select (V7.3.2)
+      desiredIndustries: [], // multi-select (V7.4.0)
       experience: null,
       japanese: 0,
       visaStatus: null,
@@ -36,6 +36,8 @@ function defaultState() {
     targetCompanies: [], // company ids or names the user is tracking
     selectedRoles: null,
     journey: { goal: null, fastMode: false },
+    history: {}, // { "YYYY-MM-DD": count } applications per day (V7.4)
+    reported: {}, // reported/hidden source links (V7.4)
     daily: null, // { date, count } daily application counter (V7.3)
     tier: "free" // free | pro | premium (placeholder)
   };

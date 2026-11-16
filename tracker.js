@@ -173,6 +173,7 @@ function moveApplication(id, toCol) {
   if (!item) return;
   item.status = toCol;
   if (toCol === "applied" && !item.appliedAt) item.appliedAt = today();
+  if (toCol === "applied" && !item.followUp) item.followUp = addDays(5);
   if (toCol === "interview" && !item.interviewDate) item.interviewDate = today();
   if (!STATE.applications[toCol]) STATE.applications[toCol] = [];
   STATE.applications[toCol].unshift(item);
