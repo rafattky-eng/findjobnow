@@ -143,12 +143,14 @@ function seedJapanJobs(roles) {
   }, s.source));
 }
 
+function jobSay(msg, ok) { if (STATE.view === "jobs") say(msg, ok); }
+
 async function searchLiveJobs() {
   const roles = getSearchRoles();
-  const industry = STATE.onboarding?.desiredIndustry || "";
+  const industry = (STATE.onboarding?.desiredIndustries || [])[0] || STATE.onboarding?.desiredIndustry || "";
   const loc = STATE.onboarding?.location || "";
   const primary = roles[0] || "jobs in Japan";
-  say(tx("Searching live jobs…", "ライブ求人を検索中…"), 1);
+  jobSay(tx("Searching live jobs…", "ライブ求人を検索中…"), 1);
 
   const out = [];
 
@@ -210,9 +212,9 @@ async function searchLiveJobs() {
   persist();
 
   if (!STATE.jobs.length) {
-    say(tx("No live results — use Japan board links below", "ライブ結果なし — 下の日本ボードを利用"), 0);
+    jobSay(tx("No live results — use Japan board links below", "ライブ結果なし — 下の日本ボードを利用"), 0);
   } else {
-    say(tx(`Found ${STATE.jobs.length} matching jobs`, `${STATE.jobs.length}件のマッチ求人`), 1);
+    jobSay(tx(`Found ${STATE.jobs.length} matching jobs`, `${STATE.jobs.length}件のマッチ求人`), 1);
   }
   if (STATE.view === "jobs") render();
 }
@@ -290,7 +292,8 @@ function renderJobs() {
   <h2>${t("find_jobs")}</h2>
   <p class="sub">${tx("Live matches · Easy Apply · Agencies · SME & Startups · Boards · Directory", "ライブマッチ · 簡単応募 · エージェント · 中小企業 · ボード · 企業一覧")}</p>
 
-  <div class="tabs scroll" style="margin-bottom:12px">
+  <div class="tabs-wrap" id="jobTabsWrap">
+  <div class="tabs scroll" id="jobTabs" style="margin-bottom:0">
     <button type="button" class="tab ${tab === "matches" ? "on" : ""}" data-jtab="matches">${tx("Matches", "マッチ")}</button>
     <button type="button" class="tab ${tab === "easy" ? "on" : ""}" data-jtab="easy">${tx("🚀 Easy Apply", "🚀 簡単応募")}</button>
     <button type="button" class="tab ${tab === "agency" ? "on" : ""}" data-jtab="agency">${tx("🤝 Agencies", "🤝 エージェント")}</button>
@@ -298,6 +301,10 @@ function renderJobs() {
     <button type="button" class="tab ${tab === "plan" ? "on" : ""}" data-jtab="plan">${tx("🎯 Plan", "🎯 計画")}</button>
     <button type="button" class="tab ${tab === "boards" ? "on" : ""}" data-jtab="boards">${tx("Japan Boards", "日本ボード")}</button>
     <button type="button" class="tab ${tab === "companies" ? "on" : ""}" data-jtab="companies">${t("company_directory")}</button>
+  </div>
+  <div class="swipe-fade l" aria-hidden="true">‹</div>
+  <div class="swipe-fade r" aria-hidden="true">›</div>
+  <div class="swipe-hint" id="swipeHint" aria-hidden="true"><span class="finger">👉</span><span>${tx("Swipe for more", "スワイプで他も表示")}</span></div>
   </div>
 
   ${tab === "matches" ? `
@@ -359,6 +366,7 @@ function wireJobs() {
     STATE._coTab = b.dataset.cotab;
     render();
   }));
+  wireSwipeTabs();
   if (typeof wireSources === "function") wireSources();
   $("btnSearchJobs")?.addEventListener("click", () => searchLiveJobs());
   $$("[data-save-job]").forEach(btn => {
@@ -418,4 +426,27 @@ function autoSuggestTargetCompanies() {
       STATE.targetCompanies.push(id);
     }
   });
+}
+
+/** Swipe indicator for horizontally scrollable tab bars. */
+function wireSwipeTabs() {
+  const bar = $("jobTabs"), wrap = $("jobTabsWrap");
+  if (!bar || !wrap) return;
+  const on = bar.querySelector(".tab.on");
+  if (on) bar.scrollLeft = Math.max(0, on.offsetLeft - (bar.clientWidth - on.offsetWidth) / 2);
+  const update = () => {
+    const max = bar.scrollWidth - bar.clientWidth;
+    wrap.classList.toggle("can-l", bar.scrollLeft > 8);
+    wrap.classList.toggle("can-r", bar.scrollLeft < max - 8);
+    if (max <= 8) wrap.classList.remove("can-l", "can-r");
+  };
+  update();
+  const seen = L("fj_swipe_seen", 0);
+  const hint = $("swipeHint");
+  if (hint && (seen >= 3 || bar.scrollWidth - bar.clientWidth <= 8)) hint.remove();
+  else if (hint) {
+    W("fj_swipe_seen", seen + 1);
+    setTimeout(() => hint.classList.add("hide"), 6000);
+  }
+  bar.addEventListener("scroll", () => { update(); if (hint) { hint.classList.add("hide"); W("fj_swipe_seen", 3); } }, { passive: true });
 }

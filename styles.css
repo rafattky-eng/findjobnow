@@ -457,25 +457,29 @@ h3 { font-size: 15px; font-weight: 700; margin: 0 0 8px; color: var(--ac); }
   z-index: 20;
 }
 
-/* Toast */
+/* Toast — top of screen, fully hidden when not shown, never covers the bottom menu */
 .toast {
   position: fixed;
   left: 50%;
-  bottom: calc(var(--nav-h) + var(--safe-b) + 16px);
-  transform: translateX(-50%) translateY(120%);
+  top: calc(env(safe-area-inset-top, 0px) + 8px);
+  transform: translateX(-50%) translateY(-30px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
   background: var(--card);
   border: 1px solid var(--bd);
   color: var(--tx);
-  padding: 12px 20px;
+  padding: 10px 18px;
   border-radius: 14px;
   font-weight: 600;
   font-size: 14px;
   z-index: 100;
-  transition: transform .25s;
+  transition: transform .25s, opacity .25s, visibility 0s .25s;
   max-width: 90%;
+  text-align: center;
   box-shadow: var(--shadow);
 }
-.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; visibility: visible; transition-delay: 0s; }
 .toast.ok { border-color: var(--ok); }
 .toast.err { border-color: var(--er); }
 
@@ -626,3 +630,15 @@ body.no-nav .app-footer {
 .tabs.scroll { scrollbar-width: none; }
 .tabs.scroll::-webkit-scrollbar { display: none; }
 .tabs.scroll .tab { flex: 0 0 auto; padding: 10px 12px; }
+
+/* V7.3.1 swipe indicator */
+.tabs-wrap { position: relative; margin-bottom: 12px; }
+.swipe-fade { position: absolute; top: 4px; bottom: 4px; width: 30px; display: none; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; color: var(--ac); pointer-events: none; z-index: 2; }
+.swipe-fade.r { right: 4px; background: linear-gradient(90deg, transparent, var(--card) 70%); border-radius: 0 10px 10px 0; }
+.swipe-fade.l { left: 4px; background: linear-gradient(270deg, transparent, var(--card) 70%); border-radius: 10px 0 0 10px; }
+.tabs-wrap.can-r .swipe-fade.r, .tabs-wrap.can-l .swipe-fade.l { display: flex; }
+.swipe-hint { position: absolute; right: 30px; bottom: -22px; display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--ac); pointer-events: none; transition: opacity .4s; }
+.swipe-hint.hide { opacity: 0; }
+.swipe-hint .finger { font-size: 20px; display: inline-block; animation: swipeNudge 1.2s ease-in-out infinite; }
+@keyframes swipeNudge { 0%,100% { transform: translateX(-10px); } 50% { transform: translateX(10px); } }
+.tabs-wrap { margin-bottom: 28px; }

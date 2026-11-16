@@ -163,9 +163,10 @@ function renderOnboarding() {
       <h2>${t("wizard_industry")}</h2>
       <div class="chip-row">
         ${INDUSTRIES.map(ind =>
-          `<button type="button" class="chip ${o.desiredIndustry === ind ? "on" : ""}" data-ind="${esc(ind)}">${esc(ind)}</button>`
+          `<button type="button" class="chip ${(o.desiredIndustries || []).includes(ind) ? "on" : ""}" data-ind="${esc(ind)}">${esc(ind)}</button>`
         ).join("")}
-      </div>`;
+      </div>
+      <p class="sub" style="margin-top:8px">${tx("Tap to select one or more.", "複数選択できます。")} ${tx("Selected:", "選択中:")} <strong>${(o.desiredIndustries || []).length}</strong></p>`;
   } else if (ws === 3) {
     body = `
       <h2>${t("wizard_exp")}</h2>
@@ -242,8 +243,12 @@ function wireOnboarding() {
     persist();
   });
   $$("[data-ind]").forEach(b => b.addEventListener("click", () => {
-    o.desiredIndustry = b.dataset.ind;
-    STATE.targetJobs.industries = [b.dataset.ind];
+    const list = Array.isArray(o.desiredIndustries) ? o.desiredIndustries.slice() : [];
+    const i = list.indexOf(b.dataset.ind);
+    if (i >= 0) list.splice(i, 1); else list.push(b.dataset.ind);
+    o.desiredIndustries = list;
+    o.desiredIndustry = list.join(" / ");
+    STATE.targetJobs.industries = list;
     persist(); render();
   }));
   $$("[data-exp]").forEach(b => b.addEventListener("click", () => {
@@ -281,7 +286,7 @@ function wireOnboarding() {
       o.desiredRole = roles[0];
       STATE.targetJobs.titles = roles.slice(0, 5);
     }
-    if (ws === 2 && !o.desiredIndustry) { say(t("pick_industry"), 0); return; }
+    if (ws === 2 && !(o.desiredIndustries || []).length) { say(t("pick_industry"), 0); return; }
     if (ws === 3 && !o.experience) { say(t("pick_exp"), 0); return; }
     if (ws === 4 && !(o.japanese >= 1)) { say(t("pick_ja"), 0); return; }
     if (ws === 5 && !o.visaStatus) { say(t("pick_visa"), 0); return; }

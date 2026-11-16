@@ -1,5 +1,5 @@
 // FindJob Now V7.1 — Local storage & state
-const APP_VERSION = "7.3.0";
+const APP_VERSION = "7.3.1";
 const DNA_ENGINE_VERSION = 7;
 const STORAGE_KEY = "fj2_state";
 
@@ -25,7 +25,8 @@ function defaultState() {
       hasResume: false,
       desiredRole: "",
       desiredRoles: [], // multi-select support (V7.2+)
-      desiredIndustry: "",
+      desiredIndustry: "", // joined string of desiredIndustries
+      desiredIndustries: [], // multi-select (V7.3.1)
       experience: null,
       japanese: 0,
       visaStatus: null,
@@ -53,6 +54,9 @@ function migrate(raw) {
   if (s.onboarding && !Array.isArray(s.onboarding.desiredRoles)) {
     s.onboarding.desiredRoles = s.onboarding.desiredRole ? [s.onboarding.desiredRole] : [];
   }
+  if (s.onboarding && !Array.isArray(s.onboarding.desiredIndustries)) {
+    s.onboarding.desiredIndustries = s.onboarding.desiredIndustry ? [s.onboarding.desiredIndustry] : [];
+  }
   // Migrate V6 fields
   if (s.onboarding.experience && !["entry","1-3","3-5","5-10","10+"].includes(s.onboarding.experience)) {
     if (s.onboarding.experience === "experienced") s.onboarding.experience = "3-5";
@@ -68,6 +72,8 @@ function startOver() {
   const lang = STATE.settings?.lang || "en";
   STATE = defaultState();
   STATE.settings.lang = lang;
+  clearTimeout(window._toastTimer);
+  document.getElementById("toast")?.classList.remove("show");
   persist();
   render();
 }

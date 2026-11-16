@@ -331,7 +331,7 @@ function scoreJobMatch(job, profile, targetDNA, onboarding) {
     desired.split(/\s+/).forEach(w => { if (w.length > 3 && text.includes(w)) role += 14; });
     if (text.includes(desired.slice(0, 18))) role += 10;
   });
-  if (o.desiredIndustry && text.includes(o.desiredIndustry.toLowerCase())) role += 15;
+  if ((o.desiredIndustries || []).some(x => text.includes(x.toLowerCase()))) role += 15;
   role = Math.min(100, role);
 
   // Language 10%
