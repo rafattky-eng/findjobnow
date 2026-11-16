@@ -1,5 +1,5 @@
 // FindJob Now V7.1 — Local storage & state
-const APP_VERSION = "7.5.0";
+const APP_VERSION = "7.6.0";
 const DNA_ENGINE_VERSION = 7;
 const STORAGE_KEY = "fj2_state";
 
@@ -26,7 +26,7 @@ function defaultState() {
       desiredRole: "",
       desiredRoles: [], // multi-select support (V7.2+)
       desiredIndustry: "", // joined string of desiredIndustries
-      desiredIndustries: [], // multi-select (V7.5.0)
+      desiredIndustries: [], // multi-select (V7.6.0)
       experience: null,
       japanese: 0,
       visaStatus: null,

@@ -2,16 +2,22 @@
 // q = search URL prefix (role appended). Where no reliable search URL exists, q is omitted and the site home opens.
 
 const EASY_APPLY_SOURCES = [
-  { id: "linkedin", name: "LinkedIn Easy Apply", url: "https://www.linkedin.com/jobs/", q: "https://www.linkedin.com/jobs/search/?location=Japan&f_AL=true&keywords=", tags: ["easy", "upload"], en: "Filtered to Easy Apply: resume upload + one-click apply.", jp: "簡単応募に絞り込み。履歴書アップロードでワンクリック応募。" },
-  { id: "indeed", name: "Indeed Japan", url: "https://jp.indeed.com/", q: "https://jp.indeed.com/jobs?q=", tags: ["easy", "upload"], en: "Huge database. Upload resume once, apply fast.", jp: "求人数が多い。履歴書を一度登録すれば素早く応募。" },
+  { id: "linkedin", name: "LinkedIn Easy Apply", url: "https://www.linkedin.com/jobs/", q: "https://www.linkedin.com/jobs/search/?location=Japan&f_AL=true&keywords=", tags: ["easy", "upload"], en: "Easy Apply filter. Availability and required steps vary by vacancy; verify on LinkedIn.", jp: "Easy Applyフィルター。応募手順は求人ごとに異なるため、LinkedIn上で確認してください。" },
+  { id: "indeed", name: "Indeed Japan", url: "https://jp.indeed.com/", q: "https://jp.indeed.com/jobs?q=", tags: ["upload"], en: "Some vacancies offer Indeed Apply; others redirect to the employer. Check each vacancy.", jp: "Indeed Apply対応求人もありますが、企業サイトへ移動する求人もあります。求人ごとに確認。" },
   { id: "careercross", name: "CareerCross", url: "https://www.careercross.com/en/", q: "https://www.careercross.com/en/job-search?keywords=", tags: ["upload", "bilingual"], en: "Bilingual jobs. Recruiters can see your profile.", jp: "バイリンガル求人。採用担当者がプロフィールを閲覧。" },
   { id: "daijob", name: "Daijob", url: "https://www.daijob.com/en/", q: "https://www.daijob.com/jobs/search?job_search_form_with_keyword%5Bkeyword%5D=", tags: ["upload", "bilingual"], en: "Resume database. Recruiters contact you.", jp: "履歴書データベース。リクルーターから連絡。" },
   { id: "jobsinjapan", name: "Jobs in Japan", url: "https://jobsinjapan.com/", tags: ["easy", "foreign"], en: "Foreigner-friendly jobs, simple applications.", jp: "外国人歓迎の求人。簡単に応募。" },
   { id: "gaijinpot", name: "GaijinPot Jobs", url: "https://jobs.gaijinpot.com/en/", q: "https://jobs.gaijinpot.com/job/index/lang/en?job_key=", tags: ["upload", "foreign"], en: "Popular with foreign job seekers.", jp: "外国人求職者に人気。" },
   { id: "wexpats-e", name: "WeXpats Jobs", url: "https://we-xpats.com/en/job/as/jp", tags: ["upload", "foreign"], en: "Foreigner-focused board with profile + consultation. (Added)", jp: "外国人向け求人サイト。プロフィール登録・相談あり。（追加）" },
-  { id: "wantedly", name: "Wantedly", url: "https://www.wantedly.com/", q: "https://www.wantedly.com/projects?q=", tags: ["easy", "sme"], en: "Casual “Want to visit” applications. Startups.", jp: "「話を聞きに行きたい」で気軽に応募。スタートアップ。" },
+  { id: "wantedly", name: "Wantedly", url: "https://www.wantedly.com/", q: "https://www.wantedly.com/projects?q=", tags: ["sme"], en: "Often an expression of interest / casual meeting request, not one-click Easy Apply.", jp: "「話を聞きに行きたい」などのカジュアル面談希望。ワンクリック応募ではありません。" },
   { id: "green", name: "Green Japan", url: "https://www.green-japan.com/", tags: ["upload", "sme"], en: "IT & startup jobs with profile system.", jp: "IT・スタートアップ求人。プロフィール登録。" },
-  { id: "openwork", name: "OpenWork", url: "https://www.openwork.jp/", tags: ["upload"], en: "Company reviews + applications.", jp: "企業口コミ＋応募。" }
+  { id: "openwork", name: "OpenWork", url: "https://www.openwork.jp/", tags: [], en: "Company reviews and job discovery; application route varies.", jp: "企業口コミ・求人検索。応募方法は求人ごとに異なります。" },
+  { id: "bizreach2", name: "BizReach", url: "https://www.bizreach.jp/", tags: [], en: "Experienced-professional / headhunter platform; registration required.", jp: "経験者向けスカウト・ヘッドハンタープラットフォーム。登録が必要です。" },
+  { id: "doda2", name: "doda", url: "https://doda.jp/", tags: [], en: "Large Japanese job board; Japanese ability may be needed.", jp: "大手日本語求人サイト。日本語力が必要な場合があります。" },
+  { id: "hellowork2", name: "Hello Work", url: "https://www.hellowork.mhlw.go.jp/", tags: [], en: "Official public employment service; Japanese-language support may be limited.", jp: "公的職業紹介サービス。外国語対応には限りがあります。" },
+  { id: "mynaviglobal", name: "Mynavi Global", url: "https://global.mynavi.jp/", tags: [], en: "Global / foreign talent recruitment information.", jp: "グローバル人材・外国人採用情報。" },
+  { id: "tokyodevjobs", name: "TokyoDev", url: "https://www.tokyodev.com/jobs", tags: [], en: "Technology roles; use for software / engineering searches.", jp: "IT・エンジニア職向け。" },
+  { id: "japandevjobs", name: "Japan Dev", url: "https://japan-dev.com/jobs", tags: [], en: "English-friendly technology companies and roles.", jp: "英語対応のテック企業・求人。" }
 ];
 
 const AGENCY_SOURCES = [
@@ -138,8 +144,9 @@ function renderEasyTab() {
   return `
   <div class="card">
     <div style="font-size:13px;font-weight:700">${tx("🚀 Easy Apply / Resume Upload", "🚀 簡単応募 / 履歴書アップロード")}</div>
-    <p class="sub" style="margin-top:4px">${tx("Upload your resume once, then apply with a tap. Buttons open each site with your role pre-filled.", "履歴書を一度登録すれば、タップで応募。職種を入力済みで各サイトを開きます。")}</p>
+    <p class="sub" style="margin-top:4px">${tx("Explore direct-apply filters, resume/profile registration and employer application pages. The application method varies by job; verify before applying.", "直接応募フィルター、履歴書・プロフィール登録、企業の応募ページを確認できます。応募方法は求人ごとに異なるため、応募前に確認してください。")}</p>
   </div>
+  <div class="card" style="padding:12px"><p class="sub" style="margin:0">${tx("Important: a job-board link is not proof of Easy Apply or CV upload. Only the individual vacancy page can confirm its application method.", "重要：求人サイトへのリンクだけではEasy Applyや履歴書アップロード対応を保証しません。実際の求人ページで応募方法を確認してください。")}</p></div>
   <div style="margin-top:10px">${renderSourceGroups(EASY_APPLY_SOURCES, "easy")}</div>
   ${renderNoteCard()}`;
 }

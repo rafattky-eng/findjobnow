@@ -455,6 +455,12 @@ function render() {
   const progress = $("progressWrap");
 
   $("btnEn")?.classList.toggle("active", STATE.settings.lang !== "jp");
+  const backButton = $("btnBack");
+  if (backButton) {
+    backButton.classList.toggle("hidden", !["jobs", "tools", "tracker", "onboarding"].includes(v));
+    backButton.setAttribute("aria-label", STATE.settings.lang === "jp" ? "戻る" : "Back");
+    backButton.title = STATE.settings.lang === "jp" ? "戻る" : "Back";
+  }
   $("btnJp")?.classList.toggle("active", STATE.settings.lang === "jp");
 
   if (v === "landing" || (v === "onboarding" && STATE.onboarding?.step === 1 && !STATE.profile && !STATE.cvText)) {
@@ -518,6 +524,17 @@ function wireCommon() {
 }
 
 function wireChrome() {
+  $("btnBack")?.addEventListener("click", () => {
+    if (STATE.view === "onboarding") {
+      const step = STATE.onboarding?.wizardStep || 1;
+      if (step > 1) STATE.onboarding.wizardStep = step - 1;
+      else STATE.view = "dashboard";
+      persist(); render(); window.scrollTo(0, 0);
+      return;
+    }
+    if (STATE.view !== "dashboard" && STATE.view !== "landing") setView("dashboard");
+    else setView("jobs");
+  });
   $("btnEn")?.addEventListener("click", () => setLang("en"));
   $("btnJp")?.addEventListener("click", () => setLang("jp"));
   $("btnRestart")?.addEventListener("click", () => {

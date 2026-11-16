@@ -59,7 +59,7 @@ function enrichJob(raw, source) {
     location: raw.location || raw.candidate_required_location || "Japan",
     description: (typeof stripHtml === "function" ? stripHtml(raw.description || raw.description_text || "") : (raw.description || "")).slice(0, 600),
     source,
-    visa: /visa|sponsor|就労|スポンサー/i.test(`${raw.title} ${raw.description || ""}`),
+    visa: /visa sponsorship (available|provided)|will sponsor|sponsorship available|ビザサポートあり/i.test(`${raw.title} ${raw.description || ""}`),
     remote: /remote|リモート|work from home/i.test(`${raw.title} ${raw.location || ""} ${raw.description || ""}`),
     posted: raw.publication_date || raw.published || raw.date || ""
   };
@@ -123,7 +123,10 @@ function renderJobCard(job) {
       ${japanReadyBadge(job.japanReady)}
       ${job.visa ? `<span class="badge visa">Visa</span>` : ""}
       ${job.remote ? `<span class="badge source">Remote</span>` : ""}
+      <span class="badge source">${esc(job.applicationMethod || "Application method not verified")}</span>
+      ${job.language ? `<span class="badge source">${esc(job.language)}</span>` : ""}
     </div>
+    ${job.language === "Japanese" || job.language === "English / Unknown" ? `<p class="sub" style="margin:6px 0">${tx("Original page language may differ from app language. Automatic page translation is external; verify details with the employer.", "求人ページの言語はアプリ設定と異なる場合があります。外部の自動翻訳を利用し、内容を雇用主に確認してください。")}</p><a class="chip" href="${esc(safeUrl("https://translate.google.com/translate?sl=auto&tl=" + (STATE.settings.lang === "jp" ? "ja" : "en") + "&u=" + encodeURIComponent(job.url)))}" target="_blank" rel="noopener noreferrer">${STATE.settings.lang === "jp" ? "日本語に翻訳（外部）" : "Translate page (external)"}</a>` : ""}
     <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:2px">
       <span class="muted">${t("match")}</span>
       <strong style="color:var(--ac)">${score}%</strong>
@@ -137,7 +140,7 @@ function renderJobCard(job) {
       ${(job.miss||[]).map(m => `<li class="miss">• ${esc(m)}</li>`).join("")}
     </ul>` : ""}
     <div class="btn-row cols-2" style="margin-top:10px">
-      <a class="btn primary sm" href="${esc(safeUrl(job.url))}" target="_blank" rel="noopener">${t("apply")}</a>
+      <a class="btn primary sm" href="${esc(safeUrl(job.url))}" target="_blank" rel="noopener noreferrer">${tx("Open original vacancy", "元の求人を開く")}</a>
       <button type="button" class="btn secondary sm" data-save-job="${esc(job.id)}">${t("save")}</button>
     </div>
     <div class="btn-row cols-2" style="margin-top:6px">
