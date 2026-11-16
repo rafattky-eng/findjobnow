@@ -644,7 +644,7 @@ body.no-nav .app-footer {
 @keyframes swipeNudge { 0%,100% { transform: translateX(-10px); } 50% { transform: translateX(10px); } }
 .tabs-wrap { margin-bottom: 28px; }
 
-/* V7.6.0: compact, non-blocking guidance and iPhone back control */
+/* V9.0.0: compact, non-blocking guidance and iPhone back control */
 #btnBack { flex: 0 0 40px; font-size: 22px; }
 #btnBack.hidden { display: none !important; }
 .next-step-hint {

@@ -95,6 +95,20 @@ const mapRemotive = d => (d.jobs || []).map(j => ({
   location: j.candidate_required_location || "Not specified", description: String(j.description || "").slice(0, 2200),
   publication_date: String(j.publication_date || "").slice(0, 10), source: "Remotive"
 }));
+const mapGreenhouse = (d, board) => (d.jobs || []).map(j => {
+  const loc = (j.location && j.location.name) || "Not specified";
+  return {
+    id: "gh-" + board + "-" + j.id,
+    title: j.title,
+    company: board.charAt(0).toUpperCase() + board.slice(1),
+    url: j.absolute_url || ("https://boards.greenhouse.io/" + board + "/jobs/" + j.id),
+    location: loc,
+    description: String((j.metadata || []).map(m => m.value).join(" ") || "").slice(0, 500),
+    publication_date: String(j.updated_at || j.created_at || "").slice(0, 10),
+    source: "Greenhouse · " + board
+  };
+});
+const GREENHOUSE_BOARDS = ["airbnb", "stripe", "figma", "dropbox", "gitlab", "intercom", "asana", "remotecom", "tripadvisor"];
 const JOBICY_TTL = 6 * 60 * 60 * 1000; // refresh far less often than once/hour
 const REMOTIVE_TTL = 6 * 60 * 60 * 1000; // Remotive advises no more than 4 requests/day
 
@@ -107,11 +121,22 @@ async function searchLiveJobs() {
   const raw = [];
   const failures = [];
   const sourceResults = [];
+  const GH_TTL = 6 * 60 * 60 * 1000;
   const requests = [
     { name: "Jobicy · APAC", url: "https://jobicy.com/api/jobs?count=100&geo=apac", ttl: JOBICY_TTL, mapper: mapJobicy, filter: x => JP_SCOPE.test(x.location || "") },
     { name: "Jobicy · Anywhere", url: "https://jobicy.com/api/jobs?count=100&geo=anywhere", ttl: JOBICY_TTL, mapper: mapJobicy, filter: x => JP_SCOPE.test(x.location || "") },
     { name: "Remotive", url: "https://remotive.com/api/remote-jobs?limit=100", ttl: REMOTIVE_TTL, mapper: mapRemotive, filter: x => JP_SCOPE.test(x.location || "") }
   ];
+  // Greenhouse public boards — filter to Japan / Tokyo / Japan-eligible locations
+  GREENHOUSE_BOARDS.forEach(board => {
+    requests.push({
+      name: "Greenhouse · " + board,
+      url: "https://boards-api.greenhouse.io/v1/boards/" + board + "/jobs",
+      ttl: GH_TTL,
+      mapper: d => mapGreenhouse(d, board),
+      filter: x => /japan|tokyo|大阪|osaka|kyoto|nagoya|fukuoka|日本|横浜|yokohama/i.test(x.location || "") || /japan|tokyo/i.test(x.title || "")
+    });
+  });
   const results = await Promise.all(requests.map(async source => {
     const r = await fetchCached(source.url, source.ttl, source.mapper);
     sourceResults.push({ name: source.name, ok: r.ok, cached: !!r.cached, count: r.list.length, error: r.error || "" });
@@ -249,14 +274,14 @@ function renderMatchesTab() {
   ${liveInfoLine()}
   ${renderJobFilters()}
   ${list.length ? `
-    <p class="sub" style="margin:10px 0 6px">${tx("Real remote/Japan-eligible listings", "実際のリモート/日本対象求人")} · ${list.length}${list.length !== byRole.length ? "/" + byRole.length : ""}</p>
+    <p class="sub" style="margin:10px 0 6px">${tx("Verified vacancies from employer feeds", "雇主フィードからの確認済み求人")} · ${list.length}${list.length !== byRole.length ? "/" + byRole.length : ""}</p>
     ${list.map(renderJobCard).join("")}`
   : `<div class="card" style="text-align:center;padding:20px">
       <p class="muted">${byRole.length ? tx("No jobs match the current filters. Try broadening the filters.", "現在の条件に一致する求人はありません。条件を広げてください。") : tx("No verified remote-feed vacancies matched these roles in this check. This does not mean there are no Japan vacancies.", "今回のリモート求人フィードでは一致する求人を確認できませんでした。日本の求人がないという意味ではありません。")}</p>
       <p class="sub" style="margin-top:8px">${tx("Try related titles or search Japan job boards directly below. Search links are not counted as vacancy listings.", "関連職種で検索するか、下の日本求人サイトを直接検索してください。検索リンクは求人件数に含みません。")}</p>
       <div class="chip-row">${searchButtons(active, true)}</div>
     </div>`}
-  <p class="sub" style="margin-top:10px">${tx("Structured feeds: Jobicy and Remotive (remote vacancies only). Japan on-site vacancies are searched through the official board links above.", "構造化フィードはJobicy・Remotiveのリモート求人です。日本の現地求人は上の公式求人サイトで検索してください。")}</p>`;
+  <p class="sub" style="margin-top:10px">${tx("Structured feeds: Greenhouse (employer boards with Japan locations) + Jobicy/Remotive (remote). Japan on-site vacancies are also searched via official board links below.", "構造化フィードはJobicy・Remotiveのリモート求人です。日本の現地求人は上の公式求人サイトで検索してください。")}</p>`;
 }
 
 /* ---------- Boards tab ---------- */

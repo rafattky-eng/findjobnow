@@ -3,6 +3,15 @@
 const $ = id => document.getElementById(id);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c]));
+const ROLE_SUGGESTIONS = [
+  "Business Development Manager","International Business Development","Travel Business Development",
+  "Inbound Tourism Manager","Tourism Operations Manager","Travel Product Manager",
+  "International Sales Manager","Partnerships Manager","Account Manager",
+  "Customer Success Manager","Operations Manager","General Manager",
+  "Project Manager","Software / Systems Manager","Travel Consultant","Tour Coordinator",
+  "Hospitality Manager","Marketing Manager","Sales Manager","Product Manager"
+];
+
 
 function say(msg, ok) {
   const el = $("toast");
@@ -147,7 +156,7 @@ function renderOnboarding() {
   let body = "";
   if (ws === 1) {
     const selected = Array.isArray(o.desiredRoles) ? o.desiredRoles : (o.desiredRole ? [o.desiredRole] : []);
-    const ROLE_SUGGESTIONS = ["Travel Consultant","Tour Coordinator","Travel Operations Manager","Customer Success Manager","Hospitality Manager","Project Manager","Software Engineer","Marketing Manager","Sales Manager","Product Manager"];
+
     body = `
       <h2>${t("wizard_role")}</h2>
       <p class="sub">${tx("Select one or more roles. You can refine later.", "1つ以上選択。後から変更できます。")}</p>
@@ -156,6 +165,10 @@ function renderOnboarding() {
         ${ROLE_SUGGESTIONS.map(r =>
           `<button type="button" class="chip ${selected.includes(r) ? "on" : ""}" data-role="${esc(r)}">${esc(r)}</button>`
         ).join("")}
+      </div>
+      <div class="btn-row" style="margin-top:8px;gap:8px">
+        <button type="button" class="btn secondary" id="btnSelectAllRoles" style="flex:1">${tx("Select All", "すべて選択")}</button>
+        <button type="button" class="btn ghost" id="btnClearRoles" style="flex:1">${tx("Clear", "クリア")}</button>
       </div>
       <p class="sub" style="margin-top:8px">${tx("Selected:", "選択中:")} <strong id="roleCount">${selected.length || 0}</strong></p>`;
   } else if (ws === 2) {
@@ -233,6 +246,18 @@ function wireOnboarding() {
     if (rc) rc.textContent = String(o.desiredRoles.length);
     persist(); render();
   }));
+  $("btnSelectAllRoles")?.addEventListener("click", () => {
+    o.desiredRoles = [...ROLE_SUGGESTIONS];
+    o.desiredRole = o.desiredRoles[0] || "";
+    if ($("wRole")) $("wRole").value = o.desiredRoles.join(", ");
+    persist(); render();
+  });
+  $("btnClearRoles")?.addEventListener("click", () => {
+    o.desiredRoles = [];
+    o.desiredRole = "";
+    if ($("wRole")) $("wRole").value = "";
+    persist(); render();
+  });
   $("wRole")?.addEventListener("input", e => {
     const raw = e.target.value.slice(0, 160);
     const parts = raw.split(/[,/|]+/).map(s => s.trim()).filter(Boolean);

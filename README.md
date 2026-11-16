@@ -1,70 +1,81 @@
-# FindJobNow
+# FindJob Now V9.0.0
 
-Free, privacy-first job search assistant for **English-friendly jobs in Japan**.
+**Real Japan job search + direct application assistant**  
+Progressive Web App · GitHub Pages · Free · Private · iPhone-friendly
 
-- No signup, no backend
-- All data stays in the browser (IndexedDB)
-- Single-page PWA (vanilla HTML/CSS/JS)
+Live site: https://rafattky-eng.github.io/findjobnow/
 
-## Features
+---
 
-1. **Landing** — Hero + CTAs for CV upload or browse boards
-2. **CV / Profile** — PDF (pdf.js) or paste text → client-side parse (name, skills, titles, years, languages, visa). Editable profile card
-3. **Job Matching** — Score ~20 sample jobs by skill overlap + language/visa fit; recommended boards
-4. **Job Board Directory** — 14 curated Japan-focused boards, filterable by Tech / Teaching / General / Startup / Multilingual
-5. **Application Tracker** — Kanban: Interested → Applied → Interview → Offer → Rejected
-6. **Tools** — Cover letter draft generator, Rirekisho checklist, scam safety checklist
-7. **Backup / Restore** — Export / import full local data as JSON
-8. **EN / JP** UI toggle
+## What this version does
 
-## Design
+1. Lets you upload (or paste) a CV and extract key information locally.
+2. Lets you select one or many target roles (including Select All).
+3. Searches **public employer feeds** that can be called from the browser:
+   - Greenhouse boards (selected companies with Japan/Tokyo locations)
+   - Jobicy (APAC / Anywhere remote)
+   - Remotive (remote)
+4. Shows **verified vacancy cards** only for results that actually came back from those feeds.
+5. Provides **Japan job-board search links** (CareerCross, Daijob, GaijinPot, Indeed Japan, LinkedIn Easy Apply filter, TokyoDev, etc.) clearly labelled as search shortcuts — never counted as vacancies.
+6. Helps prepare application emails and tracks applications on the device.
+7. Works fully offline after first load (service worker) for previously cached content; live search needs network.
 
-- Mobile-first, max-width 520px
-- Colors: bg `#05070c`, panel `#0c1526`, gold `#d4b062`, text `#f5f1e8`, muted `#8fa3c4`
-- Rounded cards, soft shadows, pill tags
+## What it deliberately does not do
 
-## Deploy
+- It does **not** invent vacancies, emails, or salaries.
+- It does **not** scrape sites that block CORS or forbid scraping.
+- It does **not** claim every “Easy Apply” or CV-upload form is verified without the user checking the employer page.
+- It does **not** require sign-up, paid APIs, or a backend subscription.
 
-### GitHub Pages
+## Deploy (GitHub Pages)
 
-1. Create a repo (e.g. `findjobnow`)
-2. Push the contents of this folder to the `main` (or `gh-pages`) branch
-3. Settings → Pages → Source: Deploy from branch → `/` (root)
-4. Site will be at `https://<user>.github.io/findjobnow/`
+1. Unzip `FindJobNow-V9.0.0.zip`.
+2. Push the contents to the root (or `/docs`) of the repository that serves  
+   https://rafattky-eng.github.io/findjobnow/
+3. Wait for GitHub Pages to rebuild (usually 1–2 minutes).
+4. On iPhone: open the site → Share → Add to Home Screen.
+5. Hard-refresh once so the new service worker (`fj-v9.0.0`) activates.
 
-### Cloudflare Pages
-
-1. Connect the GitHub repo in Cloudflare Dashboard → Pages
-2. Build command: leave empty (static)
-3. Output directory: `/` (or leave default)
-4. Deploy
-
-### Local test
-
-```bash
-npx serve .
-# or
-python3 -m http.server 8080
-```
-
-Open `http://localhost:8080` (service worker needs a proper origin, not `file://`).
+No build step. No Node required. Pure static files.
 
 ## Files
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Full app (inline CSS + JS) |
-| `manifest.json` | PWA manifest |
-| `sw.js` | Cache-first service worker |
-| `icon-192.png` / `icon-512.png` / `apple-touch-icon.png` | Icons |
+| `index.html` | Shell + CSP |
+| `app.js` | Main UI & onboarding |
+| `live.js` | Live vacancy search (Greenhouse + Jobicy + Remotive) |
+| `jobs.js` | Job cards, filters, enrichment |
+| `sources.js` | Japan board links, daily plan, notes |
+| `dna-engine.js` | CV signal extraction & matching |
+| `storage.js` | localStorage state |
+| `i18n.js` | English / Japanese strings |
+| `tracker.js` | Application tracker |
+| `tools.js` | Extra tools |
+| `boost.js` | Helpers |
+| `japan-data.js` | Companies, locations, benchmarks |
+| `styles.css` | iPhone-first design system |
+| `sw.js` | Service worker (cache version V9.0.0) |
+| `manifest.webmanifest` | PWA manifest |
+| Icons | 192 / 512 / maskable / apple-touch / favicon |
 
 ## Privacy
 
-No analytics, no accounts, no server-side storage of CV or application data. Network is only used for:
+- CV text and application history stay in the browser’s localStorage.
+- No account, no server-side storage of personal data.
+- You can clear data from the app or by clearing site data in Safari settings.
 
-- Loading pdf.js from CDN (optional offline cache)
-- Opening external job board links in a new tab
+## Limitations (honest)
 
-## License
+A static GitHub Pages site cannot:
+- Call most Japan job-board private APIs.
+- Bypass CORS.
+- Translate arbitrary third-party pages inside their own domains.
+- Confirm that an external “Apply” button is genuine Easy Apply or has a CV upload field without the user opening it.
 
-MIT — use freely.
+Where a limitation exists, the UI explains it instead of inventing results.
+
+## Licence & copyright
+
+Copyright © 2026 Rafat Kotaki. All rights reserved.  
+For personal use and deployment to the existing FindJob Now GitHub Pages site.
