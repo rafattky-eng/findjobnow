@@ -1,6 +1,6 @@
 // FindJob Now V9.0.3 — single-file bundle (storage, i18n, data, engines, UI)
 // FindJob Now V7.1 — Local storage & state
-const APP_VERSION = "9.1.1";
+const APP_VERSION = "9.1.2";
 const DNA_ENGINE_VERSION = 7;
 const STORAGE_KEY = "fj2_state";
 
@@ -1215,7 +1215,8 @@ function renderJobs() {
   const list = coTab === "japanese" ? japanese : foreign;
 
   return `
-  <h2>${t("find_jobs")}</h2>
+  ${renderNextPointer(true)}
+  <h2 style="margin-top:10px">${t("find_jobs")}</h2>
   <p class="sub">${tx("Real vacancies · One-tap Apply · Easy Apply boards · Agencies · Tracker", "実求人 · ワンタップ応募 · 簡単応募ボード · エージェント · 管理")}</p>
 
   <div class="tabs-wrap" id="jobTabsWrap">
@@ -2305,7 +2306,8 @@ function wireBoost() {
 function renderTools() {
   const tool = STATE._tool || null;
   return `
-  <h2>${tx("Toolkit", "ツールキット")}</h2>
+  ${renderNextPointer(true)}
+  <h2 style="margin-top:10px">${tx("Toolkit", "ツールキット")}</h2>
   <p class="sub">${tx("11 tools: resume, interview, culture, visa, JLPT & more", "11ツール：履歴書・面接・文化・ビザ・JLPTなど")}</p>
   <div class="tool-grid">
     <button type="button" class="tool-card" data-tool="ats"><span class="icon">📊</span><span class="label">${t("ats_score")}</span></button>
@@ -2715,7 +2717,8 @@ function renderTracker() {
   const apps = STATE.applications || {};
   const interviewItems = (apps.interview || []).filter(i => i.interviewDate);
   return `
-  <h2>${tx("Application Tracker", "応募管理")}</h2>
+  ${renderNextPointer(true)}
+  <h2 style="margin-top:10px">${tx("Application Tracker", "応募管理")}</h2>
   <p class="sub">${tx("Local only. Status buttons move items. Interview dates show countdown.", "端末内のみ。ステータスボタンで移動。面接日でカウントダウン。")}</p>
 
   ${interviewItems.length ? `
@@ -3213,6 +3216,151 @@ function wireOnboarding() {
 }
 
 /* ========== DASHBOARD ========== */
+
+/* ========== Next-to-do pointer (all pages) ========== */
+function getNextStep() {
+  const o = STATE.onboarding || {};
+  const hasCV = !!(STATE.cvText || STATE.cvFileB64);
+  const hasRoles = !!(o.desiredRole || (o.desiredRoles && o.desiredRoles.length));
+  const hasWizard = !!(o.experience && o.japanese >= 1 && o.visaStatus);
+  const jobs = STATE.jobs || [];
+  const apps = STATE.applications || {};
+  const applied = (apps.applied || []).length;
+  const saved = (apps.saved || []).length;
+  const lang = STATE.settings?.lang === "jp";
+
+  // Priority order
+  if (!hasCV) {
+    return {
+      id: "upload",
+      icon: "📄",
+      title: lang ? "次：履歴書をアップロード" : "Next: Upload your resume",
+      detail: lang ? "PDFを1回アップロードすると、応募時にすぐ使えます。" : "Upload a PDF once so you can download it when applying.",
+      cta: lang ? "アップロード" : "Upload resume",
+      view: "landing",
+      tool: null
+    };
+  }
+  if (!hasRoles) {
+    return {
+      id: "roles",
+      icon: "🎯",
+      title: lang ? "次：希望職種を選ぶ" : "Next: Choose your target roles",
+      detail: lang ? "1つ以上の職種を選ぶと求人検索が始まります。" : "Select one or more roles to start job search.",
+      cta: lang ? "職種を選ぶ" : "Select roles",
+      view: "onboarding",
+      tool: null
+    };
+  }
+  if (!hasWizard) {
+    return {
+      id: "wizard",
+      icon: "🧭",
+      title: lang ? "次：キャリア目標を完了" : "Next: Finish career target",
+      detail: lang ? "経験・日本語・ビザ・勤務地を設定してください。" : "Set experience, Japanese, visa and location.",
+      cta: lang ? "続ける" : "Continue",
+      view: "onboarding",
+      tool: null
+    };
+  }
+  if (applied === 0 && jobs.length === 0) {
+    return {
+      id: "search",
+      icon: "🚀",
+      title: lang ? "次：簡単応募ボードを開く" : "Next: Open Easy Apply boards",
+      detail: lang ? "Easy Applyタブで履歴書アップロード対応サイトを開き、求人に応募。" : "Open Easy Apply boards, find a job, upload your CV.",
+      cta: lang ? "求人へ" : "Go to Jobs",
+      view: "jobs",
+      tool: null,
+      jobsTab: "easy"
+    };
+  }
+  if (applied === 0) {
+    return {
+      id: "apply",
+      icon: "✍️",
+      title: lang ? "次：1件応募する" : "Next: Apply to 1 job",
+      detail: lang ? "実求人カードの「今すぐ応募」か、Easy Applyボードで応募。" : "Use Apply now on a Live job card, or an Easy Apply board.",
+      cta: lang ? "応募する" : "Apply now",
+      view: "jobs",
+      tool: null,
+      jobsTab: jobs.length ? "matches" : "easy"
+    };
+  }
+  if (applied > 0 && applied < 5) {
+    return {
+      id: "more",
+      icon: "📈",
+      title: lang ? `次：あと${Math.max(1, 5 - applied)}件応募` : `Next: Apply to ${Math.max(1, 5 - applied)} more`,
+      detail: lang ? "毎日20〜30件が目標。Trackerで記録を残してください。" : "Aim for 20–30/day. Record each one in Tracker.",
+      cta: lang ? "求人を続ける" : "Keep applying",
+      view: "jobs",
+      tool: null,
+      jobsTab: "easy"
+    };
+  }
+  return {
+    id: "track",
+    icon: "🗂",
+    title: lang ? "次：応募をフォローアップ" : "Next: Follow up applications",
+    detail: lang ? "Trackerで面接・返信を記録し、未返信にフォロー。" : "Check Tracker for interviews and follow up on no-replies.",
+    cta: lang ? "Trackerを開く" : "Open Tracker",
+    view: "tracker",
+    tool: null
+  };
+}
+
+function renderNextPointer(compact) {
+  const n = getNextStep();
+  if (!n) return "";
+  const finger = "👉";
+  if (compact) {
+    return `<div class="next-pointer compact" data-next-go="${esc(n.view)}" data-next-tab="${esc(n.jobsTab || "")}" data-next-tool="${esc(n.tool || "")}">
+      <span class="next-finger">${finger}</span>
+      <span class="next-text"><strong>${esc(n.title)}</strong></span>
+      <button type="button" class="btn primary sm next-cta">${esc(n.cta)}</button>
+    </div>`;
+  }
+  return `<div class="next-pointer" data-next-go="${esc(n.view)}" data-next-tab="${esc(n.jobsTab || "")}" data-next-tool="${esc(n.tool || "")}">
+    <div class="next-left">
+      <span class="next-finger">${finger}</span>
+      <div>
+        <div class="next-title">${esc(n.icon)} ${esc(n.title)}</div>
+        <div class="next-detail">${esc(n.detail)}</div>
+      </div>
+    </div>
+    <button type="button" class="btn primary sm next-cta">${esc(n.cta)}</button>
+  </div>`;
+}
+
+function wireNextPointer() {
+  $$(".next-pointer, .next-cta").forEach(el => {
+    const root = el.classList.contains("next-pointer") ? el : el.closest(".next-pointer");
+    if (!root || root._wired) return;
+    root._wired = true;
+    const go = () => {
+      const view = root.dataset.nextGo;
+      const tab = root.dataset.nextTab;
+      const tool = root.dataset.nextTool;
+      if (tab) STATE._jobsTab = tab;
+      if (tool) STATE._tool = tool;
+      if (view === "landing") {
+        setView("landing");
+      } else if (view === "onboarding") {
+        STATE.onboarding = STATE.onboarding || {};
+        if (!STATE.onboarding.step || STATE.onboarding.step < 2) STATE.onboarding.step = 2;
+        setView("onboarding");
+      } else if (view) {
+        setView(view);
+      }
+    };
+    root.addEventListener("click", e => {
+      if (e.target.closest(".next-cta") || e.currentTarget.classList.contains("next-pointer")) go();
+    });
+  });
+}
+
+
 function renderDashboard() {
   const p = STATE.profile || {};
   const s = STATE.scores || {};
@@ -3233,8 +3381,9 @@ function renderDashboard() {
     .filter(Boolean);
 
   return `
+  ${renderNextPointer(false)}
   <!-- Hero DNA -->
-  <div class="card hero">
+  <div class="card hero" style="margin-top:12px">
     <div style="display:flex;justify-content:space-between;align-items:center">
       <span class="step-badge">Career DNA</span>
       <span class="muted" style="font-size:11px">V${APP_VERSION}</span>
@@ -3275,24 +3424,39 @@ function renderDashboard() {
     `}
   </div>
 
-  <!-- Action Center — 3 primary only -->
-  <h3 style="margin:16px 0 8px">${tx("Action Center", "アクションセンター")}</h3>
+  <!-- What to do next — primary control -->
+  <h3 style="margin:16px 0 8px">${tx("What to do next", "次にやること")}</h3>
+  ${renderNextPointer(false)}
+
+  <div class="card" style="margin-top:12px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px">${tx("Your path", "あなたの流れ")}</div>
+    <ol class="flow-steps">
+      <li class="${(STATE.cvText || STATE.cvFileB64) ? "done" : "todo"}"><span class="flow-n">1</span> ${tx("Upload CV", "履歴書アップロード")}</li>
+      <li class="${(STATE.onboarding?.desiredRole || (STATE.onboarding?.desiredRoles||[]).length) ? "done" : "todo"}"><span class="flow-n">2</span> ${tx("Select roles", "職種を選ぶ")}</li>
+      <li class="${(STATE.onboarding?.experience && STATE.onboarding?.visaStatus) ? "done" : "todo"}"><span class="flow-n">3</span> ${tx("Set target (exp / visa / location)", "目標設定（経験・ビザ・勤務地）")}</li>
+      <li class="${((STATE.applications?.applied||[]).length > 0) ? "done" : "todo"}"><span class="flow-n">4</span> ${tx("Apply (Easy Apply or Live jobs)", "応募（簡単応募 or 実求人）")}</li>
+      <li class="${((STATE.applications?.applied||[]).length >= 3) ? "done" : "todo"}"><span class="flow-n">5</span> ${tx("Track & follow up", "記録とフォローアップ")}</li>
+    </ol>
+  </div>
+
+  <!-- Action Center -->
+  <h3 style="margin:16px 0 8px">${tx("Control Center", "コントロールセンター")}</h3>
   <div class="action-grid">
     <button type="button" class="action-card" data-go="jobs">
-      <div class="action-icon">🔍</div>
-      <div><div class="action-title">${t("find_jobs")}</div><div class="action-sub">${tx("Japan boards + companies", "日本ボード + 企業")}</div></div>
+      <div class="action-icon">🚀</div>
+      <div><div class="action-title">${tx("Find & apply", "求人・応募")}</div><div class="action-sub">${tx("Easy Apply · Live jobs", "簡単応募 · 実求人")}</div></div>
+    </button>
+    <button type="button" class="action-card" data-go="tracker">
+      <div class="action-icon">🗂</div>
+      <div><div class="action-title">${tx("Tracker", "管理")}</div><div class="action-sub">${tx("Applied · Interviews", "応募済 · 面接")}</div></div>
     </button>
     <button type="button" class="action-card" data-go="tools" data-tool="ats">
       <div class="action-icon">📄</div>
-      <div><div class="action-title">${t("improve_resume")}</div><div class="action-sub">ATS · Rewrite · JP resume</div></div>
-    </button>
-    <button type="button" class="action-card" data-go="tools" data-tool="culture">
-      <div class="action-icon">🏯</div>
-      <div><div class="action-title">${t("culture_tips")}</div><div class="action-sub">${tx("Visa · JLPT · Interview", "ビザ · JLPT · 面接")}</div></div>
+      <div><div class="action-title">${t("improve_resume")}</div><div class="action-sub">ATS · Rewrite</div></div>
     </button>
   </div>
 
-  <!-- Quick Insights — max 3 -->
+  <!-- Quick Insights -->
   <div class="card" style="margin-top:14px">
     <h3 style="margin-bottom:4px">${tx("Quick Insights", "クイックインサイト")}</h3>
     <div class="insight-row">
@@ -3302,10 +3466,6 @@ function renderDashboard() {
     <div class="insight-row">
       <span class="insight-icon">⚠️</span>
       <div><strong>${t("skill_gaps")}</strong><br><span class="muted">${esc((dna?.gaps || p.missing || []).slice(0, 2).join(" · ") || "—")}</span></div>
-    </div>
-    <div class="insight-row">
-      <span class="insight-icon">🎯</span>
-      <div><strong>${t("next_action")}</strong><br><span class="muted">${esc(nextActionText())}</span></div>
     </div>
   </div>
 
@@ -3400,6 +3560,7 @@ function render() {
     else if (v === "tracker") { main.innerHTML = renderTracker(); wireTracker(); }
     else main.innerHTML = renderDashboard();
     wireCommon();
+    wireNextPointer();
   }
 
   $$("#bottomNav button").forEach(b => {
@@ -3420,7 +3581,7 @@ function wireCommon() {
         STATE.onboarding.step = 2;
         STATE.onboarding.wizardStep = STATE.onboarding.wizardStep || 1;
       }
-      if (go === "jobs") STATE._jobsTab = STATE._jobsTab || "matches";
+      if (go === "jobs") STATE._jobsTab = STATE._jobsTab || "easy";
       setView(go);
     });
   });
