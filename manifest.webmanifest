@@ -2,17 +2,23 @@
   "id": "./",
   "name": "FindJob Now",
   "short_name": "FindJob",
-  "description": "Real Japan job search and direct application assistant. Find verified vacancies, match your CV, apply by email or upload. Private, free, iPhone PWA.",
+  "description": "Find real Japan jobs. Apply with your CV in fewer steps. Private PWA.",
   "lang": "en",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
   "orientation": "any",
   "background_color": "#071B35",
   "theme_color": "#071B35",
-  "categories": ["business", "productivity"],
-  "version": "9.0.3",
+  "categories": [
+    "business",
+    "productivity"
+  ],
+  "version": "9.1.0",
   "icons": [
     {
       "src": "./icon-192.png",

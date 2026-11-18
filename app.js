@@ -1,6 +1,6 @@
 // FindJob Now V9.0.3 — single-file bundle (storage, i18n, data, engines, UI)
 // FindJob Now V7.1 — Local storage & state
-const APP_VERSION = "9.0.3";
+const APP_VERSION = "9.1.0";
 const DNA_ENGINE_VERSION = 7;
 const STORAGE_KEY = "fj2_state";
 
@@ -116,8 +116,8 @@ const I18N = {
     paste_cv: "Paste Resume Text",
     skip_cv: "Continue without resume",
     or: "or",
-    hero_sub: "Career intelligence for working in Japan. Private. No sign-up.",
-    honesty: "Rule-based matching · No cloud AI · Data stays on this device",
+    hero_sub: "Find real Japan jobs. Apply with your CV in fewer steps. Private. No sign-up.",
+    honesty: "Employer feeds · Easy Apply / resume upload · Data stays on this device",
     step_resume: "Resume",
     step_target: "Career Target",
     wizard_role: "What role do you want?",
@@ -209,7 +209,7 @@ const I18N = {
     paste_cv: "テキストを貼り付け",
     skip_cv: "履歴書なしで続ける",
     or: "または",
-    hero_sub: "日本で働くためのキャリア知能。プライベート。登録不要。",
+    hero_sub: "日本の実求人を見つけて、履歴書で簡単に応募。プライベート。登録不要。",
     honesty: "ルールベース照合 · クラウドAIなし · データはこの端末のみ",
     step_resume: "履歴書",
     step_target: "キャリア目標",
@@ -1053,6 +1053,92 @@ function japanReadyBadge(level) {
   return `<span class="badge risk">🔴 ${t("visa_challenge")}</span>`;
 }
 
+
+/* ---------- CV download + Apply helpers (V9.1) ---------- */
+function downloadMyCV() {
+  if (!STATE.cvFileB64 || !STATE.cvFileMeta) {
+    say(tx("Upload a PDF resume first", "先にPDF履歴書をアップロードしてください"), 0);
+    return;
+  }
+  try {
+    const bin = atob(STATE.cvFileB64);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    const blob = new Blob([arr], { type: STATE.cvFileMeta.type || "application/pdf" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = STATE.cvFileMeta.name || "resume.pdf";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    say(tx("CV downloaded — upload it on the job page", "履歴書をダウンロードしました。求人ページでアップロードしてください"), 1);
+  } catch (e) {
+    say(tx("Could not download CV", "履歴書をダウンロードできませんでした"), 0);
+  }
+}
+
+function copyApplicationNoteForJob(job) {
+  const role = job?.title || (STATE.onboarding?.desiredRole || "");
+  const company = job?.company || "";
+  const name = STATE.profile?.name || "";
+  const lang = STATE.settings?.lang === "jp" ? "jp" : "en";
+  const text = buildApplicationNote(lang, role, company, name);
+  return (navigator.clipboard?.writeText(text) || Promise.reject()).then(() => text).catch(() => {
+    // fallback: show in prompt-like area via STATE
+    STATE._lastNote = text;
+    return text;
+  });
+}
+
+function emailApplyForJob(job) {
+  const role = job?.title || "";
+  const company = job?.company || "";
+  const name = STATE.profile?.name || "";
+  const lang = STATE.settings?.lang === "jp" ? "jp" : "en";
+  const body = buildApplicationNote(lang, role, company, name);
+  const subject = lang === "jp"
+    ? (role ? `【応募】${role}${company ? " / " + company : ""}` : "求人への応募")
+    : (role ? `Application: ${role}${company ? " at " + company : ""}` : "Job application");
+  const mailto = "mailto:?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+  window.location.href = mailto;
+}
+
+function markJobApplied(job) {
+  if (!job) return;
+  const A = STATE.applications || (STATE.applications = { saved: [], applied: [], interview: [], offer: [], rejected: [] });
+  // remove from saved if present
+  A.saved = (A.saved || []).filter(x => x.id !== job.id);
+  if (!(A.applied || []).some(x => x.id === job.id)) {
+    A.applied = A.applied || [];
+    A.applied.unshift({
+      ...job,
+      appliedAt: today(),
+      status: "applied",
+      notes: "",
+      salary: "",
+      followUp: "",
+      interviewDate: ""
+    });
+  }
+  // daily counter
+  try {
+    const d = getDaily();
+    d.count = (d.count || 0) + 1;
+  } catch (_) {}
+  persist();
+  say(tx("Marked as applied", "応募済みに記録しました"), 1);
+}
+
+function applyNowFlow(job) {
+  if (!job) return;
+  copyApplicationNoteForJob(job).then(() => {
+    say(tx("Note copied · Opening job page · Upload your CV there", "応募文をコピー · 求人ページを開きます · そこで履歴書をアップロード"), 1);
+    setTimeout(() => {
+      const url = safeUrl(job.url);
+      if (url && url !== "#") window.open(url, "_blank", "noopener,noreferrer");
+    }, 350);
+  });
+}
+
 function renderJobCard(job) {
   const score = job.matchScore || 0;
   return `
@@ -1082,14 +1168,16 @@ function renderJobCard(job) {
       ${(job.good||[]).map(g => `<li class="good">✓ ${esc(g)}</li>`).join("")}
       ${(job.miss||[]).map(m => `<li class="miss">• ${esc(m)}</li>`).join("")}
     </ul>` : ""}
-    <div class="btn-row cols-2" style="margin-top:10px">
-      <a class="btn primary sm" href="${esc(safeUrl(job.url))}" target="_blank" rel="noopener noreferrer">${tx("Open original vacancy", "元の求人を開く")}</a>
-      <button type="button" class="btn secondary sm" data-save-job="${esc(job.id)}">${t("save")}</button>
+    <div class="btn-row" style="margin-top:10px;gap:6px">
+      <button type="button" class="btn primary sm" style="flex:1.4" data-apply-now="${esc(job.id)}">🚀 ${tx("Apply now", "今すぐ応募")}</button>
+      <button type="button" class="btn secondary sm" style="flex:1" data-email-apply="${esc(job.id)}">✉️ ${tx("Email apply", "メール応募")}</button>
     </div>
-    <div class="btn-row cols-2" style="margin-top:6px">
-      <button type="button" class="btn ghost sm" data-job-applied="${esc(job.id)}">✅ ${tx("I applied", "応募した")}</button>
-      <button type="button" class="btn ghost sm" data-job-note="${esc(job.id)}">✉️ ${tx("Write note", "応募文")}</button>
+    <div class="btn-row cols-3" style="margin-top:6px;gap:6px">
+      <button type="button" class="btn ghost sm" data-dl-cv>📄 ${tx("My CV", "履歴書")}</button>
+      <button type="button" class="btn ghost sm" data-save-job="${esc(job.id)}">${t("save")}</button>
+      <button type="button" class="btn ghost sm" data-job-applied="${esc(job.id)}">✅ ${tx("Applied", "応募済")}</button>
     </div>
+    <p class="sub" style="margin-top:8px;font-size:11px">${tx("Apply now = copy note + open job page. Then upload your CV on that page.", "「今すぐ応募」＝応募文をコピー＋求人ページを開く。そこで履歴書をアップロードしてください。")}</p>
   </article>`;
 }
 
@@ -1128,7 +1216,7 @@ function renderJobs() {
 
   return `
   <h2>${t("find_jobs")}</h2>
-  <p class="sub">${tx("Live matches · Easy Apply · Agencies · SME & Startups · Boards · Directory", "ライブマッチ · 簡単応募 · エージェント · 中小企業 · ボード · 企業一覧")}</p>
+  <p class="sub">${tx("Real vacancies · One-tap Apply · Easy Apply boards · Agencies · Tracker", "実求人 · ワンタップ応募 · 簡単応募ボード · エージェント · 管理")}</p>
 
   <div class="tabs-wrap" id="jobTabsWrap">
   <div class="tabs scroll" id="jobTabs" style="margin-bottom:0">
@@ -1178,6 +1266,19 @@ function wireJobs() {
   if (typeof wireSources === "function") wireSources();
   $("btnSearchJobs")?.addEventListener("click", () => searchLiveJobs());
   if (typeof wireLive === "function") wireLive();
+  $$("[data-apply-now]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const job = (STATE.jobs || []).find(j => j.id === btn.dataset.applyNow);
+      if (job) applyNowFlow(job);
+    });
+  });
+  $$("[data-email-apply]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const job = (STATE.jobs || []).find(j => j.id === btn.dataset.emailApply);
+      if (job) emailApplyForJob(job);
+    });
+  });
+  $$("[data-dl-cv]").forEach(btn => btn.addEventListener("click", () => downloadMyCV()));
   $$("[data-save-job]").forEach(btn => {
     btn.addEventListener("click", () => {
       const id = btn.dataset.saveJob;
@@ -1199,6 +1300,12 @@ function wireJobs() {
       } else {
         say(tx("Already saved", "保存済み"), 1);
       }
+    });
+  });
+  $$("[data-job-applied]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const job = (STATE.jobs || []).find(j => j.id === btn.dataset.jobApplied);
+      if (job) markJobApplied(job);
     });
   });
   $$("[data-target-co]").forEach(btn => {
@@ -1758,6 +1865,36 @@ function getDaily() {
 /* ---------- Rendering ---------- */
 function srcQuery() { return encodeURIComponent((typeof getActiveRole === "function" ? getActiveRole() : "") || "jobs"); }
 
+
+function sortedEasySources() {
+  const rank = s => {
+    const t = s.tags || [];
+    let r = 0;
+    if (t.includes("easy")) r += 3;
+    if (t.includes("upload")) r += 2;
+    if (t.includes("foreign") || t.includes("bilingual")) r += 1;
+    return -r;
+  };
+  return [...EASY_APPLY_SOURCES].sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name));
+}
+
+function cvReadyBar() {
+  const has = !!(STATE.cvFileB64 && STATE.cvFileMeta);
+  const name = STATE.cvFileMeta?.name || "";
+  if (has) {
+    return `<div class="card" style="padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-color:rgba(74,222,128,0.35)">
+      <div style="min-width:0"><div style="font-size:12px;font-weight:700;color:var(--ok)">✅ ${tx("CV ready", "履歴書準備完了")}</div>
+      <div class="sub" style="margin:0;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(name)}</div></div>
+      <button type="button" class="btn secondary sm" data-dl-cv style="flex-shrink:0">${tx("Download CV", "履歴書DL")}</button>
+    </div>`;
+  }
+  return `<div class="card" style="padding:10px 12px">
+    <div style="font-size:12px;font-weight:700">${tx("No CV stored yet", "履歴書未保存")}</div>
+    <p class="sub" style="margin:4px 0 8px;font-size:11px">${tx("Upload a PDF on Home so you can download it in one tap when applying.", "ホームでPDFをアップロードすると、応募時にワンタップでダウンロードできます。")}</p>
+    <button type="button" class="btn secondary sm" data-go-upload>${tx("Upload resume", "履歴書をアップロード")}</button>
+  </div>`;
+}
+
 function renderSourceCard(s, kind) {
   const verified = typeof VERIFIED_IDS !== "undefined" && VERIFIED_IDS.includes(s.id);
   const href = s.q ? s.q + srcQuery() : s.url;
@@ -1769,7 +1906,7 @@ function renderSourceCard(s, kind) {
         <div class="job-title" style="font-size:15px">${esc(s.name)}</div>
         <p class="sub" style="margin-top:4px;font-size:12px">${esc(tx(s.en, s.jp))}</p>
       </div>
-      <a class="btn primary sm" href="${esc(safeUrl(href))}" target="_blank" rel="noopener" data-src-open="${kind}" style="flex-shrink:0;min-height:36px">${s.q ? tx("Search", "検索") : (kind === "agency" ? tx("Register", "登録") : tx("Website", "サイト"))}</a>
+      <a class="btn primary sm" href="${esc(safeUrl(href))}" target="_blank" rel="noopener" data-src-open="${kind}" style="flex-shrink:0;min-height:36px">${kind === "easy" ? tx("Open & apply", "開いて応募") : (s.q ? tx("Search", "検索") : (kind === "agency" ? tx("Register", "登録") : tx("Website", "サイト")))}</a>
     </div>
     ${tags ? `<div class="job-meta" style="margin-top:6px">${tags}</div>` : ""}
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:11px">
@@ -1810,12 +1947,13 @@ function renderNoteCard() {
 
 function renderEasyTab() {
   return `
+  ${cvReadyBar()}
   <div class="card">
-    <div style="font-size:13px;font-weight:700">${tx("🚀 Easy Apply / Resume Upload", "🚀 簡単応募 / 履歴書アップロード")}</div>
-    <p class="sub" style="margin-top:4px">${tx("Explore direct-apply filters, resume/profile registration and employer application pages. The application method varies by job; verify before applying.", "直接応募フィルター、履歴書・プロフィール登録、企業の応募ページを確認できます。応募方法は求人ごとに異なるため、応募前に確認してください。")}</p>
+    <div style="font-size:13px;font-weight:700">${tx("🚀 Easy Apply / Resume Upload (ranked)", "🚀 簡単応募 / 履歴書アップロード（優先順）")}</div>
+    <p class="sub" style="margin-top:4px">${tx("Top boards first: Easy Apply + resume upload. Open the board, paste your note, upload your CV.", "上位はEasy Apply・履歴書アップロード対応。サイトを開き、応募文を貼り付け、履歴書をアップロード。")}</p>
   </div>
-  <div class="card" style="padding:12px"><p class="sub" style="margin:0">${tx("Important: a job-board link is not proof of Easy Apply or CV upload. Only the individual vacancy page can confirm its application method.", "重要：求人サイトへのリンクだけではEasy Applyや履歴書アップロード対応を保証しません。実際の求人ページで応募方法を確認してください。")}</p></div>
-  <div style="margin-top:10px">${renderSourceGroups(EASY_APPLY_SOURCES, "easy")}</div>
+  <div class="card" style="padding:12px"><p class="sub" style="margin:0">${tx("Important: a link is not proof of one-click apply. Always verify the vacancy page.", "重要：リンクだけではワンクリック応募を保証しません。必ず求人ページで確認してください。")}</p></div>
+  <div style="margin-top:10px">${renderSourceGroups(sortedEasySources(), "easy")}</div>
   ${renderNoteCard()}`;
 }
 
@@ -1910,6 +2048,8 @@ function wireSources() {
   $$("[data-src-open]").forEach(a => a.addEventListener("click", () => {
     // Opening a source never counts as an application; no state change.
   }));
+  $$("[data-dl-cv]").forEach(b => b.addEventListener("click", () => downloadMyCV()));
+  $$("[data-go-upload]").forEach(b => b.addEventListener("click", () => { setView("landing"); }));
   $$("[data-daily]").forEach(b => b.addEventListener("click", () => {
     const c = bumpDaily(b.dataset.daily === "+1" ? 1 : -1);
     render();
@@ -2815,6 +2955,20 @@ function wireLanding() {
 async function handleFile(f) {
   say(t("reading"), 1);
   try {
+    // Keep original file for one-tap download when applying
+    try {
+      if (f.size < 1800000) { // ~1.8MB limit for localStorage safety
+        const buf = await f.arrayBuffer();
+        const bytes = new Uint8Array(buf);
+        let binary = "";
+        for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+        STATE.cvFileMeta = { name: f.name || "resume.pdf", type: f.type || "application/pdf", size: f.size };
+        STATE.cvFileB64 = btoa(binary);
+      } else {
+        STATE.cvFileMeta = { name: f.name || "resume.pdf", type: f.type || "application/pdf", size: f.size, tooLarge: true };
+        STATE.cvFileB64 = null;
+      }
+    } catch (_) { STATE.cvFileB64 = null; }
     let text = "";
     if (f.type === "application/pdf" || /\.pdf$/i.test(f.name)) text = await extractPdfText(f);
     else text = await f.text();
