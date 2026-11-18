@@ -1,24 +1,21 @@
-# FindJob Now V9.1.0
+# FindJob Now V9.1.1
 
-Real Japan job search + **one-tap apply helpers**  
-PWA · GitHub Pages · Free · Private · iPhone-friendly
+## Fixes in this build
+- **GaijinPot** broken search URL fixed (`/en/job?keywords=`)
+- **Easy Apply tab first** (main target)
+- **Live jobs** tab renamed (was Matches) — this is where real vacancy cards with **Apply now** appear
+- Clearer messaging: Easy Apply boards open search/apply sites; Live jobs = specific positions from employer feeds
+- More **Greenhouse** company boards for Japan-eligible live listings (Airbnb, Stripe, Figma, Mercari, Cloudflare, Nintendo, Datadog, …)
 
-**Live:** https://rafattky-eng.github.io/findjobnow/
+## How to use (high priority path)
+1. Upload your PDF once (Home).
+2. **Easy Apply** tab → open a board that supports Easy Apply / CV upload → pick a job on that site.
+3. **Live jobs** tab → Refresh → open a real vacancy card → **Apply now** (note copied + page opens) or **Email apply** / **My CV**.
 
-## New in V9.1.0
-- **Apply now** on every real vacancy: copies application note + opens job page
-- **Email apply**: opens Mail with note pre-filled (attach CV in Mail app)
-- **My CV / Download CV**: after you upload a PDF once, download it in one tap when a form asks for it
-- **CV ready** bar on Easy Apply tab
-- Easy Apply boards **ranked** (Easy Apply + resume upload first)
-- Hero & messaging focused on finding jobs and applying with your CV
-- Still a single `app.js` (minimal file count)
+## Limit (honest)
+Japan boards (GaijinPot, CareerCross, Daijob, etc.) do not publish open APIs. The app cannot list their individual jobs as cards without scraping (not allowed).  
+Live job cards come from public employer feeds (Greenhouse + remote feeds filtered for Japan).
 
-## Honest limit
-True automatic form-fill on LinkedIn / Indeed / employer sites is not possible from a static site.  
-“Apply now” prepares the note and opens the page so you only need to upload the CV and submit.
+Deploy → hard-refresh for service worker `fj-v9.1.1`.
 
-## Deploy
-Unzip → push to GitHub Pages repo → hard-refresh on iPhone (`fj-v9.1.0`).
-
-Copyright © 2026 Rafat Kotaki. All rights reserved.
+Copyright © 2026 Rafat Kotaki.

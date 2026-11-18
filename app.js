@@ -1,6 +1,6 @@
 // FindJob Now V9.0.3 — single-file bundle (storage, i18n, data, engines, UI)
 // FindJob Now V7.1 — Local storage & state
-const APP_VERSION = "9.1.0";
+const APP_VERSION = "9.1.1";
 const DNA_ENGINE_VERSION = 7;
 const STORAGE_KEY = "fj2_state";
 
@@ -946,7 +946,7 @@ function finalizeWizard() {
 const JAPAN_BOARDS = [
   { id: "careercross", name: "CareerCross", url: "https://www.careercross.com/en/", q: "https://www.careercross.com/en/job-search?keywords=" },
   { id: "daijob", name: "Daijob", url: "https://www.daijob.com/en/", q: "https://www.daijob.com/jobs/search?job_search_form_with_keyword%5Bkeyword%5D=" },
-  { id: "gaijinpot", name: "GaijinPot", url: "https://jobs.gaijinpot.com/en/", q: "https://jobs.gaijinpot.com/job/index/lang/en?job_key=" },
+  { id: "gaijinpot", name: "GaijinPot", url: "https://jobs.gaijinpot.com/en/", q: "https://jobs.gaijinpot.com/en/job?keywords=" },
   { id: "tokyodev", name: "TokyoDev", url: "https://www.tokyodev.com/", q: "https://www.tokyodev.com/jobs?q=" },
   { id: "japandev", name: "Japan Dev", url: "https://japan-dev.com/", q: "https://japan-dev.com/jobs?query=" },
   { id: "linkedin", name: "LinkedIn Japan", url: "https://www.linkedin.com/jobs/", q: "https://www.linkedin.com/jobs/search/?location=Japan&keywords=" },
@@ -1207,7 +1207,7 @@ function renderJobs() {
   const jobs = STATE.jobs || [];
   const roles = getSearchRoles();
   const q = encodeURIComponent(roles[0] || "jobs");
-  const tab = STATE._jobsTab || "matches";
+  const tab = STATE._jobsTab || "easy";
   const coTab = STATE._coTab || "foreign";
 
   const foreign = FOREIGNER_FRIENDLY_COMPANIES.filter(c => c.type === "foreign-friendly");
@@ -1220,8 +1220,8 @@ function renderJobs() {
 
   <div class="tabs-wrap" id="jobTabsWrap">
   <div class="tabs scroll" id="jobTabs" style="margin-bottom:0">
-    <button type="button" class="tab ${tab === "matches" ? "on" : ""}" data-jtab="matches">${tx("Matches", "マッチ")}</button>
     <button type="button" class="tab ${tab === "easy" ? "on" : ""}" data-jtab="easy">${tx("🚀 Easy Apply", "🚀 簡単応募")}</button>
+    <button type="button" class="tab ${tab === "matches" ? "on" : ""}" data-jtab="matches">${tx("Live jobs", "実求人")}</button>
     <button type="button" class="tab ${tab === "agency" ? "on" : ""}" data-jtab="agency">${tx("🤝 Agencies", "🤝 エージェント")}</button>
     <button type="button" class="tab ${tab === "sme" ? "on" : ""}" data-jtab="sme">${tx("🏢 SME", "🏢 中小企業")}</button>
     <button type="button" class="tab ${tab === "plan" ? "on" : ""}" data-jtab="plan">${tx("🎯 Plan", "🎯 計画")}</button>
@@ -1475,7 +1475,7 @@ const mapGreenhouse = (d, board) => (d.jobs || []).map(j => {
     source: "Greenhouse · " + board
   };
 });
-const GREENHOUSE_BOARDS = ["airbnb", "stripe", "figma", "dropbox", "gitlab", "intercom", "asana", "remotecom", "tripadvisor"];
+const GREENHOUSE_BOARDS = ["airbnb","stripe","figma","dropbox","gitlab","intercom","asana","remotecom","tripadvisor","lyft","coinbase","brex","ramp","gusto","lattice","cultureamp","webflow","contentful","datadog","twilio","smartsheet","airtable","vercel","netlify","cloudflare","nintendo","mercari"];
 const JOBICY_TTL = 6 * 60 * 60 * 1000; // refresh far less often than once/hour
 const REMOTIVE_TTL = 6 * 60 * 60 * 1000; // Remotive advises no more than 4 requests/day
 
@@ -1629,8 +1629,8 @@ const SEARCH_SITES = [
   { n: "Indeed Japan", q: "https://jp.indeed.com/jobs?q=", main: true },
   { n: "CareerCross", q: "https://www.careercross.com/en/job-search?keywords=", main: true },
   { n: "Daijob", q: "https://www.daijob.com/jobs/search?job_search_form_with_keyword%5Bkeyword%5D=", main: true },
-  { n: "GaijinPot Jobs", q: "https://jobs.gaijinpot.com/job/index/lang/en?job_key=", main: true },
-  { n: "Jobs in Japan", q: "https://jobsinjapan.com/jobs/?s=", main: true },
+  { n: "GaijinPot Jobs", q: "https://jobs.gaijinpot.com/en/job?keywords=", main: true },
+  { n: "Jobs in Japan", q: "https://jobsinjapan.com/?s=", main: true },
   { n: "WeXpats Jobs", q: "https://we-xpats.com/en/job/as/jp/?occupation=", main: true },
   { n: "Wantedly", q: "https://www.wantedly.com/projects?q=", main: true },
   { n: "Green Japan", q: "https://www.green-japan.com/search_key/1?key=", main: true },
@@ -1762,9 +1762,9 @@ const EASY_APPLY_SOURCES = [
   { id: "indeed", name: "Indeed Japan (Indeed Apply)", url: "https://jp.indeed.com/", q: "https://jp.indeed.com/jobs?q=", tags: ["easy", "upload"], en: "Indeed Apply on many listings — upload CV once and apply quickly. Others open employer site.", jp: "Indeed Apply対応求人が多い。履歴書を一度アップロードして素早く応募。他は企業サイトへ。" },
   { id: "careercross", name: "CareerCross", url: "https://www.careercross.com/en/", q: "https://www.careercross.com/en/job-search?keywords=", tags: ["upload", "bilingual"], en: "Create profile + upload resume. Recruiters and companies can contact you for bilingual roles.", jp: "プロフィール作成＋履歴書アップロード。バイリンガル求人でリクルーター・企業から連絡あり。" },
   { id: "daijob", name: "Daijob", url: "https://www.daijob.com/en/", q: "https://www.daijob.com/jobs/search?job_search_form_with_keyword%5Bkeyword%5D=", tags: ["upload", "bilingual"], en: "Strong resume database. Upload once; recruiters search and contact you.", jp: "履歴書データベースが強い。一度アップロードするとリクルーターが検索・連絡。" },
-  { id: "gaijinpot", name: "GaijinPot Jobs", url: "https://jobs.gaijinpot.com/en/", q: "https://jobs.gaijinpot.com/job/index/lang/en?job_key=", tags: ["upload", "foreign", "easy"], en: "Foreigner-focused. Many simple apply / CV upload flows.", jp: "外国人向け。簡単な応募・履歴書アップロードが多い。" },
+  { id: "gaijinpot", name: "GaijinPot Jobs", url: "https://jobs.gaijinpot.com/en/", q: "https://jobs.gaijinpot.com/en/job?keywords=", tags: ["upload", "foreign", "easy"], en: "Foreigner-focused. Many simple apply / CV upload flows.", jp: "外国人向け。簡単な応募・履歴書アップロードが多い。" },
   { id: "jobsinjapan", name: "Jobs in Japan", url: "https://jobsinjapan.com/", tags: ["easy", "upload", "foreign"], en: "Simple applications and resume upload for foreign residents.", jp: "在日外国人向けの簡単応募・履歴書アップロード。" },
-  { id: "wexpats", name: "WeXpats Jobs", url: "https://we-xpats.com/en/job/as/jp", tags: ["upload", "foreign"], en: "Profile + resume for foreign job seekers in Japan.", jp: "外国人求職者向けプロフィール＋履歴書登録。" },
+  { id: "wexpats", name: "WeXpats Jobs", url: "https://we-xpats.com/en/job/as/jp/", tags: ["upload", "foreign"], en: "Profile + resume for foreign job seekers in Japan.", jp: "外国人求職者向けプロフィール＋履歴書登録。" },
   { id: "green", name: "Green (IT / startup)", url: "https://www.green-japan.com/", tags: ["upload", "sme"], en: "IT & startup. Profile system with resume; companies contact you.", jp: "IT・スタートアップ。プロフィール＋履歴書。企業から連絡。" },
   { id: "wantedly", name: "Wantedly", url: "https://www.wantedly.com/", q: "https://www.wantedly.com/projects?q=", tags: ["sme", "easy"], en: "Often “talk to us” / casual apply. Good for startups; not always full CV upload.", jp: "「話を聞きに行きたい」型が多い。スタートアップ向き。フル履歴書アップロードではない場合あり。" },
   { id: "tokyodev", name: "TokyoDev", url: "https://www.tokyodev.com/", q: "https://www.tokyodev.com/jobs?q=", tags: ["upload", "foreign"], en: "English-friendly tech jobs in Japan. Many accept direct CV / apply form.", jp: "英語歓迎の日本テック求人。直接履歴書・応募フォームが多い。" },
@@ -1798,7 +1798,7 @@ const SME_SOURCES = [
   { id: "japandev2", name: "Japan Dev", url: "https://japan-dev.com/", q: "https://japan-dev.com/jobs?query=", en: "English-friendly tech companies of all sizes.", jp: "英語対応のテック企業（規模問わず）。" },
   { id: "hellowork", name: "Hello Work", url: "https://www.hellowork.mhlw.go.jp/", en: "Government board. Mostly small & regional employers.", jp: "公共職業安定所。中小・地方企業が中心。" },
   { id: "engage", name: "Engage (en-japan)", url: "https://en-gage.net/", en: "Free for SMEs to post, so lots of small employers.", jp: "中小企業が無料で掲載。小規模企業が多い。" },
-  { id: "wexpats", name: "WeXpats Jobs", url: "https://we-xpats.com/en/job/as/jp", tags: ["foreign"], en: "20,000+ jobs for foreigners in Japan, incl. small & mid-size firms. (Added)", jp: "外国人向け求人2万件以上。中小企業も多数。（追加）" },
+  { id: "wexpats", name: "WeXpats Jobs", url: "https://we-xpats.com/en/job/as/jp/", tags: ["foreign"], en: "20,000+ jobs for foreigners in Japan, incl. small & mid-size firms. (Added)", jp: "外国人向け求人2万件以上。中小企業も多数。（追加）" },
   { id: "indeed2", name: "Indeed Japan", url: "https://jp.indeed.com/", q: "https://jp.indeed.com/jobs?q=", en: "Filter by small company / region in the site.", jp: "サイト内で中小企業・地域を絞り込み。" },
   { id: "doda", name: "doda", url: "https://doda.jp/", en: "Large board with many mid-size firms. (Added)", jp: "中堅企業の求人が多い。（追加）" },
   { id: "mynavi", name: "Mynavi Global", url: "https://global.mynavi.jp/", en: "Mid-size Japanese firms hiring foreigners. (Added)", jp: "外国人採用に積極的な中堅企業。（追加）" }
@@ -1949,10 +1949,13 @@ function renderEasyTab() {
   return `
   ${cvReadyBar()}
   <div class="card">
-    <div style="font-size:13px;font-weight:700">${tx("🚀 Easy Apply / Resume Upload (ranked)", "🚀 簡単応募 / 履歴書アップロード（優先順）")}</div>
-    <p class="sub" style="margin-top:4px">${tx("Top boards first: Easy Apply + resume upload. Open the board, paste your note, upload your CV.", "上位はEasy Apply・履歴書アップロード対応。サイトを開き、応募文を貼り付け、履歴書をアップロード。")}</p>
+    <div style="font-size:13px;font-weight:700">${tx("🚀 Easy Apply boards (open → find job → apply)", "🚀 簡単応募ボード（開く→求人を選ぶ→応募）")}</div>
+    <p class="sub" style="margin-top:4px">${tx("These open job boards that support Easy Apply or CV upload. Pick a board, open a vacancy, then use Apply now / Email / Download CV from this app.", "Easy Applyや履歴書アップロード対応の求人サイトを開きます。求人を選び、このアプリの「今すぐ応募／メール／履歴書DL」を使ってください。")}</p>
   </div>
-  <div class="card" style="padding:12px"><p class="sub" style="margin:0">${tx("Important: a link is not proof of one-click apply. Always verify the vacancy page.", "重要：リンクだけではワンクリック応募を保証しません。必ず求人ページで確認してください。")}</p></div>
+  <div class="card" style="padding:12px;border-color:rgba(244,180,0,0.4)">
+    <p class="sub" style="margin:0;font-weight:600">${tx("Want specific live job cards with Apply now?", "個別の実求人カードで「今すぐ応募」したい？")}</p>
+    <p class="sub" style="margin:6px 0 0">${tx("Use the “Live jobs” tab — vacancies from employer feeds (Greenhouse etc.) with direct Apply buttons.", "「実求人」タブを使ってください。雇主フィード（Greenhouseなど）の求人に直接応募ボタンがあります。")}</p>
+  </div>
   <div style="margin-top:10px">${renderSourceGroups(sortedEasySources(), "easy")}</div>
   ${renderNoteCard()}`;
 }
