@@ -67,17 +67,16 @@ async function fetchCached(url, ttl, mapper) {
   if (hit) return { list: hit, ok: true, cached: true, error: "" };
   try {
     const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 14000);
-    let response;
+    const timer = setTimeout(() => ctrl.abort(), 10000);
     try {
-      response = await fetch(url, { signal: ctrl.signal, headers: { Accept: "application/json" } });
+      const response = await fetch(url, { signal: ctrl.signal, headers: { Accept: "application/json" } });
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      const data = await response.json();
+      if (data && data.success === false) throw new Error(data.error || "Provider returned an error");
+      const list = mapper(data);
+      lcSet(url, list);
+      return { list, ok: true, cached: false, error: "" };
     } finally { clearTimeout(timer); }
-    if (!response.ok) throw new Error("HTTP " + response.status);
-    const data = await response.json();
-    if (data && data.success === false) throw new Error(data.error || "Provider returned an error");
-    const list = mapper(data);
-    lcSet(url, list);
-    return { list, ok: true, cached: false, error: "" };
   } catch (err) {
     return { list: [], ok: false, cached: false, error: err?.name === "AbortError" ? "Timed out" : (err?.message || "Network/CORS error") };
   }
@@ -100,7 +99,7 @@ const mapGreenhouse = (d, board) => (d.jobs || []).map(j => {
   return {
     id: "gh-" + board + "-" + j.id,
     title: j.title,
-    company: board.charAt(0).toUpperCase() + board.slice(1),
+    company: greenhouseCompanyName(board),
     url: j.absolute_url || ("https://boards.greenhouse.io/" + board + "/jobs/" + j.id),
     location: loc,
     description: String((j.metadata || []).map(m => m.value).join(" ") || "").slice(0, 500),
@@ -112,80 +111,149 @@ const GREENHOUSE_BOARDS = ["airbnb", "stripe", "figma", "dropbox", "gitlab", "in
 const JOBICY_TTL = 6 * 60 * 60 * 1000; // refresh far less often than once/hour
 const REMOTIVE_TTL = 6 * 60 * 60 * 1000; // Remotive advises no more than 4 requests/day
 
+const JP_PLACE_RE = /japan|日本|tokyo|東京|osaka|大阪|kyoto|京都|nagoya|名古屋|fukuoka|福岡|yokohama|横浜|kawasaki|川崎|sapporo|札幌|kobe|神戸|hiroshima|広島|sendai|仙台|chiba|千葉|saitama|埼玉|okinawa|沖縄|aichi|愛知|kanagawa|神奈川|hyogo|兵庫|shizuoka|静岡|hokkaido|北海道|ibaraki|茨城|tochigi|栃木|gunma|群馬|niigata|新潟|nagano|長野|gifu|岐阜|mie|三重|shiga|滋賀|nara|奈良|wakayama|和歌山|okayama|岡山|yamaguchi|山口|kumamoto|熊本|kagoshima|鹿児島|nagasaki|長崎|oita|大分|miyazaki|宮崎|aomori|青森|iwate|岩手|akita|秋田|yamagata|山形|fukushima|福島|toyama|富山|ishikawa|石川|fukui|福井|tottori|鳥取|shimane|島根|tokushima|徳島|kagawa|香川|ehime|愛媛|kochi|高知|saga|佐賀/i;
+function isJapanEligibleListing(job) {
+  const location = String(job?.location || "");
+  const detail = `${job?.title || ""} ${job?.description || ""}`;
+  if (JP_PLACE_RE.test(location)) return true;
+  // A remote / worldwide label alone is NOT proof that Japan applicants are eligible.
+  return /(remote|リモート|work from anywhere|worldwide|anywhere)/i.test(location) && JP_PLACE_RE.test(detail);
+}
+function greenhouseCompanyName(slug) {
+  const names = {
+    airbnb: "Airbnb", stripe: "Stripe", figma: "Figma", dropbox: "Dropbox",
+    gitlab: "GitLab", intercom: "Intercom", asana: "Asana",
+    remotecom: "Remote", tripadvisor: "Tripadvisor"
+  };
+  return names[slug] || slug;
+}
 async function searchLiveJobs() {
   if (STATE._liveBusy) return;
   STATE._liveBusy = true;
+  STATE._liveProgress = { done: 0, total: 0 };
   if (STATE.view === "jobs") render();
-  const roles = getSearchRoles().filter(r => r && r !== "jobs in Japan");
+
   const previous = new Set((STATE.jobs || []).map(j => j.id));
   const raw = [];
   const failures = [];
   const sourceResults = [];
-  const GH_TTL = 6 * 60 * 60 * 1000;
-  const requests = [
-    { name: "Jobicy · APAC", url: "https://jobicy.com/api/jobs?count=100&geo=apac", ttl: JOBICY_TTL, mapper: mapJobicy, filter: x => JP_SCOPE.test(x.location || "") },
-    { name: "Jobicy · Anywhere", url: "https://jobicy.com/api/jobs?count=100&geo=anywhere", ttl: JOBICY_TTL, mapper: mapJobicy, filter: x => JP_SCOPE.test(x.location || "") },
-    { name: "Remotive", url: "https://remotive.com/api/remote-jobs?limit=100", ttl: REMOTIVE_TTL, mapper: mapRemotive, filter: x => JP_SCOPE.test(x.location || "") }
-  ];
-  // Greenhouse public boards — filter to Japan / Tokyo / Japan-eligible locations
-  GREENHOUSE_BOARDS.forEach(board => {
-    requests.push({
-      name: "Greenhouse · " + board,
-      url: "https://boards-api.greenhouse.io/v1/boards/" + board + "/jobs",
-      ttl: GH_TTL,
-      mapper: d => mapGreenhouse(d, board),
-      filter: x => /japan|tokyo|大阪|osaka|kyoto|nagoya|fukuoka|日本|横浜|yokohama/i.test(x.location || "") || /japan|tokyo/i.test(x.title || "")
+  let requests = [];
+
+  try {
+    const roles = getSearchRoles().filter(r => r && r !== "jobs in Japan");
+    const GH_TTL = 6 * 60 * 60 * 1000;
+    requests = [
+      { name: "Jobicy · APAC", url: "https://jobicy.com/api/jobs?count=100&geo=apac", ttl: JOBICY_TTL, mapper: mapJobicy, filter: isJapanEligibleListing },
+      { name: "Jobicy · Anywhere", url: "https://jobicy.com/api/jobs?count=100&geo=anywhere", ttl: JOBICY_TTL, mapper: mapJobicy, filter: isJapanEligibleListing },
+      { name: "Remotive", url: "https://remotive.com/api/remote-jobs?limit=100", ttl: REMOTIVE_TTL, mapper: mapRemotive, filter: isJapanEligibleListing }
+    ];
+
+    // Public Greenhouse boards. Only listings with a clear Japan location qualify.
+    GREENHOUSE_BOARDS.forEach(board => {
+      requests.push({
+        name: "Greenhouse · " + greenhouseCompanyName(board),
+        url: "https://boards-api.greenhouse.io/v1/boards/" + board + "/jobs",
+        ttl: GH_TTL,
+        mapper: d => mapGreenhouse(d, board),
+        filter: isJapanEligibleListing
+      });
     });
-  });
-  const results = await Promise.all(requests.map(async source => {
-    const r = await fetchCached(source.url, source.ttl, source.mapper);
-    sourceResults.push({ name: source.name, ok: r.ok, cached: !!r.cached, count: r.list.length, error: r.error || "" });
-    if (!r.ok) failures.push(source.name + ": " + r.error);
-    r.list.filter(source.filter).forEach(x => raw.push({ x, src: x.source || source.name.split(" · ")[0] }));
-    return r;
-  }));
 
-  const targetRoles = roles.length ? roles : [""];
-  const byKey = new Map();
-  raw.forEach(({ x, src }) => {
-    const clean = { title: stripHtml(x.title), description: stripHtml(x.description) };
-    const matched = targetRoles.filter(role => !role || jobRelevantTo(clean, role));
-    if (!matched.length) return;
-    const canonical = String(x.url || "").split("?")[0].replace(/\/$/, "");
-    const key = String(x.id || (clean.title + "|" + x.company + "|" + x.location + "|" + canonical)).toLowerCase();
-    if (byKey.has(key)) {
-      const existing = byKey.get(key);
-      matched.forEach(m => { if (m && !existing.roles.includes(m)) existing.roles.push(m); });
-      return;
+    STATE._liveProgress.total = requests.length;
+    if (STATE.view === "jobs") render();
+
+    // Each source has its own timeout; one unavailable feed must never block the others.
+    const settled = await Promise.all(requests.map(async source => {
+      try {
+        const r = await fetchCached(source.url, source.ttl, source.mapper);
+        const accepted = (r.list || []).filter(source.filter);
+        sourceResults.push({
+          name: source.name, ok: !!r.ok, cached: !!r.cached,
+          count: accepted.length, error: r.error || ""
+        });
+        if (!r.ok) failures.push(source.name + ": " + (r.error || "Unavailable"));
+        accepted.forEach(x => raw.push({ x, src: x.source || source.name }));
+        return r;
+      } catch (err) {
+        sourceResults.push({ name: source.name, ok: false, cached: false, count: 0, error: err?.message || "Source error" });
+        failures.push(source.name + ": " + (err?.message || "Source error"));
+        return { list: [], ok: false };
+      } finally {
+        STATE._liveProgress.done += 1;
+        if (STATE.view === "jobs") {
+          if (STATE._liveProgress.done === STATE._liveProgress.total || STATE._liveProgress.done % 3 === 0) render();
+          const label = tx(
+            `Checking job sources… ${STATE._liveProgress.done}/${STATE._liveProgress.total}`,
+            `求人ソースを確認中… ${STATE._liveProgress.done}/${STATE._liveProgress.total}`
+          );
+          jobSay(label, 1);
+        }
+      }
+    }));
+
+    const targetRoles = roles.length ? roles : [""];
+    const byKey = new Map();
+    raw.forEach(({ x, src }) => {
+      const clean = { title: stripHtml(x.title), description: stripHtml(x.description) };
+      const matched = targetRoles.filter(role => !role || jobRelevantTo(clean, role));
+      if (!matched.length) return;
+      const canonical = String(x.url || "").split("?")[0].replace(/\/$/, "");
+      const key = String(x.id || (clean.title + "|" + x.company + "|" + x.location + "|" + canonical)).toLowerCase();
+      if (byKey.has(key)) {
+        const existing = byKey.get(key);
+        matched.forEach(m => { if (m && !existing.roles.includes(m)) existing.roles.push(m); });
+        return;
+      }
+      if (!x.title || !x.company || !/^https?:\/\//i.test(String(x.url || ""))) return;
+      const job = enrichJob(x, src);
+      job.roles = matched.filter(Boolean);
+      job.url = x.url;
+      job.location = x.location || "Not specified";
+      job.language = /[\u3000-\u30ff\u3400-\u9fff]/.test((x.title || "") + " " + (x.description || "")) ? "Japanese" : "English / Unknown";
+      job.applicationMethod = "Application method not verified";
+      byKey.set(key, job);
+    });
+
+    // Strict Japan eligibility is checked again after normalization.
+    let list = [...byKey.values()].filter(j => isJapanEligibleListing(j) && locationAllowed(j));
+    list.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0) || String(b.posted).localeCompare(String(a.posted)));
+    list = list.slice(0, 80);
+
+    const stat = {};
+    list.forEach(j => { stat[j.source] = (stat[j.source] || 0) + 1; });
+    const fresh = list.filter(j => !previous.has(j.id)).length;
+    const successCount = sourceResults.filter(x => x.ok).length;
+    STATE.jobs = list;
+    STATE._liveInfo = {
+      at: Date.now(), total: list.length, fresh, stat,
+      failures, hadPrev: previous.size > 0,
+      sources: sourceResults, sourceCount: requests.length, successCount,
+      cached: sourceResults.some(x => x.cached), searchLinks: SEARCH_SITES.length
+    };
+    persist();
+
+    if (list.length) {
+      jobSay(tx(`${list.length} Japan-eligible vacancies matched · ${fresh} new`, `日本で応募可能な求人 ${list.length}件 · 新着 ${fresh}件`), 1);
+    } else if (!successCount) {
+      jobSay(tx("Job feeds could not be reached. Check the source errors below and try again.", "求人フィードに接続できませんでした。下のエラーを確認して再試行してください。"), 0);
+    } else {
+      jobSay(tx("Search completed: no Japan-eligible vacancies matched these roles in the connected feeds. This does not mean Japan has no vacancies.", "検索完了：接続済みフィードでは条件に合う日本の求人がありませんでした。日本に求人がないという意味ではありません。"), 0);
     }
-    if (!x.title || !x.company || !/^https?:\/\//i.test(String(x.url || ""))) return;
-    const job = enrichJob(x, src);
-    job.roles = matched.filter(Boolean);
-    job.url = x.url;
-    job.location = x.location || "Not specified";
-    job.language = /[\u3000-\u30ff\u3400-\u9fff]/.test((x.title || "") + " " + (x.description || "")) ? "Japanese" : "English / Unknown";
-    job.applicationMethod = "Application method not verified";
-    byKey.set(key, job);
-  });
-
-  let list = [...byKey.values()].filter(locationAllowed);
-  list.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0) || String(b.posted).localeCompare(String(a.posted)));
-  list = list.slice(0, 80);
-  const stat = {};
-  list.forEach(j => { stat[j.source] = (stat[j.source] || 0) + 1; });
-  const fresh = list.filter(j => !previous.has(j.id)).length;
-  const successCount = sourceResults.filter(x => x.ok).length;
-  STATE.jobs = list;
-  STATE._liveInfo = {
-    at: Date.now(), total: list.length, fresh, stat, failed, hadPrev: previous.size > 0,
-    sources: sourceResults, sourceCount: requests.length, successCount,
-    cached: sourceResults.some(x => x.cached), searchLinks: SEARCH_SITES.length
-  };
-  STATE._liveBusy = false;
-  persist();
-  if (list.length) jobSay(tx(`${list.length} matched remote listings · ${fresh} new`, `関連リモート求人 ${list.length}件 · 新着 ${fresh}件`), 1);
-  else jobSay(tx("No feed matches. Use the Japan job-board searches below; feed errors are shown here.", "フィードに一致する求人はありません。下の日本求人検索を利用してください。エラーも表示します。"), 0);
-  if (STATE.view === "jobs") render();
+  } catch (err) {
+    STATE._liveInfo = {
+      at: Date.now(), total: 0, fresh: 0, stat: {},
+      failures: [...failures, "Search error: " + (err?.message || "Unexpected error")],
+      sources: sourceResults, sourceCount: requests.length,
+      successCount: sourceResults.filter(x => x.ok).length, cached: false,
+      searchLinks: SEARCH_SITES.length
+    };
+    jobSay(tx("Search stopped safely. Please try again; the error is shown in Feed status.", "検索を安全に停止しました。再試行してください。エラーはフィード状況に表示されます。"), 0);
+  } finally {
+    STATE._liveBusy = false;
+    STATE._liveProgress = null;
+    try { persist(); } catch (_) {}
+    if (STATE.view === "jobs") render();
+  }
 }
 /* ---------- per-role search shortcuts (real result pages) ---------- */
 const SEARCH_SITES = [
@@ -230,8 +298,11 @@ function renderRolePicker(withAll) {
 /* ---------- Matches tab ---------- */
 function liveInfoLine() {
   const i = STATE._liveInfo;
-  if (STATE._liveBusy) return `<p class="sub">⏳ ${tx("Checking independent job feeds…", "求人フィードを個別に確認中…")}</p>`;
-  if (!i) return `<p class="sub">${tx("Tap Refresh to check live remote feeds. Japan job-board search links are available below.", "更新を押してリモート求人を確認。日本の求人サイト検索は下にあります。")}</p>`;
+  if (STATE._liveBusy) {
+    const p = STATE._liveProgress || { done: 0, total: 0 };
+    return `<p class="sub">⏳ ${tx(`Checking job sources… ${p.done}/${p.total}`, `求人ソースを確認中… ${p.done}/${p.total}`)}</p>`;
+  }
+  if (!i) return `<p class="sub">${tx("Tap Refresh to search public feeds for Japan-eligible vacancies. Japan job-board search links are separate.", "更新を押してリモート求人を確認。日本の求人サイト検索は下にあります。")}</p>`;
   const time = new Date(i.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   const status = (i.sources || []).map(x => `<div class="sub" style="margin:3px 0">${x.ok ? "✓" : "⚠"} ${esc(x.name)} · ${x.ok ? (x.cached ? tx("Cached", "キャッシュ") : tx("Responded", "応答")) + " · " + x.count : esc(x.error)}</div>`).join("");
   return `<div class="card" style="padding:12px;margin:8px 0">
@@ -277,11 +348,11 @@ function renderMatchesTab() {
     <p class="sub" style="margin:10px 0 6px">${tx("Verified vacancies from employer feeds", "雇主フィードからの確認済み求人")} · ${list.length}${list.length !== byRole.length ? "/" + byRole.length : ""}</p>
     ${list.map(renderJobCard).join("")}`
   : `<div class="card" style="text-align:center;padding:20px">
-      <p class="muted">${byRole.length ? tx("No jobs match the current filters. Try broadening the filters.", "現在の条件に一致する求人はありません。条件を広げてください。") : tx("No verified remote-feed vacancies matched these roles in this check. This does not mean there are no Japan vacancies.", "今回のリモート求人フィードでは一致する求人を確認できませんでした。日本の求人がないという意味ではありません。")}</p>
+      <p class="muted">${byRole.length ? tx("No jobs match the current filters. Try broadening the filters.", "現在の条件に一致する求人はありません。条件を広げてください。") : tx("No verified Japan-eligible vacancies matched these roles in this check. This does not mean there are no Japan vacancies.", "今回のリモート求人フィードでは一致する求人を確認できませんでした。日本の求人がないという意味ではありません。")}</p>
       <p class="sub" style="margin-top:8px">${tx("Try related titles or search Japan job boards directly below. Search links are not counted as vacancy listings.", "関連職種で検索するか、下の日本求人サイトを直接検索してください。検索リンクは求人件数に含みません。")}</p>
       <div class="chip-row">${searchButtons(active, true)}</div>
     </div>`}
-  <p class="sub" style="margin-top:10px">${tx("Structured feeds: Greenhouse (employer boards with Japan locations) + Jobicy/Remotive (remote). Japan on-site vacancies are also searched via official board links below.", "構造化フィードはJobicy・Remotiveのリモート求人です。日本の現地求人は上の公式求人サイトで検索してください。")}</p>`;
+  <p class="sub" style="margin-top:10px">${tx("Structured feeds: Greenhouse employer boards + Jobicy/Remotive, filtered to explicit Japan locations or remote roles that explicitly accept Japan-based applicants.", "構造化フィードはJobicy・Remotiveのリモート求人です。日本の現地求人は上の公式求人サイトで検索してください。")}</p>`;
 }
 
 /* ---------- Boards tab ---------- */

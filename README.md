@@ -1,4 +1,4 @@
-# FindJob Now V9.0.0
+# FindJob Now V9.0.1
 
 **Real Japan job search + direct application assistant**  
 Progressive Web App · GitHub Pages · Free · Private · iPhone-friendly
@@ -7,7 +7,7 @@ Live site: https://rafattky-eng.github.io/findjobnow/
 
 ---
 
-## What this version does
+## V9.0.1 search hotfix\n\nThis build fixes the V9.0.0 defect that left the search button on “Searching…” after feed requests completed. It also guarantees that the busy state resets after unexpected errors, shows feed progress, and requires explicit Japan location eligibility rather than accepting APAC / worldwide labels alone. See `CHANGELOG-V9.0.1.md` and `TEST-REPORT-V9.0.1.md`.\n\n## What this version does
 
 1. Lets you upload (or paste) a CV and extract key information locally.
 2. Lets you select one or many target roles (including Select All).
