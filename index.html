@@ -26,13 +26,13 @@
       <img src="./icon-192.png" alt="FindJob Now" class="logo-img" width="36" height="36">
       FindJob Now
     </div>
-    <div class="header-actions">
-      <div class="lang-switch" role="group" aria-label="Language">
-        <button type="button" id="btnEn" class="active" aria-pressed="true">EN</button>
-        <button type="button" id="btnJp" aria-pressed="false">JP</button>
+    <div class="header-actions" role="group" aria-label="Language and tools">
+      <div class="header-cube">
+        <button type="button" id="btnEn" class="cube-btn lang active" aria-pressed="true" title="English">EN</button>
+        <button type="button" id="btnJp" class="cube-btn lang" aria-pressed="false" title="日本語">JP</button>
+        <button type="button" id="btnRestart" class="cube-btn" aria-label="Start over" title="Start over">🔄</button>
+        <button type="button" id="btnBackup" class="cube-btn" aria-label="Backup" title="Backup (long-press to restore)">💾</button>
       </div>
-      <button class="icon-btn" id="btnRestart" type="button" aria-label="Start over" title="Start over">🔄</button>
-      <button class="icon-btn" id="btnBackup" type="button" aria-label="Backup" title="Backup (long-press to restore)">💾</button>
     </div>
   </header>
 
@@ -62,7 +62,7 @@
   </nav>
   <footer class="app-footer" id="appFooter">
     <div>© 2026 Rafat Kotaki. All rights reserved.</div>
-    <div>FindJob Now · v9.0.1</div>
+    <div>FindJob Now · v9.0.2</div>
   </footer>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>

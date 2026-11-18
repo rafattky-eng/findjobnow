@@ -2,22 +2,21 @@
 // q = search URL prefix (role appended). Where no reliable search URL exists, q is omitted and the site home opens.
 
 const EASY_APPLY_SOURCES = [
-  { id: "linkedin", name: "LinkedIn Easy Apply", url: "https://www.linkedin.com/jobs/", q: "https://www.linkedin.com/jobs/search/?location=Japan&f_AL=true&keywords=", tags: ["easy", "upload"], en: "Easy Apply filter. Availability and required steps vary by vacancy; verify on LinkedIn.", jp: "Easy Applyフィルター。応募手順は求人ごとに異なるため、LinkedIn上で確認してください。" },
-  { id: "indeed", name: "Indeed Japan", url: "https://jp.indeed.com/", q: "https://jp.indeed.com/jobs?q=", tags: ["upload"], en: "Some vacancies offer Indeed Apply; others redirect to the employer. Check each vacancy.", jp: "Indeed Apply対応求人もありますが、企業サイトへ移動する求人もあります。求人ごとに確認。" },
-  { id: "careercross", name: "CareerCross", url: "https://www.careercross.com/en/", q: "https://www.careercross.com/en/job-search?keywords=", tags: ["upload", "bilingual"], en: "Bilingual jobs. Recruiters can see your profile.", jp: "バイリンガル求人。採用担当者がプロフィールを閲覧。" },
-  { id: "daijob", name: "Daijob", url: "https://www.daijob.com/en/", q: "https://www.daijob.com/jobs/search?job_search_form_with_keyword%5Bkeyword%5D=", tags: ["upload", "bilingual"], en: "Resume database. Recruiters contact you.", jp: "履歴書データベース。リクルーターから連絡。" },
-  { id: "jobsinjapan", name: "Jobs in Japan", url: "https://jobsinjapan.com/", tags: ["easy", "foreign"], en: "Foreigner-friendly jobs, simple applications.", jp: "外国人歓迎の求人。簡単に応募。" },
-  { id: "gaijinpot", name: "GaijinPot Jobs", url: "https://jobs.gaijinpot.com/en/", q: "https://jobs.gaijinpot.com/job/index/lang/en?job_key=", tags: ["upload", "foreign"], en: "Popular with foreign job seekers.", jp: "外国人求職者に人気。" },
-  { id: "wexpats-e", name: "WeXpats Jobs", url: "https://we-xpats.com/en/job/as/jp", tags: ["upload", "foreign"], en: "Foreigner-focused board with profile + consultation. (Added)", jp: "外国人向け求人サイト。プロフィール登録・相談あり。（追加）" },
-  { id: "wantedly", name: "Wantedly", url: "https://www.wantedly.com/", q: "https://www.wantedly.com/projects?q=", tags: ["sme"], en: "Often an expression of interest / casual meeting request, not one-click Easy Apply.", jp: "「話を聞きに行きたい」などのカジュアル面談希望。ワンクリック応募ではありません。" },
-  { id: "green", name: "Green Japan", url: "https://www.green-japan.com/", tags: ["upload", "sme"], en: "IT & startup jobs with profile system.", jp: "IT・スタートアップ求人。プロフィール登録。" },
-  { id: "openwork", name: "OpenWork", url: "https://www.openwork.jp/", tags: [], en: "Company reviews and job discovery; application route varies.", jp: "企業口コミ・求人検索。応募方法は求人ごとに異なります。" },
-  { id: "bizreach2", name: "BizReach", url: "https://www.bizreach.jp/", tags: [], en: "Experienced-professional / headhunter platform; registration required.", jp: "経験者向けスカウト・ヘッドハンタープラットフォーム。登録が必要です。" },
-  { id: "doda2", name: "doda", url: "https://doda.jp/", tags: [], en: "Large Japanese job board; Japanese ability may be needed.", jp: "大手日本語求人サイト。日本語力が必要な場合があります。" },
-  { id: "hellowork2", name: "Hello Work", url: "https://www.hellowork.mhlw.go.jp/", tags: [], en: "Official public employment service; Japanese-language support may be limited.", jp: "公的職業紹介サービス。外国語対応には限りがあります。" },
-  { id: "mynaviglobal", name: "Mynavi Global", url: "https://global.mynavi.jp/", tags: [], en: "Global / foreign talent recruitment information.", jp: "グローバル人材・外国人採用情報。" },
-  { id: "tokyodevjobs", name: "TokyoDev", url: "https://www.tokyodev.com/jobs", tags: [], en: "Technology roles; use for software / engineering searches.", jp: "IT・エンジニア職向け。" },
-  { id: "japandevjobs", name: "Japan Dev", url: "https://japan-dev.com/jobs", tags: [], en: "English-friendly technology companies and roles.", jp: "英語対応のテック企業・求人。" }
+  { id: "linkedin", name: "LinkedIn Easy Apply", url: "https://www.linkedin.com/jobs/", q: "https://www.linkedin.com/jobs/search/?location=Japan&f_AL=true&keywords=", tags: ["easy", "upload"], en: "Use Easy Apply filter. Many Japan roles accept 1-click or CV upload. Verify each vacancy.", jp: "Easy Applyフィルターを使用。日本の求人の多くが1クリックまたは履歴書アップロード対応。求人ごとに確認。" },
+  { id: "indeed", name: "Indeed Japan (Indeed Apply)", url: "https://jp.indeed.com/", q: "https://jp.indeed.com/jobs?q=", tags: ["easy", "upload"], en: "Indeed Apply on many listings — upload CV once and apply quickly. Others open employer site.", jp: "Indeed Apply対応求人が多い。履歴書を一度アップロードして素早く応募。他は企業サイトへ。" },
+  { id: "careercross", name: "CareerCross", url: "https://www.careercross.com/en/", q: "https://www.careercross.com/en/job-search?keywords=", tags: ["upload", "bilingual"], en: "Create profile + upload resume. Recruiters and companies can contact you for bilingual roles.", jp: "プロフィール作成＋履歴書アップロード。バイリンガル求人でリクルーター・企業から連絡あり。" },
+  { id: "daijob", name: "Daijob", url: "https://www.daijob.com/en/", q: "https://www.daijob.com/jobs/search?job_search_form_with_keyword%5Bkeyword%5D=", tags: ["upload", "bilingual"], en: "Strong resume database. Upload once; recruiters search and contact you.", jp: "履歴書データベースが強い。一度アップロードするとリクルーターが検索・連絡。" },
+  { id: "gaijinpot", name: "GaijinPot Jobs", url: "https://jobs.gaijinpot.com/en/", q: "https://jobs.gaijinpot.com/job/index/lang/en?job_key=", tags: ["upload", "foreign", "easy"], en: "Foreigner-focused. Many simple apply / CV upload flows.", jp: "外国人向け。簡単な応募・履歴書アップロードが多い。" },
+  { id: "jobsinjapan", name: "Jobs in Japan", url: "https://jobsinjapan.com/", tags: ["easy", "upload", "foreign"], en: "Simple applications and resume upload for foreign residents.", jp: "在日外国人向けの簡単応募・履歴書アップロード。" },
+  { id: "wexpats", name: "WeXpats Jobs", url: "https://we-xpats.com/en/job/as/jp", tags: ["upload", "foreign"], en: "Profile + resume for foreign job seekers in Japan.", jp: "外国人求職者向けプロフィール＋履歴書登録。" },
+  { id: "green", name: "Green (IT / startup)", url: "https://www.green-japan.com/", tags: ["upload", "sme"], en: "IT & startup. Profile system with resume; companies contact you.", jp: "IT・スタートアップ。プロフィール＋履歴書。企業から連絡。" },
+  { id: "wantedly", name: "Wantedly", url: "https://www.wantedly.com/", q: "https://www.wantedly.com/projects?q=", tags: ["sme", "easy"], en: "Often “talk to us” / casual apply. Good for startups; not always full CV upload.", jp: "「話を聞きに行きたい」型が多い。スタートアップ向き。フル履歴書アップロードではない場合あり。" },
+  { id: "tokyodev", name: "TokyoDev", url: "https://www.tokyodev.com/", q: "https://www.tokyodev.com/jobs?q=", tags: ["upload", "foreign"], en: "English-friendly tech jobs in Japan. Many accept direct CV / apply form.", jp: "英語歓迎の日本テック求人。直接履歴書・応募フォームが多い。" },
+  { id: "japandev", name: "Japan Dev", url: "https://japan-dev.com/", q: "https://japan-dev.com/jobs?q=", tags: ["upload", "foreign"], en: "Developer jobs with clear apply / CV paths.", jp: "開発者向け。明確な応募・履歴書ルート。" },
+  { id: "workjapan", name: "WORK JAPAN", url: "https://workjapan.jp/", tags: ["upload", "foreign"], en: "Jobs for foreigners; profile and apply flows.", jp: "外国人向け求人。プロフィール・応募フローあり。" },
+  { id: "careerjet", name: "Careerjet Japan", url: "https://www.careerjet.jp/", q: "https://www.careerjet.jp/search/jobs?s=", tags: ["upload"], en: "Aggregator — many listings lead to employer apply / CV forms.", jp: "集約サイト。多くの求人が企業の応募・履歴書フォームへ。" },
+  { id: "glassdoor", name: "Glassdoor Japan", url: "https://www.glassdoor.com/Job/japan-jobs-SRCH_IL.0,5_IN123.htm", tags: ["easy", "upload"], en: "Some Easy Apply style and CV upload options (availability varies).", jp: "Easy Apply風・履歴書アップロードがある場合あり（求人による）。" },
+  { id: "reed", name: "Reed Japan (if available)", url: "https://www.reedglobal.com/en-jp", tags: ["upload"], en: "Recruiter-led; submit CV for matching roles.", jp: "リクルーター経由。履歴書提出でマッチング。" }
 ];
 
 const AGENCY_SOURCES = [
@@ -63,20 +62,40 @@ const PRIORITY_ORDER = [
 ];
 
 const STEPS = [
-  ["Create 2 resumes (English + Japanese), save as PDF and DOCX.", "履歴書を2種類（英語・日本語）作成し、PDFとDOCXで保存。"],
-  ["Upload your resume to LinkedIn, CareerCross, Daijob, GaijinPot, Jobs in Japan, Green, Wantedly, Indeed.", "LinkedIn・CareerCross・Daijob・GaijinPot・Jobs in Japan・Green・Wantedly・Indeedに履歴書を登録。"],
-  ["Register with Recruit Agent, JAC, Robert Walters, Hays, Michael Page — one recruiter can submit you to many companies.", "Recruit Agent・JAC・Robert Walters・Hays・Michael Pageに登録。1人の担当者が複数社へ推薦。"],
-  ["Apply daily: 20–30 applications (see counter above).", "毎日20〜30件応募（上のカウンター参照）。"],
-  ["Use the ready-made application note below (edit the role & company).", "下の応募文テンプレートを使用（職種・会社名を編集）。"]
+  ["Upload or paste your CV once in FindJob Now (stays on this device).", "FindJob Nowに履歴書を一度アップロードまたは貼り付け（この端末にのみ保存）。"],
+  ["Select one or more target roles (use Select All if needed).", "1つ以上の希望職種を選択（必要ならすべて選択）。"],
+  ["Search real vacancies from employer feeds, then open Japan boards that accept resume upload / Easy Apply.", "雇主フィードから実求人を検索し、履歴書アップロードやEasy Apply対応の日本求人サイトを開く。"],
+  ["Apply by CV upload or email using the application note below (edit role & company first).", "下の応募文を編集してから、履歴書アップロードまたはメールで応募。"],
+  ["Track every application in the Tracker tab and follow up.", "Trackerタブで応募を記録し、フォローアップする。"]
 ];
 
 /* ---------- Application note ---------- */
 function buildApplicationNote(lang, role, company, name) {
-  const r = (role || "").trim(), c = (company || "").trim(), n = (name || "").trim();
+  const r = (role || "").trim(), co = (company || "").trim(), n = (name || "").trim();
   if (lang === "jp") {
-    return `採用ご担当者様\n\n${c ? c + "の" : "貴社の"}${r ? "「" + r + "」" : "求人"}に応募いたします。これまでの経験とスキルを活かし、貴社に貢献できると考えております。\n\nご都合のよい日時に面接を受けることが可能です。ぜひお話しできれば幸いです。\n\nご検討のほど、よろしくお願いいたします。\n${n}`;
+    return `採用ご担当者様
+
+${co ? co + "の" : "貴社の"}${r ? "「" + r + "」" : "求人"}に応募させていただきたく、ご連絡いたしました。
+これまでの経験とスキルを活かし、貴社の事業に貢献できると考えております。
+
+履歴書を添付いたしました。ご都合のよい日時に面接の機会をいただけますと幸いです。
+
+ご検討のほど、よろしくお願いいたします。
+
+${n}`;
   }
-  return `Dear Hiring Manager,\n\nI am interested in ${r ? "the " + r + " position" : "this position"}${c ? " at " + c : ""} and would like to apply. My experience includes relevant skills and professional experience in my field.\n\nI am available for an interview at your convenience and look forward to discussing how I can contribute to your team.\n\nThank you for your consideration.\n\nBest regards,\n${n}`;
+  return `Dear Hiring Manager,
+
+I am writing to apply for ${r ? "the " + r + " position" : "this position"}${co ? " at " + co : ""}.
+
+Please find my resume attached. I would welcome the opportunity to discuss how my experience can contribute to your team.
+
+I am available for an interview at your convenience.
+
+Thank you for your consideration.
+
+Best regards,
+${n}`;
 }
 
 /* ---------- Daily counter ---------- */

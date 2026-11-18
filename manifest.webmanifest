@@ -12,7 +12,7 @@
   "background_color": "#071B35",
   "theme_color": "#071B35",
   "categories": ["business", "productivity"],
-  "version": "9.0.1",
+  "version": "9.0.2",
   "icons": [
     {
       "src": "./icon-192.png",
